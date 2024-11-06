@@ -1,13 +1,13 @@
 .\" Version: 1.001 
 .\"
-.TH ocf_suse_SAPHanaFilesystem 7 "14 Aug 2023" "" "OCF resource agents"
+.TH ocf_suse_SAPHanaFilesystem 7 "24 Jun 2024" "" "OCF resource agents"
 .\"
 .SH NAME
 SAPHanaFilesystem \- Monitors mounted SAP HANA filesystems.
 .PP
 .\"
 .SH SYNOPSIS
-\fBSAPHanaFilesystem\fP [start | stop | status | monitor | meta\-data | validate\-all | methods | usage ]
+\fBSAPHanaFilesystem\fP [ start | stop | status | monitor | meta\-data | validate\-all | reload | methods | usage ]
 .PP
 .\"
 .SH DESCRIPTION
@@ -33,10 +33,8 @@ migration-threshold is reached.
 .PP
 * Behaviour on HANA secondary sites
 .PP
-In case of monitor failure the Linux cluster tries to stop and restart the
-SAPHanaFilesystem resource (not the real filesystem). This will be repeated until
-it gains success or migration-threshold is reached.
-.\" TODO migration-threshold?
+In case of monitor failure the Linux cluster is not informed by SAPHanaFilesystem
+resource agent.
 .PP
 * Background information
 .PP
@@ -48,14 +46,14 @@ In case of NFS failure, HANA might stop working but the Linux cluster might not
 take action in reasonable time.
 Due to obligatory NFS for the directory /hana/shared/$SID/, scale-out systems
 are affected more often than scale-up systems.
-The SAPHanaFilsystem RA can be used on local filesystems as well. This migth be
+The SAPHanaFilsystem RA can be used on local filesystems as well. This might be
 useful for scale-up systems.
 Even if SAPHanaFilesystem improves Linux cluster reaction on failed filesystems,
 reliable filesystems are cornerstones for SAP HANA database availability.  
 .PP
-SAPHanaFilesystem relies on cluster attributes set by SAPHanaTopology,
-particularly hana_$SID_site_srHook_$SITE. See manual pages
-ocf_suse_SAPHanaTopology(7) and SAPHanaSR-showAttr(8).
+SAPHanaFilesystem relies on cluster attributes set by SAPHanaTopology and
+susHanaSR.py, particularly hana_$SID_site_srHook_$SITE. See manual pages
+ocf_suse_SAPHanaTopology(7), susHanaSR.py(7) and SAPHanaSR-showAttr(8).
 .PP
 Please see also the REQUIREMENTS section below.
 .PP
@@ -90,7 +88,7 @@ Optional. Default: "DIRECTORY=/hana/shared/$SID/".
 .PP
 \fBON_FAIL_ACTION\fR
 .RS 4
-Internal RA decision in case of monitor failure. Values: [ ignore | fence].
+Internal RA decision in case of monitor failure. Values: [ ignore | fence ].
 .br
 - ignore: do nothing, just report failure into logs.
 .br
@@ -165,7 +163,13 @@ Suggested minimum timeout: 5\&.
 .PP
 \fBmethods\fR
 .RS 4
+Reports which methods (operations) the resource agent supports.
 Suggested minimum timeout: 5\&.
+.RE
+.PP
+\fBreload\fR
+.RS 4
+Changes parameters without forcing a recover of the resource. Suggested minimum timeout: 5.
 .RE
 .PP
 .\"
@@ -197,7 +201,7 @@ params SID="SLE" InstanceNumber="00"
 .PP
 clone cln_SAPHanaFil_SLE_HDB00 rsc_SAPHanaFil_SLE_HDB00 \\
 .br
-meta clone-node-max="1" notify="true" interleave="true"
+meta clone-node-max="1" interleave="true"
 .RE
 .PP
 * Example configuration for a SAPHanaFilesystem resource on HANA scale-up that does nothing.
@@ -220,12 +224,9 @@ params SID="SLE" InstanceNumber="00" ON_FAIL_ACTION="ignore"
 .PP
 clone cln_SAPHanaFil_SLE_HDB00 rsc_SAPHanaFil_SLE_HDB00 \\
 .br
-meta clone-node-max="1" notify="true" interleave="true"
+meta clone-node-max="1" interleave="true"
 .RE
 .PP
-* Example configuration for a SAPHanaFilesystem resource on HANA scale-out.
-.PP
-The HANA consists of two sites with several nodes each. An additional cluster node
 * Example configuration for a SAPHanaFilesystem resource for HANA scale-out.
 .PP
 The HANA consists of two sites with several nodes each. An additional cluster node
@@ -247,9 +248,9 @@ params SID="SLE" InstanceNumber="00"
 .PP
 clone cln_SAPHanaFil_SLE_HDB00 rsc_SAPHanaFil_SLE_HDB00 \\
 .br
-meta clone-node-max="1" notify="true" interleave="true"
+meta clone-node-max="1" interleave="true"
 .PP
-location SAPHanaFil_not_on_majority_maker cln_SAPHanaFIL_SLE_HDB00 -inf: vm-majority
+location SAPHanaFil_not_on_majority_maker cln_SAPHanaFil_SLE_HDB00 -inf: vm-majority
 .RE
 .PP
 * Example on showing the current SAPHanaFilesystem rescource configuration on scale-out.
@@ -292,13 +293,16 @@ The constraints´ names are starting with "SAPHanaFil".
 # grep "Stop.of.failed.*is.fenced" /var/log/messages
 .RE
 .PP
-* Show failcount for resource agent.
+* Show and delete failcount for resource.
 .PP
-SID is SLE, instance number is 00.
+Resource is rsc_SAPHanaFil_HA1_HDB00, node is node22. Useful after a failure
+has been fixed and for testing.
 See also cluster properties migration-threshold and failure-timeout.
 .PP
 .RS 4
-# cibadmin -Ql | grep rsc_SAPHanaFil_SLE_HDB00.*fail-count
+# crm resource failcount rsc_SAPHanaFil_HA1_HDB00 show node22
+.br
+# crm resource failcount rsc_SAPHanaFil_HA1_HDB00 delete node22
 .RE
 .PP
 * Example for static NFS mount.
@@ -311,7 +315,7 @@ for the NFS server in use. See manual pages nfs(5) and fstab(5) for details.
 nfs1:/export/SLE/shared/ /hana/shared/SLE/ auto defaults,rw,hard,proto=tcp,intr,noatime,vers=4,lock 0 0
 .RE
 .PP
-* Example for temporarily blocking HANA filesystems.
+* Example for temporarily blocking HANA access to local filesystems.
 .PP
 This could be done for testing the SAPHanaFilesystem RA integration.
 Blocking the HANA filesystem is dangerous. This test should not be done on production
@@ -335,6 +339,37 @@ Note: Understand the impact before trying.
 4. On secondary, unblock /hana/shared/SLE/ filesystem.
 .RS 2
 # fsfreeze --unfreeze /hana/shared/SLE/
+.RE
+.PP
+5. Check HANA and Linux cluster for clean idle state.
+.RE
+.PP
+* Example for temporarily blocking HANA access to NFS filesystems.
+.PP
+This could be done for testing the SAPHanaFilesystem RA integration.
+Blocking the HANA filesystem is dangerous. This test should not be done on production
+systems.
+Used TCP port is 2049. See also SUSE TID 7000524.
+.br
+Note: Understand the impact before trying.
+.PP
+.RS 2
+1. Check HANA and Linux cluster for clean idle state.
+.PP
+2. On secondary, block /hana/shared/SLE/ filesystem.
+.RS 2
+# sync /hana/shared/SLE/
+.br
+# iptables -I OUTPUT -p tcp -m multiport --ports 2049 -j ACCEPT
+.br
+Note: The ACCEPT needs to be replaced by appropriate action.
+.RE
+.PP
+3. Check system log for SAPHanaFilsystem entries.
+.PP
+4. On secondary, unblock /hana/shared/SLE/ filesystem.
+.RS 2
+# iptables -D OUTPUT -p tcp -m multiport --ports 2049 -j DROP
 .RE
 .PP
 5. Check HANA and Linux cluster for clean idle state.
@@ -391,8 +426,10 @@ SAPHanaSR-angi(7) and its references.
 .br
 6. SAP HANA host auto-failover is currently not supported.
 .br
-7. If an HANA worker node of a scale-out site got fenced but not the master
-nameserver, the time needed for stopping the whole site depends on HANA timeouts.
+7. For HANA scale-out, the SAPHanaSR-alert-fencing should be configured. See manual
+page SAPHanaSR-alert-fencing(8) for details.
+.\" 7. If an HANA worker node of a scale-out site got fenced but not the master
+.\" nameserver, the time needed for stopping the whole site depends on HANA timeouts.
 .PP
 .\"
 .SH BUGS
@@ -404,12 +441,15 @@ Please report any other feedback and suggestions to feedback@suse.com.
 .SH SEE ALSO
 \fBocf_suse_SAPHanaController\fP(7) , \fBocf_suse_SAPHanaTopology\fP(7) ,
 \fBsusHanaSR.py\fP(7) , \fBSAPHanaSR-showAttr\fP(8) ,
-\fBSAPHanaSR-angi\fP(7) , \fBSAPHanaSR\fP(7) , \fBSAPHanaSR-ScaleOut\fP(7) ,
+\fBSAPHanaSR-alert-fencing\fP(8) , \fBSAPHanaSR-angi\fP(7) , \fBSAPHanaSR\fP(7) ,
+\fBSAPHanaSR-ScaleOut\fP(7) ,
 \fBfstab\fP(5) , \fBmount\fP(8) , \fBnfs\fP(5) ,
 .br
 https://documentation.suse.com/sbp/sap/ ,
 .br
-https://www.suse.com/support/kb/doc/?id=000019904
+https://www.suse.com/support/kb/doc/?id=000019904 ,
+.br
+https://www.suse.com/support/kb/doc/?id=000016649
 .PP
 .\"
 .SH AUTHORS
@@ -418,7 +458,7 @@ F.Herschel, L.Pinne.
 .\"
 .SH COPYRIGHT
 .br
-(c) 2023 SUSE LLC
+(c) 2023-2024 SUSE LLC
 .br
 SAPHanaFilesystem comes with ABSOLUTELY NO WARRANTY.
 .br

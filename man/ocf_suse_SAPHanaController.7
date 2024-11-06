@@ -1,37 +1,43 @@
-.\" Version: 1.001
+.\" Version: 1.2.9
 .\"
-.TH ocf_suse_SAPHanaController 7 "09 Aug 2022" "" "OCF resource agents"
+.TH ocf_suse_SAPHanaController 7 "18 Oct 2024" "" "OCF resource agents"
 .\"
 .SH NAME
 SAPHanaController \- Manages takeover between two SAP HANA databases with system replication.
 .PP
 .\"
 .SH SYNOPSIS
-\fBSAPHanaController\fP [start | stop | status | monitor | promote | demote | notify | meta\-data | validate\-all | methods | usage ]
+\fBSAPHanaController\fP [ start | stop | status | monitor | promote | demote | meta\-data | validate\-all | reload | methods | usage ]
 .PP
 .\"
 .SH DESCRIPTION
-
-\fBSAPHanaController\fP is a resource agent for SAP HANA databases in scale-up and scale-out setups.
-It manages takeover for a SAP HANA database with system replication in an OCF multi-state configuration.
+.PP
+\fBSAPHanaController\fP is a resource agent (RA) for SAP HANA databases in scale-up and scale-out setups.
+It manages takeover for a SAP HANA database with system replication in an OCF promotable clone configuration.
 .PP
 System replication will help to replicate the database data from one site to another site in order to compensate for database failures.
 With this mode of operation, internal SAP HANA high-availability (HA) mechanisms and the Linux cluster have to work together.
 .PP
 An HANA scale-out setup already is, to some degree, an HA cluster on its own.
-The HANA is able to replace failing nodes with standby nodes or to restart certain sub-systems on other nodes.
-As long as the HANA landscape status is not "ERROR" the Linux cluster will not act.
-The main purpose of the Linux cluster is to handle the takeover to the other site.
-Only if the HANA landscape status indicates that HANA can not recover from the failure and the replication is in sync, then Linux will act. 
-As an exception, the Linux cluster will react if HANA moves the master nameserver role to another candidate. 
-SAPHanaController is also able to restart former failed worker nodes as standby. In addition to the SAPHanaTopology RA, the SAPHanaSR solution uses a "HA/DR provider" API provided by HANA to get informed about the current state of the system replication.
+The HANA is able to replace failing nodes with standby nodes or to restart
+certain sub-systems on other nodes. As long as the HANA landscape status is not
+"ERROR" the Linux cluster will not act. The main purpose of the Linux cluster is
+to handle the takeover to the other site. Only if the HANA landscape status
+indicates that HANA can not recover from the failure and the replication is in
+sync, then Linux will act. As an exception, the Linux cluster will react if HANA
+moves the master nameserver role to another candidate. SAPHanaController is also
+able to restart former failed worker nodes as standby. In addition to the
+SAPHanaController and SAPHanaTopology RAs, the SAPHanaSR solution uses an 
+"HA/DR provider" API provided by HANA to get informed about the current state of
+the system replication.
 .PP
-On initial cluster start, the cluster needs to detect a valid HANA system replication setup, including system replication status (SOK) and last primary timestamp (LPT). This is neccessary to ensure data integrity.
+On initial cluster start, the cluster needs to detect a valid HANA system replication setup, including system replication status (SOK) and last primary timestamp (LPT). This is necessary to ensure data integrity.
 .PP
-The SAPHanaController resource agent (RA) performs the actual check of the SAP HANA database instances and is configured as a multi-state resource.
-The Linux cluster resource's master status will follow the HANA's active master name server role. Resources (e.g. IP address) that need to run on the same node with that HANA role should be co-located with the master target.
-.PP
-Managing the two SAP HANA instances in scale-up or scale-out setup means that the resource agent controls the start/stop of the instances. 
+The SAPHanaController RA performs the actual check of the SAP HANA database instances
+and is configured as promoatble clone resource.
+The Linux cluster resources' promoted status will follow the HANA's active master name server role. Resources (e.g. IP address) that need to run on the same node with that HANA role should be co-located with the promoted target.
+Managing the two SAP HANA instances in scale-up or scale-out setup means that
+the resource agent controls the start/stop of the instances. 
 In addition the resource agent is able to monitor the SAP HANA databases on landscape host configuration level. For this monitoring the resource agent relies on interfaces provided by SAP.
 A third task of the resource agent is to also check the synchronisation status of the two SAP HANA databases. If the synchronisation is not "SOK", then the cluster avoids to takeover to the secondary side, if the primary fails. This is to improve the data consistency.
 .PP
@@ -40,18 +46,24 @@ The resource agent uses the following five interfaces provided by SAP:
 1. \fBsapcontrol/sapstartsrv\fP
 .br
 The interface sapcontrol/sapstartsrv is used to start/stop a HANA database
-instance/system. SAPHanaController also checks via this interface the instance status to allow a start of HANA standby nodes.
+instance/system. In scale-out systems, the whole system is started or stopped
+at once by calling the sapcontrol function StartSystem or StopSystem on the
+master nameserver node. An exception is made on orphaned worker nodes.
+SAPHanaController also checks via this interface the instance status to allow
+a start of HANA standby nodes.
 .PP
 2. \fBlandscapeHostConfiguration\fP
 .br
-The interface is used to monitor an entire HANA system. The python script is named
-landscapeHostConfiguration.py.
+The interface is used to monitor an entire HANA system. The python script is
+named landscapeHostConfiguration.py.
 landscapeHostConfiguration.py has some detailed output about HANA system status
 and node roles. For our monitor the overall status is relevant. This overall
 status is reported by the return code of the script:
 0: Internal Fatal, 1: ERROR, 2: WARNING, 3: INFO, 4: OK
-The SAPHanaController resource agent will interpret return code 0 as FATAL, 1 as not-running
-(or ERROR) and return codes 2+3+4 as RUNNING.
+.br
+The SAPHanaController resource agent will interpret return code 0 as FATAL,
+1 as NOT-RUNNING (or ERROR) and return codes 2+3+4 as RUNNING. FATAL means the
+status can not be determined.
 .br
 Note: Some conditions cause HANA stopping to work, but not reporting an error. E.g. filesystem filled up. 
 .PP
@@ -75,17 +87,17 @@ Please see also the REQUIREMENTS section below.
 .PP
 .\"
 .SH SUPPORTED PARAMETERS
-.br
+.PP
 This resource agent supports the following parameters:
 .PP
 \fBSID\fR
 .RS 4
-SAP System Identifier. Has to be same on both instances. Example "SID=SLE".
+SAP System Identifier. Has to be same on both instances. Required. Example "SID=SLE".
 .RE
 .PP
 \fBInstanceNumber\fR
 .RS 4
-Number of the SAP HANA database. Has to be same on both instances. For system replication also Instance Number+1 is blocked. Example "InstanceNumber=00".
+Number of the SAP HANA database. Has to be same on both instances. For system replication also Instance Number+1 is blocked. Required. Example "InstanceNumber=00".
 .RE
 .PP
 \fBDIR_EXECUTABLE\fR
@@ -110,7 +122,7 @@ Optional, well known directories will be searched by default.
 .RS 4
 Define timeout how long a call to HANA to receive information can take. This could be e.g. landscapeHostConfiguration.py. There are some specific calls to HANA which have their own timeout values. For example the sr_takeover command does not timeout (inf). If the timeout is reached, the return code will be 124. If you increase the timeouts for HANA calls you should also adjust the operation timeouts of your Linux cluster resources.
 .br
-Optional, experimental. Default value: 120.
+Optional. Default value: 120.
 .RE
 .PP
 \fBINSTANCE_PROFILE\fR
@@ -123,17 +135,33 @@ Normally you do not need to set this parameter.
 Optional, well known directories will be searched by default.
 .RE 
 .PP
+\fBON_FAIL_ACTION\fR
+.RS 4 
+Defines how the RA escalates monitor failures on an HANA primary node.
+If srHook=SOK, in case of monitor failure an node fencing could be triggered. 
+For srHook=SFAIL, the restart will be proceeded as usual. This option may speed
+up takeover on scale-up systems, depending on how long HANA needs for stopping.
+For scale-out see also SAPHanaSR-alert-fencing(8).
+Values: [ proceed | fence ].
+.br
+- proceed: proceed the failure as usual, i.e. initiate demote-stop sequence.
+.br
+- fence: trigger stop failure and node fencing, if conditions are matched.
+.br
+Optional. Default value: proceed.
+.RE
+.PP
 \fBPREFER_SITE_TAKEOVER\fR
 .RS 4
-Defines whether RA should prefer to takeover to the secondary database instead of restarting the primary site locally. However a takeover will only be triggered, if the SAP HANA landscape status is on "ERROR". This option usually is choosen for HANA system replication performance-optimised setups. On the other hand local restart of the master instead of takeover could be combined with HANA's persistent memory features. Example: "PREFER_SITE_TAKEOVER=true".
+Defines whether RA should prefer to takeover to the secondary database instead of restarting the primary site locally. However a takeover will only be triggered, if the SAP HANA landscape status is on "ERROR". For "FATAL" a local restart is initiated.  PREFER_SITE_TAKEOVER usually is choosen for HANA system replication performance-optimised setups. On the other hand local restart of the master instead of takeover could be combined with HANA's persistent memory features. Example: "PREFER_SITE_TAKEOVER=true".
 .br
 Optional. Default value: false\&.
 .RE
 .PP
 \fBDUPLICATE_PRIMARY_TIMEOUT\fR
 .RS 4
-Time difference needed between two primary time stamps (LPTs), in case a dual-primary situation occurs. If the difference between both node's last primary time stamps is less than DUPLICATE_PRIMARY_TIMESTAMP, then the cluster holds one or both instances in a "WAITING" status. This is to give an admin the chance to react on a failover.
-Note: How the cluster proceeds after the DUPLICATE_PRIMARY_TIMESTAMP has passed, depends on the parameter AUTOMATED_REGISTER. See also the examples section below.
+Time difference needed between two primary time stamps (LPTs), in case a dual-primary situation occurs. If the difference between both node's last primary time stamps is less than DUPLICATE_PRIMARY_TIMEOUT, then the cluster holds one or both instances in a "WAITING" status. This is to give an admin the chance to react on a failover.
+Note: How the cluster proceeds after the DUPLICATE_PRIMARY_TIMEOUT has passed, depends on the parameter AUTOMATED_REGISTER. See also the examples section below.
 .br
 Optional. Default value: 7200\&.
 .RE
@@ -148,7 +176,7 @@ Optional. Default value: false\&.
 .PP
 .\"
 .SH SUPPORTED PROPERTIES
-.br
+.PP
 \fBhana_${sid}_glob_filter\fR
 .RS 4
 Global cluster property \fBhana_${sid}_glob_filter\fR . This property defines which messages are logged by the RA. It should only be set if requested by support engineers. The default is sufficient for normal operation. See also SAPHanaSR-showAttr(8).
@@ -190,21 +218,29 @@ Optional.
 .PP
 .\"
 .SH SUPPORTED ACTIONS
+.PP
 This resource agent supports the following actions (operations):
 .PP
 \fBstart\fR
 .RS 4
-Starts the HANA instance or bring the "clone instance" to a WAITING status. The correct value depends on factors like database size and storage performance. Large databases might require higher start timeouts, use of persistent memory might reduce the timeout needed. Suggested minimum timeout: 3600\&.
+Starts the HANA instance or brings the "clone instance" to a WAITING status. The correct timeout depends on factors like database size and storage performance. Large databases might require higher start timeouts, use of persistent memory might reduce the timeout needed. Suggested minimum timeout: 3600\&.
 .RE
 .PP
 \fBstop\fR
 .RS 4
-Stops the HANA instance. Suggested minimum timeout: 3600\&.
+Stops the HANA instance.
+The correct timeout depends on factors like database size.
+Starting with SAP HANA 2.0 SPS06, shutdown can be accelerated by optimizing memory
+de-allocation. See also manual page SAPHanaSR_basic_cluster(7).
+If HANA database memory de-allocation and internal timeouts have been tuned for
+fast shutdown, the RA timeout might be reduced.
+.\" TODO point to HANA parameters
+Suggested minimum timeout: 600\&.
 .RE
 .PP
 \fBpromote\fR
 .RS 4
-Either runs a takeover for a secondary or a just-nothing for a primary. The correct value depends on factors like system replication operation mode and current load on the database. Suggested minimum timeout: 900\&.
+Either runs a takeover for a secondary or a just-nothing for a primary. The correct timeout depends on factors like system replication operation mode and current load on the database. Suggested minimum timeout: 900\&.
 .RE
 .PP
 \fBdemote\fR
@@ -212,24 +248,19 @@ Either runs a takeover for a secondary or a just-nothing for a primary. The corr
 Nearly does nothing and just marks the instance as demoted. Suggested minimum timeout: 320\&.
 .RE
 .PP
-\fBnotify\fR
-.RS 4
-Always returns SUCCESS. Suggested minimum timeout: 10\&.
-.RE
-.PP
 \fBstatus\fR
 .RS 4
 Reports whether the HANA instance is running. Suggested minimum timeout: 60\&.
 .RE
 .PP
-\fBmonitor (Master role)\fR
+\fBmonitor (promoted role)\fR
 .RS 4
-Reports whether the HANA database seems to be working in multi-state mode. It also needs to check the system replication status. Suggested minimum timeout: 700\&. Suggested interval: 60\&.
+Reports whether the HANA database seems to be working in replication primary mode. It also needs to check the system replication status. Suggested minimum timeout: 700\&. Suggested interval: 60\&.
 .RE
 .PP
 \fBmonitor (demoted role)\fR
 .RS 4
-Reports whether the HANA database seems to be working in multi-state mode. It also needs to check the system replication status. The secondary role's monitor interval has to be different from the primary (master) role. Suggested minimum timeout: 700\&. Suggested interval: 61\&.
+Reports whether the HANA database seems to be working in replication secondary mode. It also needs to check the system replication status. The secondary role's monitor interval has to be different from the primary (promoted) role. Suggested minimum timeout: 700\&. Suggested interval: 61\&.
 .RE
 .PP
 \fBvalidate\-all\fR
@@ -244,11 +275,18 @@ Retrieves resource agent metadata (internal use only). Suggested minimum timeout
 .PP
 \fBmethods\fR
 .RS 4
+Reports which methods (operations) the resource agent supports.
 Suggested minimum timeout: 5\&.
+.RE
+.PP
+\fBreload\fR
+.RS 4
+Changes parameters without forcing a recover of the resource. Suggested minimum timeout: 5.
 .RE
 .PP
 .\"
 .SH RETURN CODES
+.PP
 The return codes are defined by the OCF cluster framework. Please refer to the
 OCF definition on the website mentioned below. 
 In addition return code 124 will be logged if HANA_CALL_TIMEOUT has been exceeded.
@@ -257,6 +295,7 @@ In addition, log entries are written, which can be scanned by using a pattern li
 .PP
 .\"
 .SH EXAMPLES
+.PP
 * Below is an example configuration for a SAPHanaController multi-state resource in an HANA scale-out performance-optimised scenario.
 .br
 The HANA consists of two sites with five nodes each. An additional cluster node is used as majority maker for split-brain situations. In addition, a SAPHanaTopology clone resource is needed to make this work.
@@ -305,7 +344,7 @@ hana_ha1_glob_filter="ra-act-dec-lpa"
 * Remove log messages filter attribute from CIB, pacemaker-2.0. 
 .br
 Could be done once a specific filter is not needed anymore.
-
+.PP
 .RS 4
 # SAPHanaSR-showAttr
 .br
@@ -327,13 +366,17 @@ Could be done once a specific filter is not needed anymore.
 # grep "SAPHanaContoller.*end.action.monitor_clone.*rc=" /var/log/messages | awk '{print $1,$11,$13}' | colrm 20 32 | tr -d "=()rsc" | tr "T" " "
 .RE
 .PP
-* Show failcount for resource rsc_SAPHanaCon_HA1_HDB00 .
+* Show and delete failcount for resource.
 .br
+Resource is rsc_SAPHanaCon_HA1_HDB00, node is node22. Useful after a failure
+has been fixed and for testing.
 See also cluster properties migration-threshold, failure-timeout and
 SAPHanaController parameter PREFER_SITE_TAKEOVER.
 .PP
-.RS 4
-# cibadmin -Ql | grep rsc_SAPHanaCon_HA1_HDB00.*fail-count
+.RS 4 
+# crm resource failcount rsc_SAPHanaCon_HA1_HDB00 show node22
+.br
+# crm resource failcount rsc_SAPHanaCon_HA1_HDB00 delete node22
 .RE
 .PP
 * Manually trigger an SAPHanaController probe action. Output goes to the
@@ -354,22 +397,22 @@ OCF_RESKEY_CRM_meta_interval=0
 .RE
 .PP
 * Use of DUPLICATE_PRIMARY_TIMEOUT and Last Primary Timestamp (LPT) in case the primary node has been crashed completely.
-
+.PP
 Typically on each side where the RA detects a running primary a time stamp is written to the node's attributes (last primary seen at time: lpt). If the timestamps ("last primary seen at") differ less than the DUPLICATE_PRIMARY_TIMEOUT then the RA could not automatically decide which of the two primaries is the better one.
-
+.PP
 .RS 2
 1. nodeA is primary and has a current time stamp, nodeB is secondary and has a secondary marker set:
 .br
 nodeA: 1479201695
 .br
 nodeB: 30
-
+.PP
 2. Now nodeA crashes and nodeB takes over:
 .br
 (nodeA: 1479201695)
 .br
 nodeB: 1479201700
-
+.PP
 3. A bit later nodeA comes back into the cluster:
 .br
 nodeA: 1479201695
@@ -377,7 +420,7 @@ nodeA: 1479201695
 nodeB: 1479202000
 .br
 You see while nodeA keeps its primary down the old timestamp is kept. NodeB increases its timestamp on each monitor run.
-
+.PP
 4. After some more time (depending on the parameter DUPLICATE_PRIMARY_TIMEOUT)
 .br
 nodeA: 1479201695
@@ -385,13 +428,13 @@ nodeA: 1479201695
 nodeB: 1479208895
 .br
 Now the time stamps differ >= DUPLICATE_PRIMARY_TIMEOUT. The algorithm defines nodeA now as "the looser" and depending on the AUTOMATED_REGISTER the nodeA will become the secondary.
-
+.PP
 5. NodeA would be registered:
 .br
 nodeA: 10
 .br
 nodeB: 1479208900
-
+.PP
 6. Some time later the secondary gets into sync
 .br
 nodeA: 30
@@ -400,34 +443,34 @@ nodeB: 1479209100
 .RE
 .PP
 * Use of DUPLICATE_PRIMARY_TIMEOUT and Last Primary Timestamp (LPT) in case the the database on primary node has been crashed, but the node is still alive.
-
+.PP
 Typically on each side where the RA detects a running primary a time stamp is written to the node's attributes (last primary seen at time: lpt). If the timestamps ("last primary seen at") differ less than the DUPLICATE_PRIMARY_TIMEOUT then the RA could not automatically decide which of the two primaries is the better one.
-
+.PP
 .RS 2
 1. nodeA is primary and has a current time stamp, nodeB is secondary and has a secondary marker set:
 .br
 nodeA: 1479201695
 .br
 nodeB: 30
-
+.PP
 2. Now HANA on nodeA crashes and nodeB takes over:
 .br
 nodeA: 1479201695
 .br
 nodeB: 1479201700
-
+.PP
 3. As the cluster could be sure to properly stopped the HANA instance at nodeA it *immediately* marks the old primary to be a register candidate, if AUTOMATED_REGISTER is true:
 .br
 nodeA: 10
 .br
 nodeB: 1479201760
-
+.PP
 4. Depending on the AUTOMATED_REGISTER parameter the RA will also immediately regisiter the former primary to become the new secondary:
 .br
 nodeA: 10
 .br
 nodeB: 1479201820
-
+.PP
 5. And after a while the secondary gets in sync
 .br
 nodeA: 30
@@ -436,7 +479,7 @@ nodeB: 1479202132
 .RE
 .PP
 * Set parameter AUTOMATED_REGISTER="true". See SUPPORTED PARAMETERS section above for details.
-
+.PP
 .RS 4
 # crm_resource -r rsc_SAPHanaCon_HA1_HDB00 -p AUTOMATED_REGISTER -v true
 .br
@@ -468,6 +511,7 @@ default path for DIR_PROFILE
 .PP
 .\"
 .SH REQUIREMENTS
+.PP
 For the current version of the SAPHanaController resource agent that comes with the software package SAPHanaSR-angi, the support is limited to the scenarios and parameters described in the manual pages SAPHanaSR(7) and SAPHanaSR-ScaleOut(7).
 .PP
 .\"
@@ -479,7 +523,13 @@ Please report any other feedback and suggestions to feedback@suse.com.
 .PP
 .\"
 .SH SEE ALSO
-\fBocf_suse_SAPHanaTopology\fP(7) ,  \fBocf_suse_SAPHanaFilesystem\fP(7) , \fBocf_heartbeat_IPaddr2\fP(8) , \fBSAPHanaSR-monitor\fP(8) , \fBSAPHanaSR-showAttr\fP(8) , \fBSAPHanaSR\fP(7) , \fBSAPHanaSR-ScaleOut\fP(7) , \fBSAPHanaSR_maintenance_examples\fP(7) , \fBSAPHanaSR_basic_cluster\fP(7) , \fBSAPHanaSR-ScaleOut_basic_cluster\fP(7) , \fBSAPHanaSR-manageAttr\fP(8) , \fBchrony.conf\fP(5) , \fBstonith\fP(8) , \fBcrm\fP(8) 
+\fBocf_suse_SAPHanaTopology\fP(7) , \fBocf_suse_SAPHanaFilesystem\fP(7) ,
+\fBocf_heartbeat_IPaddr2\fP(8) , \fBSAPHanaSR-monitor\fP(8) , \fBSAPHanaSR-showAttr\fP(8) ,
+\fBSAPHanaSR\fP(7) , \fBSAPHanaSR-ScaleOut\fP(7) ,
+\fBSAPHanaSR_maintenance_examples\fP(7) , \fBSAPHanaSR_basic_cluster\fP(7) ,
+\fBSAPHanaSR-ScaleOut_basic_cluster\fP(7) , \fBSAPHanaSR-manageAttr\fP(8) , 
+\fBSAPHanaSR-alert-fencing\fP(8) ,
+\fBchrony.conf\fP(5) , \fBstonith\fP(8) , \fBcrm\fP(8) 
 .br
 https://documentation.suse.com/sbp/sap/ ,
 .br
@@ -501,7 +551,7 @@ F.Herschel, L.Pinne.
 .br
 (c) 2015-2017 SUSE Linux GmbH, Germany.
 .br
-(c) 2018-2023 SUSE LLC
+(c) 2018-2024 SUSE LLC
 .br
 The resource agent SAPHanaController comes with ABSOLUTELY NO WARRANTY.
 .br

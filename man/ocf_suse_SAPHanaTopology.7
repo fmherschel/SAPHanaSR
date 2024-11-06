@@ -1,20 +1,21 @@
-.\" Version: 0.180.0
+.\" Version: 1.001 
 .\"
-.TH ocf_suse_SAPHanaTopology 7 "07 Aug 20223 "" "OCF resource agents"
+.TH ocf_suse_SAPHanaTopology 7 "02 Jul 2024" "" "OCF resource agents"
 .\"
 .SH NAME
 SAPHanaTopology \- Helps to manage two SAP HANA databases with system replication.
 .PP
 .\"
 .SH SYNOPSIS
-\fBSAPHanaTopology\fP [start | stop | status | monitor | meta\-data | validate\-all | methods | usage ]
+\fBSAPHanaTopology\fP [start | stop | status | monitor | meta\-data | validate\-all | reload | methods | usage ]
 .PP
 .\"
 .SH DESCRIPTION
 SAPHanaTopology is a resource agent (RA) that analyzes the SAP HANA topology
-and "sends" all findings via the node status attributes to all nodes in the
-cluster. These attributes are taken by the SAPHanaController RA to control the
-SAP HANA databases. In addition it starts and monitors the local saphostagent.
+and "sends" all findings via cluster information base (CIB) attributes to all
+nodes in the cluster. These attributes are taken by the SAPHanaController RA to
+control the SAP HANA databases. In addition SAPHanaTopology starts and monitors
+the local saphostagent.
 .PP
 The resource agent uses the following interfaces provided by SAP:
 .PP
@@ -23,14 +24,15 @@ The resource agent uses the following interfaces provided by SAP:
 landscapeHostConfiguration.py has some detailed output about HANA system
 status and node roles. For our monitor the overall status is relevant. This
 overall status is reported by the return code of the script:
-0: Internal Fatal 1: ERROR 2: WARNING 3: INFO (maybe a switch of the resource
-running) 4: OK
+0: Internal Fatal, 1: ERROR, 2: WARNING, 3: INFO (e.g. host auto-failover happened), 4: OK
 .br
-The SAPHanaTopology resource agent will interpret return codes 1 as
-NOT-RUNNING (or 1 failure) and return codes 2+3+4 as RUNNING.
-SAPHanaTopology scans the output table of landscapeHostConfiguration.py to
-identify the roles of the cluster node. Roles means configured and current
-role of the nameserver as well as the indexserver.
+The SAPHanaTopology resource agent will interpret return code 0 as FATAL,
+1 as NOT-RUNNING (or ERROR) and return codes 2+3+4 as RUNNING. FATAL means the
+status can not be determined.
+.br
+SAPHanaTopology scans the output of landscapeHostConfiguration.py to identify
+the roles of the cluster node. Roles means configured and current role of the
+nameserver as well as the indexserver.
 .PP
 2. \fBhdbnsutil\fP
 .br
@@ -134,7 +136,7 @@ Suggested minimum timeout: 60\&.
 .RS 4
 Analyses the nodes HANA roles and landscape status.
 Suggested minimum timeout: 600\&.
-Suggested interval: 10\&.
+Suggested interval: 50\&.
 .RE
 .PP
 \fBvalidate\-all\fR
@@ -151,7 +153,13 @@ Suggested minimum timeout: 5\&.
 .PP
 \fBmethods\fR
 .RS 4
+Reports which methods (operations) the resource agent supports.
 Suggested minimum timeout: 5\&.
+.RE
+.PP
+\fBreload\fR
+.RS 4
+Changes parameters without forcing a recover of the resource. Suggested minimum timeout: 5.
 .RE
 .PP
 .\"
@@ -163,9 +171,11 @@ In addition return code 124 is used if HANA_CALL_TIMEOUT has been exceeded.
 .PP
 .\"
 .SH EXAMPLES
-* This is an example configuration for a SAPHanaTopology resource for HANA scale-up.
+* Example configuration of SAPHanaTopology resource for HANA scale-up.
 .br
-In addition, a SAPHana resource is needed to make this work.
+In addition, a SAPHanaController resource is needed to make this work.
+The SAPHanaTopology monitoring intervall should be shorter than the one of that
+SAPHanaController.
 .RE
 .PP
 .RS 4
@@ -175,20 +185,23 @@ op start interval="0" timeout="600" \\
 .br
 op stop interval="0" timeout="600" \\
 .br
-op monitor interval="10" timeout="600" \\
+.\" TODO check interval
+op monitor interval="50" timeout="600" \\
 .br
 params SID="SLE" InstanceNumber="00"
 .PP
 clone cln_SAPHanaTop_SLE_HDB00 rsc_SAPHanaTop_SLE_HDB00 \\
 .br
-meta clone-node-max="1" notify="true" interleave="true"
+meta clone-node-max="1" interleave="true"
 .RE
 .PP
-* Below is an example configuration for a SAPHanaTopology resource for HANA scale-out.
+* Example configuration of SAPHanaTopology resource for HANA scale-out.
 .br
 The HANA consists of two sites with five nodes each. An additional cluster node
 is used as majority maker for split brain situations.
 In addition, a SAPHanaController resource is needed to make this work.
+The SAPHanaTopology monitoring intervall should be shorter than the one of that
+SAPHanaController.
 .RE
 .PP
 .RS 4
@@ -198,23 +211,23 @@ op start interval="0" timeout="600" \\
 .br
 op stop interval="0" timeout="600" \\
 .br
-op monitor interval="10" timeout="600" \\
+op monitor interval="50" timeout="600" \\
 .br
 params SID="SLE" InstanceNumber="00"
 .PP
 clone cln_SAPHanaTop_SLE_HDB00 rsc_SAPHanaTop_SLE_HDB00 \\
 .br
-meta clone-node-max="1" notify="true" interleave="true"
+meta clone-node-max="1" interleave="true"
 .PP
 location SAPHanaTop_not_on_majority_maker cln_SAPHanaTop_SLE_HDB00 -inf: vm-majority
 .PP
 order SAPHanaTop_first Optional: cln_SAPHanaTop_SLE_HDB00 mst_SAPHanaCon_SLE_HDB00
 .RE
 .PP
-* Exmaple on showing the current SAPHanaTopology rescource configuration on scale-up.
+* Showing the current SAPHanaTopology resource configuration on scale-up.
 .br
 The primitive is "rsc_SAPHanaTop_SLE_HDB00" and clone is "cln_SAPHanaTop_SLE_HDB00".
-The contsraints´ names are starting with "SAPHanaTop".
+The constraints´ names are starting with "SAPHanaTop".
 .RE
 .PP
 .RS 4
@@ -224,7 +237,21 @@ The contsraints´ names are starting with "SAPHanaTop".
 .br
 # crm configure show cln_SAPHanaTop_SLE_HDB00
 .br
-# crm configure show SAPHanaTop_first 
+# crm configure show SAPHanaTop_first
+.RE
+.PP
+* Correlating SAPHanaTopology syslog entry with HANA nameserver trace entry. 
+.br
+.RS 4
+# grep "SAPHanaTop.*16933.*monitor_clone" /var/log/messages | awk '{print $1,$3,$7,$11,$12,$13}'
+.br
+# su - hxeadm
+.br
+~> cdtrace
+.br
+~> grep "2023-11-01.*parent.*16933" nameserver_*trc | awk '{print $2,$3,$22,$23,$24,$25}'
+.br
+~> exit
 .RE
 .PP
 .\"
@@ -288,7 +315,7 @@ F.Herschel, L.Pinne.
 .br
 (c) 2015-2017 SUSE Linux GmbH, Germany.
 .br
-(c) 2018-2023 SUSE LLC
+(c) 2018-2024 SUSE LLC
 .br
 SAPHanaTopology comes with ABSOLUTELY NO WARRANTY.
 .br

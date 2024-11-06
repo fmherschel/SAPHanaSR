@@ -1,9 +1,9 @@
 .\" Version: 1.001 
 .\"
-.TH SAPHanaSR 7 "08 May 2023" "" "SAPHanaSR-angi"
+.TH SAPHanaSR 7 "20 Sep 2024" "" "SAPHanaSR-angi"
 .\"
 .SH NAME
-SAPHanaSR \- Tools for automating SAP HANA system replication in scale-up setups.
+SAPHanaSR \- Automating SAP HANA system replication in scale-up setups.
 .PP
 .\"
 .SH DESCRIPTION
@@ -12,7 +12,7 @@ SAPHanaSR \- Tools for automating SAP HANA system replication in scale-up setups
 .PP
 This manual page SAPHanaSR provides information for setting up
 and managing automation of SAP HANA system replication (SR) in scale-up setups.
-For scale-out, please refer to SAPHanaSR-ScaleOut(7).
+For scale-out, please refer to SAPHanaSR-ScaleOut(7), see also SAPHanaSR-angi(7).
 .PP
 System replication will help to replicate the database data from one site to
 another site in order to compensate for database failures. With this mode of
@@ -193,10 +193,11 @@ best practices.
 .PP
 2. Technical users and groups such as sidadm are defined locally in the
 Linux system. If users are resolved by remote service, local caching is
-neccessary. Substitute user (su) to sidadm needs to work reliable and without
+necessary. Substitute user (su) to sidadm needs to work reliable and without
 customized actions or messages. Supported shell is bash.
 .PP
-3. Strict time synchronization between the cluster nodes, e.g. NTP.
+3. Strict time synchronization between the cluster nodes, e.g. NTP. All nodes of
+the Linux cluster have configured the same timezone.
 .PP
 4. For scale-up the following SAP HANA SR scenarios are possible with the
 SAPHanaSR-angi package:
@@ -215,13 +216,14 @@ SAPHanaSR-angi package:
 .br
 Note: For MCOS, there must be no constraints between HANA SR pairs.
 .PP
-5. Only one system replication between the two SAP HANA database in the Linux cluster.
-Maximum one system replication to an HANA database outside the Linux cluster.
-See also item 12 below.
+5. Only one system replication between the two SAP HANA databases in the Linux
+cluster. Maximum one system replication to an HANA database outside the Linux
+cluster. See also item 12 below.
 .PP
 6. The replication mode is either sync or syncmem for the controlled replication.
 Replication mode async is not supported. The operation modes delta_datashipping,
-logreplay and logreplay_readaccess are supported.
+logreplay and logreplay_readaccess are supported. The operation mode logreplay
+is default.
 .PP
 7. Both SAP HANA database systems have the same SAP Identifier (SID) and
 Instance Number (INO).
@@ -237,7 +239,7 @@ However, all nodes in one Linux cluster have to use the same style.
 9. Automated start of SAP HANA database systems during system boot must be switched
 off.
 .PP
-10. The RA's monitoring operations have to be active.
+10. The RAs' monitoring operations have to be active.
 .PP
 11. Using HA/DR provider hook for srConnectionChanged() by enabling susHanaSR.py
 or susHanaSrMultiTarget.py is mandatory.
@@ -256,7 +258,8 @@ being written into CIB attributes. The current HANA SR status might differ
 from CIB srHook attribute after cluster maintenance.
 .PP
 15. Once an HANA system replication site is known to the Linux cluster, that
-exact site name has to be used whenever the site is registered manually.
+exact site name has to be used whenever the site is registered manually. At any
+time only one site is configured as primary replication source.
 .PP
 16. Reliable access to the /hana/shared/ filesystem is crucial for HANA and the
 Linux cluster.
@@ -264,7 +267,7 @@ Linux cluster.
 17. HANA feature Secondary Time Travel is not supported.
 .PP
 18. In MDC configurations the HANA database is treated as a single system
-including all database containers. Therefore, cluster takeover decisions are
+including all database containers. Therefor, cluster takeover decisions are
 based on the complete status independent of the status of individual containers.
 .PP
 19. If a third HANA site is connected by system replication, that HANA is not
@@ -284,15 +287,28 @@ character or number. Subsequent characters may contain dash and underscore.
 23. The SAPHanaController RA, the SUSE HA cluster and several SAP components
 need read/write access and sufficient space in the Linux /tmp filesystem.
 .PP
+24. SAP HANA Native Storage Extension (NSE) is supported.
+Important is that this feature does not change the HANA topology or interfaces.
+In opposite to Native Storage Extension, the HANA Extension Nodes are changing
+the topology and thus currently are not supported. 
+Please refer to SAP documentation for details.
+.PP
+25. The Linux user root´s shell is /bin/bash, or completely compatible.
+.PP
+26. No manual actions must be performed on the HANA database while it is controlled
+by the Linux cluster. All administrative actions need to be aligned with the cluster.
+See also SAPHanaSR_maintenance_examples(7).
+.PP
 .\"
 .SH BUGS
-.\" TODO
+.PP
 In case of any problem, please use your favourite SAP support process to open
 a request for the component BC-OP-LNX-SUSE.
 Please report any other feedback and suggestions to feedback@suse.com.
 .PP
 .\"
 .SH SEE ALSO
+.PP
 \fBSAPHanaSR-angi\fP(7) , \fBSAPHanaSR-ScaleOut\fP(7) ,
 \fBocf_suse_SAPHanaTopology\fP(7) , \fBocf_suse_SAPHanaController\fP(7) ,
 \fBocf_heartbeat_IPaddr2\fP(7) , \fBSAPHanaSR_basic_cluster\fP(7) ,
@@ -327,15 +343,17 @@ https://wiki.scn.sap.com/wiki/display/ATopics/HOW+TO+SET+UP+SAPHanaSR+IN+THE+COS
 .br
 https://blogs.sap.com/2020/01/30/sap-hana-and-persistent-memory/
 .PP
+.\"
 .SH AUTHORS
-.br
+.PP
 A.Briel, F.Herschel, L.Pinne.
 .PP
 .\"
 .SH COPYRIGHT
-(c) 2015-2018 SUSE Linux GmbH, Germany.
+.PP
+(c) 2015-2017 SUSE Linux GmbH, Germany.
 .br
-(c) 2019-2023 SUSE LLC
+(c) 2018-2024 SUSE LLC
 .br
 The package SAPHanaSR-angi comes with ABSOLUTELY NO WARRANTY.
 .br

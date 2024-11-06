@@ -1,6 +1,6 @@
-.\" Version: 1.001 
+.\" Version: 1.001
 .\"
-.TH SAPHanaSR_maintenance_examples 7 "12 Jun 2023" "" "SAPHanaSR"
+.TH SAPHanaSR_maintenance_examples 7 "20 Sep 2024" "" "SAPHanaSR"
 .\"
 .SH NAME
 SAPHanaSR_maintenance_examples \- maintenance examples for SAPHanaController.
@@ -19,7 +19,7 @@ below.
 .SH EXAMPLES
 .PP
 \fB*\fR Check status of Linux cluster and HANA system replication pair.
-
+.PP
 This steps should be performed before doing anything with the cluster, and
 after something has been done. See also cs_show_saphanasr_status(8) and section
 REQUIREMENTS below.
@@ -37,16 +37,40 @@ REQUIREMENTS below.
 .RE
 .PP
 \fB*\fR Watch status of HANA cluster resources and system replication.
-
+.PP
 This might be convenient when performing administrative actions or cluster tests. It does not replace the afore mentioned checks. See also cs_show_saphanasr_status(8).
 .PP
 .RS 4
-# watch -n 9 "(crm_mon -1r;SAPHanaSR-showAttr;cs_clusterstate -i)|egrep -v'(^$|configured|###)'"
+# watch -n9 "crm_mon -1r --include=none,nodes,resources,failures;echo;SAPHanaSR-showAttr;cs_clusterstate -i|grep -v '#'"
 .RE
 .PP
+\fB*\fR Overview on stopping the HANA database at one site.
+.PP
+This procedure does work for scale-up and scale-out. No takeover will be done. This procedure
+should be used, when it is necessary to stop the HANA database. Stopping the HANA database
+should not be done by just stopping the Linux cluster or shutting down the OS. This particularly
+applies to scale-out systems. It might be good to define upfront which HANA site needs to be
+stopped. In case both sites need to be stopped, it might be good to define the order. First
+stopping the primary should keep system replication in sync.
+.br
+How long a stop will take, depends on database size, performance of underlying infrastructure,
+SAP HANA version and configuration. Please refer to SAP HANA documentation for details on
+tuning and stopping an HANA database.
+.PP
+.RS 4
+1. Checking status of Linux cluster and HANA system replication pair.
+.br
+2. Setting SAPHana or SAPHanaController multi-state resource into maintenance.
+.br
+3. Stopping HANA database at the given site by using "sapcontrol -nr <nr> -function StopSystem".
+.br
+4. Checking that HANA is stopped.
+.RE
+.PP
+Note: Do not forget to end the resource maintenance after you have re-started the HANA database.
+.PP
 \fB*\fR Initiate an administrative takeover of the HANA primary from one node to the other by using the Linux cluster.
-
-
+.PP
 This procedure does not work for scale-out. On scale-up, it will stop the HANA primary.
 This might take a while. If you want to avoid waiting for the stopped primary,
 use the below procedure which suspends the primary.
@@ -81,7 +105,7 @@ After takeover of the primary has been finished, the migration rule has to be de
 Note: Former versions of the Linux cluster used "migrate" instead of "move" and "unmigrate" instead of "clear".
 .PP
 \fB*\fR Perform an SAP HANA takeover by using SAP tools. 
-
+.PP
 The procedure is described here for scale-out. It works for scale-up as well. 
 The procedure will stop the HANA primary. This might take a while. If you want
 to avoid waiting for the stopped primary, use the below procedure which suspends
@@ -90,9 +114,10 @@ The status of HANA databases, system replication and Linux cluster has to be
 checked.
 The SAP HANA resources are set into maintenance, an sr_takeover is performed,
 the old primary is registered as new secondary.
-Therefore the correct secondary site name has to be used, see later example.
+Therefor the correct secondary site name has to be used, see later example.
 Finally the SAP HANA resources are given back to the Linux cluster.
-See also section REQUIREMENTS below and later example on determining the correct site name.
+See also section REQUIREMENTS below and later example on determining the correct
+site name.
 .PP
 .RS 2
 1. On either node
@@ -161,7 +186,7 @@ If everything looks fine, proceed.
 .br
 ~> cdpy; python3 ./systemReplicationStatus.py; echo RC:$?
 .br
-~> cdpy; python3 ./landscapeConfigurationStatus.py; echo RC:$?
+~> cdpy; python3 ./landscapeHostConfiguration.py; echo RC:$?
 .br
 ~> exit
 .br
@@ -186,15 +211,16 @@ If everything looks fine, proceed.
 .RE
 .PP
 \fB*\fR Overview on SAP HANA takeover using SAP tools and suspend primary feature.
-
+.PP
 The procedure works for scale-up and scale-out.
 The status of HANA databases, system replication and Linux cluster has to be
 checked.
 The SAP HANA resources are set into maintenance, an sr_takeover is performed
 with suspending the primary, the old primary is registered as new secondary.
-Therefore the correct secondary site name has to be used.
+Therefor the correct secondary site name has to be used.
 Finally the SAP HANA resources are given back to the Linux cluster.
-See also section REQUIREMENTS below and later example on determining the correct site name.
+See also section REQUIREMENTS below and later example on determining the correct
+site name.
 .PP
 .RS 2
 1. Check status of Linux cluster and HANA, show current site names.
@@ -225,7 +251,7 @@ See also section REQUIREMENTS below and later example on determining the correct
 .RE
 .PP
 \fB*\fR Check the two site names that are known to the Linux cluster. 
-
+.PP
 This is useful in case AUTOMATED_REGISTER is not yet set. In that case a former  primary needs to be registered manually with the former site name as new secondary. The point is finding the site name that already is in use by the Linux cluster. That exact site name has to be used for registration of the new secondary. See also REQUIREMENTS of SAPHanaSR(7) and SAPHanaSR-ScaleOut(7).
 .br
 In this example, node is suse11 on the future secondary site to be registered. Remote HANA master nameserver is suse21 on current primary site. Lowercase-SID is ha1.
@@ -243,7 +269,7 @@ In this example, node is suse11 on the future secondary site to be registered. R
 .RE
 .PP
 \fB*\fR Manually start the HANA primary if only one site is available.
-
+.PP
 This might be necessary in case the cluster can not detect the status of both sites.
 This is an advanced task.
 .PP
@@ -271,56 +297,90 @@ This is an advanced task.
 10. Please bring back the other node and register that HANA as soon as possible. If the HANA primary stays alone for too long, the log area will fill up.
 .RE
 .PP
-.\"
+\fB*\fR Start Linux cluster after node has been fenced.
+.PP
+It is recommended to not configure the Linux cluster for always starting
+autmatically on boot. Better is to start automatically only, if cluster and/or
+node have been stopped cleanly. If the node has been rebooted by STONITH, the
+cluster should not start automatically. If the cluster is configure that way,
+some steps are needed to start the cluster after a node has been rebooted by
+STONITH. STONITH via SBD is used in this example. 
+.PP
+.RS 2
+# cs_clear_sbd_devices --all
+.br
+# cs_show_sbd_devices
+.br
+# crm cluster start
+.br
+# crm_mon -r
+.RE
+.PP
+.\" \fB*\fR Register secondary HANA after takeover.
+.\" TODO for AUTOMATED_REGISTER=false
+.\" 
 \fB*\fR Overview on maintenance procedure for Linux, HANA remains running, on pacemaker-2.0.
-
-See also section REQUIREMENTS below and example on checking status of HANA and cluster above.
+.PP
+It is necessary to wait for each step to complete and to check the result. It
+also is necessary to test and document the whole procedure before applying in
+production. See also section REQUIREMENTS below and example on checking status
+of HANA and cluster above.
 .\" TODO details
 .PP
 .RS 2
 1. Check status of Linux cluster and HANA, see above.
 .br
-2. Set the Linux cluster into maintenance mode, on either node.
+2. Set HANA multistate resource into maintenance mode.
+.RE
+.RS 4
+# crm resource maintenance mst_... on
+.RE
+.RS 2
+3. Set the Linux cluster into maintenance mode, on either node.
 .RE
 .RS 4
 # crm maintenance on
 .RE
 .RS 2
-3. Stop Linux Cluster on all nodes. Make sure to do that on all nodes.
-.RE
-.RS 3
-# crm cluster stop
-.RE
-.RS 2
-4. Perform Linux maintenance.
-.br
-5. Start Linux cluster on all nodes. Make sure to do that on all nodes.
+4. Stop Linux Cluster on all nodes. Make sure to do that on all nodes.
 .RE
 .RS 4
-# crm cluster start
+# crm cluster run "crm cluster stop"
 .RE
 .RS 2
-6. Let Linux cluster detect status of HANA resource, on either node.
+.PP
+5. Perform Linux maintenance.
+.PP
+6. Start Linux cluster on all nodes. Make sure to do that on all nodes.
 .RE
 .RS 4
-# crm resource refresh cln_...
-.br
-# crm resource refresh mst_...
+# crm cluster run "crm cluster start"
 .RE
 .RS 2
 7. Set cluster ready for operations, on either node.
 .RE
 .RS 4
 # crm maintenance off
-.\" TODO delete property, optional?
 .RE
 .RS 2
-8. Check status of Linux cluster and HANA, see above.
+8. Let Linux cluster detect status of HANA multistate resource, on either node.
+.RE
+.RS 4
+# crm resource refresh mst_...
+.RE
+.RS 2
+9. Set HANA multistate resource ready for operations, on either node.
+.RE
+.RS 4
+# crm maintenance mst_... off
+.RE
+.RS 2
+10. Check status of Linux cluster and HANA, see above.
 .RE
 .PP
 \fB*\fR Overview on simple procedure for stopping and temporarily disabling the Linux cluster,
 HANA gets fully stopped.
-
+.PP
 This procedure can be used to update HANA, OS or hardware.
 HANA roles and resource status remains unchanged.
 It is necessary to wait for each step to complete and to check the result.
@@ -357,12 +417,12 @@ It also is necessary to test and document the whole procedure before applying in
 .br
 - system replication recovers to SOK
 .RE
-
+.PP
 Note: HANA is not available from step 4 to step 9. 
 .RE
 .PP
 \fB*\fR Overview on update procedure for the SAPHanaSR-angi package.
-
+.PP
 This procedure can be used to update RAs, HANA HADR provider hook scripts and related tools while HANA and Linux cluster stay online. See also SAPHanaSR-manageAttr(8) for details on reloading the HANA HADR provider.
 .PP
 .RS 2
@@ -382,9 +442,9 @@ This procedure can be used to update RAs, HANA HADR provider hook scripts and re
 .RE
 .PP
 \fB*\fR Remove left-over maintenance attribute from overall Linux cluster.
-
+.PP
 This could be done to avoid confusion caused by different maintenance procedures.
-See above overview on maintenance procedures whith running Linux cluster.
+See above overview on maintenance procedures with running Linux cluster.
 Before doing so, check for cluster attribute maintenance-mode="false".
 .PP
 .RS 4
@@ -398,9 +458,9 @@ Before doing so, check for cluster attribute maintenance-mode="false".
 .RE
 .PP
 \fB*\fR Remove left-over standby attribute from Linux cluster nodes.
-
+.PP
 This could be done to avoid confusion caused by different maintenance procedures.
-See above overview on maintenance procedures whith running Linux cluster.
+See above overview on maintenance procedures with running Linux cluster.
 Before doing so for all nodes, check for node attribute standby="off" on all nodes.
 .PP
 .RS 4
@@ -414,9 +474,9 @@ Before doing so for all nodes, check for node attribute standby="off" on all nod
 .RE
 .PP
 \fB*\fR Remove left-over maintenance attribute from resource.
-
+.PP
 This should usually not be needed.
-See above overview on maintenance procedures whith running Linux cluster.
+See above overview on maintenance procedures with running Linux cluster.
 .PP
 .RS 4
 # SAPHanaSR-showAttr
@@ -427,12 +487,12 @@ See above overview on maintenance procedures whith running Linux cluster.
 .RE
 .PP
 \fB*\fR Manually update global site attribute.
-
+.PP
 .\" TODO: attributes still used for angi?
 In rare cases the global site attribute hana_<sid>_glob_prim or
 hana_<sid>_glob_sec is not updated automatically after successful takeover,
 while all other attributes are updated correctly. The global site attribute
-stays outdated even after the cluster has been idle for a while.
+stays outdated even after the Linux cluster has been idle for a while.
 In this case, that site attribute could be updated manually.
 Make sure everything else is fine and just the global site attribute has not
 been updated. Updating hana_<sid>_glob_sec for SID HA1 with site name VOLKACH:
@@ -440,13 +500,13 @@ been updated. Updating hana_<sid>_glob_sec for SID HA1 with site name VOLKACH:
 .RS 4
 # crm configure show SAPHanaSR
 .br
-# crm_attribute --type crm_config --name hana_ha1_glob_sec --update=VOLKACH
+# crm_attribute --type crm_config --set-name SAPHanaSR --name hana_ha1_glob_sec --update VOLKACH
 .br
 # crm configure show SAPHanaSR
 .RE
 .PP
 \fB*\fR Upgrade scale-out srHook attribute from old-style to multi-target.
-
+.PP
 As final result of this upgrade, the RAs and hook script are upgraded from
 old-style to multi-target. Further the Linux cluster's old-style global srHook
 attribute hana_${sid}_glob_srHook is replaced by site-aware attributes
@@ -484,7 +544,6 @@ l. Finally check if everything looks fine.
 .PP
 .\"
 .SH FILES
-.br
 .PP
 .\"
 .SH REQUIREMENTS
@@ -501,12 +560,21 @@ landscape status, and the HANA SR status.
 .PP
 \fB*\fR Maintenance attributes for cluster, nodes and resources must not be mixed.
 .PP
-\fB*\fR The Linux cluster needs to be up and running to allow HA/DR provider events being written into CIB attributes.
-The current HANA SR status might differ from CIB srHook attribute after Linux cluster maintenance.
+\fB*\fR The Linux cluster needs to be up and running to allow HA/DR provider events
+being written into CIB attributes. The current HANA SR status might differ from CIB
+srHook attribute after Linux cluster maintenance.
 .PP
-\fB*\fR Manually activating an HANA primary, like start of HANA primary or takeover outside
-the cluster creates risk of a duplicate-primary situation. The user is responsible for data
-integrity, particularly when activating an HANA primary.
+\fB*\fR Manually activating an HANA primary, like start of HANA primary or takeover
+outside the Linux cluster creates risk of a duplicate-primary situation. The user
+is responsible for data integrity, particularly when activating an HANA primary.
+See also susTkOver.py(7).
+.PP
+\fB*\fR When manually disabling or unregistering HANA system replication that is
+controlled by the Linux cluster, the SAPHanaController resource needs to be in
+maintenance mode. The user is responsible for data integrity.  
+.PP
+\fB*\fR HANA site names are discovered automatically when the RAs are activated the
+very first time. That exact site names have to be used later for all manual tasks.
 .PP
 .\"
 .SH BUGS
@@ -550,7 +618,7 @@ F.Herschel, L.Pinne.
 .SH COPYRIGHT
 (c) 2017-2018 SUSE Linux GmbH, Germany.
 .br
-(c) 2019-2023 SUSE LLC
+(c) 2019-2024 SUSE LLC
 .br
 This maintenance examples are coming with ABSOLUTELY NO WARRANTY.
 .br
