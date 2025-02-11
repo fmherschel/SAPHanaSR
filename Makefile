@@ -5,15 +5,17 @@
 
 FILE_LIST = LICENSE \
 		README.md \
+        alert \
+        crm_cfg \
 		icons \
 		man \
 		ra \
 		srHook \
-		test \
 		tools \
 		wizard
 
 #TAR_EXTRAS = -X tools/SAPHanaSR-testDriver
+TAR_EXTRAS = --exclude="man/*adoc"
 
 PKG = SAPHanaSR-angi
 SPECFILE = ${PKG}.spec

@@ -1,9 +1,9 @@
 #
-# spec file for package SAPHanaSR
+# spec file for package SAPHanaSR-angi
 #
 # Copyright (c) 2013-2014 SUSE Linux Products GmbH, Nuernberg, Germany.
 # Copyright (c) 2014-2016 SUSE Linux GmbH, Nuernberg, Germany.
-# Copyright (c) 2017-2023 SUSE LLC.
+# Copyright (c) 2017-2024 SUSE LLC.
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -21,7 +21,7 @@ License:        GPL-2.0
 Group:          Productivity/Clustering/HA
 AutoReqProv:    on
 Summary:        Resource agents to control the HANA database in system replication setup
-Version:        1.2.0
+Version:        1.2.9
 Release:        0
 Url:            https://www.suse.com/c/fail-safe-operation-of-sap-hana-suse-extends-its-high-availability-solution/
 
@@ -36,27 +36,25 @@ Requires:       pacemaker > 2.1.2
 Requires:       resource-agents
 Requires:       perl
 
-# Require crmsh-scripts on SLES 12 SP1+ for the new HAWK wizards
-%if 0%{?sle_version} >= 120100
+# Require crmsh-scripts for the HAWK2 wizards
 Requires:       crmsh >= 4.4.0
 Requires:       crmsh-scripts >= 4.4.0
 Requires:       python3
 Requires:       /usr/bin/xmllint
+%if 0%{?suse_version} >= 1600
+Requires:       /usr/bin/sudo
+Requires:       /usr/bin/logger
+%endif
 BuildRequires:  resource-agents >= 4.1.0
 BuildRequires:  crmsh
 BuildRequires:  crmsh-scripts
-%endif
 
 %description
 SAPHanaSR-angi is "SAP HANA SR - An Next Generation Interface" for SUSE high availabilty clusters to manage SAP HANA databases with system replication.
 
-The current version of SAPHanaSR-angi is targeting SAP HANA SR scale-up setups.
+The current version of SAPHanaSR-angi is targeting SAP HANA SR scale-up and scale-out setups.
 
-CIB attributes are not backward compatible between SAPHanaSR-angi and SAPHanaSR. So there is currently no easy migration path.
-
-SAPHanaSR-angi is shipped as technology preview.
-
-The resource agents SAPHanaController and SAPHanaTopology are responsible for controlling a SAP HANA Database which is running in system replication (SR) configuration.
+CIB attributes are not backward compatible between SAPHanaSR-angi and SAPHanaSR. Nevertheless, SAPHanaSR and SAPHanaSR-ScaleOut can be upgraded to SAPHanaSR-angi by following the documented procedure.
 
 For SAP HANA Databases in System Replication only the listed scenarios at https://documentation.suse.com/sles-sap/sap-ha-support/html/sap-ha-support/article-sap-ha-support.html are supported. For any scenario not matching the scenarios named or referenced in our setup guides please contact SUSE services.
 
@@ -71,7 +69,6 @@ Authors:
 
 %prep
 tar xf %{S:0}
-%define crmscr_path /usr/share/crmsh/scripts/
 
 %build
 gzip man/*
@@ -80,8 +77,8 @@ gzip man/*
 mkdir -p %{buildroot}/usr/bin
 mkdir -p %{buildroot}%{_docdir}/%{name}
 mkdir -p %{buildroot}/usr/share/%{name}/icons
-mkdir -p %{buildroot}/usr/share/%{name}/tests
 mkdir -p %{buildroot}/usr/share/%{name}/samples
+mkdir -p %{buildroot}/usr/share/%{name}/samples/crm_cfg/angi-ScaleUp
 mkdir -p %{buildroot}/usr/lib/ocf/resource.d/suse
 mkdir -p %{buildroot}/usr/lib/%{name}
 mkdir -p %{buildroot}%{_mandir}/man7
@@ -99,6 +96,12 @@ install -m 0644 srHook/susCostOpt.py %{buildroot}/usr/share/%{name}/
 install -m 0644 srHook/susChkSrv.py %{buildroot}/usr/share/%{name}/
 install -m 0444 srHook/global.ini_* %{buildroot}/usr/share/%{name}/samples
 
+# alert manager
+install -m 0755 alert/SAPHanaSR-alert-fencing %{buildroot}/usr/bin
+
+# crm config templates
+install -m 0644 crm_cfg/angi-ScaleUp/[0-9]*_* %{buildroot}/usr/share/%{name}/samples/crm_cfg/angi-ScaleUp
+
 # icons for SAPHanaSR-monitor
 install -m 0444 icons/* %{buildroot}/usr/share/%{name}/icons
 
@@ -115,13 +118,9 @@ install -m 0555 tools/SAPHanaSR-replay-archive-legacy %{buildroot}/usr/bin
 install -m 0555 tools/SAPHanaSR-filter-legacy %{buildroot}/usr/bin
 install -m 0555 tools/SAPHanaSR-hookHelper %{buildroot}/usr/bin
 install -m 0555 tools/SAPHanaSR-manageProvider %{buildroot}/usr/bin
+install -m 0555 tools/SAPHanaSR-upgrade-to-angi-demo %{buildroot}/usr/share/%{name}/samples
 install -m 0444 tools/SAPHanaSRTools.pm %{buildroot}/usr/lib/%{name}
 install -m 0444 tools/saphana_sr_tools.py %{buildroot}/usr/lib/%{name}
-
-# wizard files for hawk2
-install -D -m 0644 wizard/hawk2/saphanasr.yaml %{buildroot}%{crmscr_path}/saphanasr/main.yml
-install -D -m 0644 wizard/hawk2/saphanasr_su_po.yaml %{buildroot}%{crmscr_path}/saphanasr-su-po/main.yml
-install -D -m 0644 wizard/hawk2/saphanasr_su_co.yaml %{buildroot}%{crmscr_path}/saphanasr-su-co/main.yml
 
 %files
 %defattr(-,root,root)
@@ -142,14 +141,7 @@ install -D -m 0644 wizard/hawk2/saphanasr_su_co.yaml %{buildroot}%{crmscr_path}/
 /usr/bin/SAPHanaSR-filter-legacy
 /usr/bin/SAPHanaSR-hookHelper
 /usr/bin/SAPHanaSR-manageProvider
-
-## HAWK2 wizard
-%dir %{crmscr_path}/saphanasr/
-%dir %{crmscr_path}/saphanasr-su-po/
-%dir %{crmscr_path}/saphanasr-su-co/
-%{crmscr_path}/saphanasr/main.yml
-%{crmscr_path}/saphanasr-su-po/main.yml
-%{crmscr_path}/saphanasr-su-co/main.yml
+/usr/bin/SAPHanaSR-alert-fencing
 
 %license LICENSE
 %dir %{_docdir}/%{name}

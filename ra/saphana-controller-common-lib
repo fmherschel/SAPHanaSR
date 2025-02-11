@@ -10,7 +10,7 @@
 # Support:      linux@sap.com
 # License:      GNU General Public License (GPL)
 # Copyright:    (c) 2013,2014 SUSE Linux Products GmbH
-# Copyright:    (c) 2015-2023 SUSE LLC
+# Copyright:    (c) 2015-2024 SUSE LLC
 #
 # An example usage:
 #      See usage() function below for more details...
@@ -23,7 +23,6 @@
 #   OCF_RESKEY_INSTANCE_PROFILE (optional, well known directories will be searched by default)
 #   OCF_RESKEY_PREFER_SITE_TAKEOVER (optional, default is no)
 #   OCF_RESKEY_DUPLICATE_PRIMARY_TIMEOUT (optional, time difference needed between two last-primary-tiemstampe (lpt))
-#   OCF_RESKEY_REMOVE_SAP_SOCKETS (optional, default is true)
 #
 # HANA must support the following commands:
 #     hdbnsutil -sr_stateConfiguration (unsure, if this means >= SPS110, SPS111 or SPS10x)
@@ -33,7 +32,7 @@
 #     systemReplicationStatus.py (>= SPS090)
 #
 #######################################################################
-# SAPHanaControllerLibVersion="1.001.10"
+# SAPHanaControllerLibVersion="1.2.8"
 #######################################################################
 #
 # KNOWN PROBLEMS TO BE FIXED:
@@ -180,24 +179,25 @@ function get_crm_promote() {
 function set_crm_promote() {
     # called by: TODO
     super_ocf_log info "FLOW ${FUNCNAME[0]} ($*)"
-    local rc=0 score=0 node=""
+    local rc=0 score=0 node_name="" node_opt=""
     if [ -n "$1" ]; then
         score=$1
     fi
     if [ -n "$2" ]; then
-        node="-N $2"
+        node_name="$2"
+        node_opt="-N"
     fi
     # shellcheck disable=SC2154
     ocf_version_cmp "3.9.0" "$OCF_RESKEY_crm_feature_set"
     # DONE: PRIO2: Only adjust master if value is really different (try to check that)
-    oldscore=$("${HA_SBIN_DIR}/$CRM_PROMO" "$node" -G -q "$CRM_PROMO_PARAMS" )
+    oldscore=$("${HA_SBIN_DIR}/$CRM_PROMO" "$node_opt" "$node_name" -G -q "$CRM_PROMO_PARAMS" )
     if [ "$oldscore" != "$score" ]; then
        dstr=$(date)
        if ocf_is_true "$log_attributes"; then
-           echo "$dstr: SAPHanaController: $CRM_PROMO $node -v $score $CRM_PROMO_PARAMS" >> "$log_attr_file"
+           echo "$dstr: SAPHanaController: $CRM_PROMO $node_opt $node_name -v $score $CRM_PROMO_PARAMS" >> "$log_attr_file"
        fi
-       super_ocf_log debug "DBG: SET crm promo: $node $score (old: $oldscore)"
-       "${HA_SBIN_DIR}/$CRM_PROMO" "$node" -v "$score" "$CRM_PROMO_PARAMS" ; rc="$?"
+       super_ocf_log debug "DBG: SET crm promo: $node_opt $node_name $score (old: $oldscore)"
+       "${HA_SBIN_DIR}/$CRM_PROMO" "$node_opt" "$node_name" -v "$score" "$CRM_PROMO_PARAMS" ; rc="$?"
     else
        super_ocf_log debug "DBG: LET crm promo: $score"
        rc=0
@@ -412,49 +412,17 @@ function saphana_init_sap_commands() {
 #
 # handle_unix_domain_sockets
 # params: -
-# globals: OCF_RESKEY_REMOVE_SAP_SOCKETS
 #
 function handle_unix_domain_sockets() {
     # called by: TODO
     super_ocf_log info "FLOW ${FUNCNAME[0]}"
 
-    if ocf_is_true "$RemoveSAPSockets"; then
-        # previous and new default handling
-        # removing the unix domain socket files as they might have
-        # wrong permissions or ownership
-        # they will be recreated by sapstartsrv during next start
-        rm -f /tmp/.sapstream5"${InstanceNr}"13
-        rm -f /tmp/.sapstream5"${InstanceNr}"14
-    else
-        # try to change permission and ownership of the unix domain socket files
-        for sockFile in /tmp/.sapstream5"${InstanceNr}"13 /tmp/.sapstream5"${InstanceNr}"14; do
-            sockError=false
-            if [ -S "$sockFile" ]; then
-                if ! chown "${sid}"adm "$sockFile" > /dev/null 2>&1; then
-                    sockError=true
-                fi
-                if ! chgrp sapsys "$sockFile" > /dev/null 2>&1; then
-                    sockError=true
-                fi
-                if chmod 700 "$sockFile" > /dev/null 2>&1; then
-                    sockError=true
-                fi
-            else
-                if [ -f "$sockFile" ]; then
-                    super_ocf_log error "RA: file '$sockFile' still exists, but is NO longer a socket."
-                    super_ocf_log info "DEC: remove file '$sockFile' to give sapstartsrv a chance to create it the right way during next start"
-                    sockError=true
-                else
-                    super_ocf_log info "RA: file '$sockFile' not found. Nothing to do, let sapstartsrv create a new one during start"
-                fi
-            fi
-            if ocf_is_true "$sockError"; then
-                # fallback - if there are Errors, remove unix domain socket as
-                # last resort
-                rm -f "$sockFile"
-            fi
-        done
-    fi
+    # previous and new default handling
+    # removing the unix domain socket files as they might have
+    # wrong permissions or ownership
+    # they will be recreated by sapstartsrv during next start
+    rm -f /tmp/.sapstream5"${InstanceNr}"13
+    rm -f /tmp/.sapstream5"${InstanceNr}"14
 } # end function handle_unix_domain_sockets
 
 #
@@ -475,7 +443,17 @@ function check_sapstartsrv() {
         local systemd_unit_name="SAP${SID}_${InstanceNr}.service"
 
         if "$SYSTEMCTL" is-active --quiet "$systemd_unit_name"; then
-            super_ocf_log info "ACT: systemd service $systemd_unit_name is active"
+            if output=$("$SAPCONTROL" -nr "$InstanceNr" -function ParameterValue INSTANCE_NAME -format script)
+            then
+                super_ocf_log info "ACT: systemd service $systemd_unit_name is active and Unix Domain Socket authentication is working."
+            else
+                super_ocf_log info "ACT: systemd service $systemd_unit_name is active but Unix Domain Socket authentication is NOT working."
+                "$SYSTEMCTL" kill --kill-who=main --signal=9 "$systemd_unit_name"
+                "$SYSTEMCTL" is-active --quiet "$systemd_unit_name"; src=$?
+                if [[ "$src" -ne 0 ]]; then
+                    "$SYSTEMCTL" start "$systemd_unit_name" >/dev/null 2>&1; src=$?
+                fi
+            fi
         else
             super_ocf_log warn "ACT: systemd service $systemd_unit_name is not active, it will be started using systemd"
             # use start, because restart does also stop sap instance
@@ -488,29 +466,24 @@ function check_sapstartsrv() {
         fi
     else
         # no SAP systemd unit available, continue with old code...
-        if [ ! -S "/tmp/.sapstream5${InstanceNr}13" ]; then
-            super_ocf_log warn "ACT: sapstartsrv is not running for instance $SID-$InstanceName (no UDS), it will be started now"
-            restart=1
-        else
-            if output=$("$SAPCONTROL" -nr "$InstanceNr" -function ParameterValue INSTANCE_NAME -format script)
+        if output=$("$SAPCONTROL" -nr "$InstanceNr" -function ParameterValue INSTANCE_NAME -format script)
+        then
+            runninginst=$(echo "$output" | grep '^0 : ' | cut -d' ' -f3)
+            if [ "$runninginst" != "$InstanceName" ]
             then
-                runninginst=$(echo "$output" | grep '^0 : ' | cut -d' ' -f3)
-                if [ "$runninginst" != "$InstanceName" ]
-                then
-                    super_ocf_log warn "ACT: sapstartsrv is running for instance $runninginst, that service will be killed"
-                    restart=1
-                else
-                    if ! output=$("$SAPCONTROL" -nr "$InstanceNr" -function AccessCheck Start)
-                    then
-                        super_ocf_log warn "ACT: FAILED - sapcontrol -nr $InstanceNr -function AccessCheck Start ($(ls -ld1 "/tmp/.sapstream5${InstanceNr}13"))"
-                        super_ocf_log warn "ACT: sapstartsrv will be restarted to try to solve this situation, otherwise please check sapstsartsrv setup (SAP Note 927637)"
-                        restart=1
-                    fi
-                fi
-            else
-                super_ocf_log warn "ACT: sapstartsrv is not running for instance $SID-$InstanceName, it will be started now"
+                super_ocf_log warn "ACT: sapstartsrv is running for instance $runninginst, that service will be killed"
                 restart=1
+            else
+                if ! output=$("$SAPCONTROL" -nr "$InstanceNr" -function AccessCheck Start)
+                then
+                    super_ocf_log warn "ACT: FAILED - sapcontrol -nr $InstanceNr -function AccessCheck Start ($(ls -ld1 "/tmp/.sapstream5${InstanceNr}13"))"
+                    super_ocf_log warn "ACT: sapstartsrv will be restarted to try to solve this situation, otherwise please check sapstsartsrv setup (SAP Note 927637)"
+                    restart=1
+                fi
             fi
+        else
+            super_ocf_log warn "ACT: sapstartsrv is not running for instance $SID-$InstanceName, it will be started now"
+            restart=1
         fi
         if [ -z "$runninginst" ]; then runninginst="$InstanceName"; fi
         if [[ "$restart" == 1 ]]
@@ -570,28 +543,39 @@ function cleanup_instance() {
 
 #
 # function: get_hana_landscape_status - figure out hana landscape status
-# params:   -
-# globals:  sidadm(r), DIR_EXECUTABLE(r), hana_LSS_Out(w)
+# params:   optional: cache_mode: empty or "" or "cache" or "live"
+# globals:  sidadm(r), DIR_EXECUTABLE(r), hana_LSS_Out(w), g_chache_lss(rw)
 #
 function get_hana_landscape_status() {
     # called by: TODO
     super_ocf_log info "FLOW ${FUNCNAME[0]} ()"
     local rc=0
-    hana_LSS_Out=$(HANA_CALL --timeout "$HANA_CALL_TIMEOUT" --cmd "python landscapeHostConfiguration.py --sapcontrol=1" 2>/dev/null); rc=$?
-    if [[ "$rc" == 124 ]]; then
-        # TODO: PRIO 1: Check, if we should loop here like 'for i in 1 2 3 ...' ?
-        # landscape timeout
-        super_ocf_log warn "RA: landscapeHostConfiguration.py TIMEOUT after $HANA_CALL_TIMEOUT seconds"
-        sleep 20
-        # shellcheck disable=SC2034
-        hana_LSS_Out=$(HANA_CALL --timeout "$HANA_CALL_TIMEOUT" --cmd "python landscapeHostConfiguration.py --sapcontrol=1" 2>/dev/null); rc=$?
-        if [ "$rc" == 124 ]; then
-           super_ocf_log warn "RA: landscapeHostConfiguration.py second TIMEOUT after $HANA_CALL_TIMEOUT seconds"
-           # TODO PRIO2: How to handle still hanging lss - current solution is to say "FATAL" - Maybe we should return the stored attribute value?
-           rc=0
-        fi
+    local cache_mode=""
+    if [[ "$#" == "1" ]]; then
+        cache_mode="$1"
     fi
-    return "$rc";
+    if [[ "$cache_mode" == "cache" && "$g_cache_lss" != "" ]]; then
+        super_ocf_log info "RUNTIME use cached value for lss return code"
+        return "$g_cache_lss"
+    else
+        super_ocf_log info "RUNTIME do NOT use cached value for lss return code (cache_mode=$cache_mode, g_cache_lss=$g_cache_lss)"
+        hana_LSS_Out=$(HANA_CALL --timeout "$HANA_CALL_TIMEOUT" --cmd "python landscapeHostConfiguration.py --sapcontrol=1" 2>/dev/null); rc=$?
+        if [[ "$rc" -ge 124 ]]; then
+            # TODO: PRIO 1: Check, if we should loop here like 'for i in 1 2 3 ...' ?
+            # landscape timeout
+            super_ocf_log warn "RA: landscapeHostConfiguration.py TIMEOUT after $HANA_CALL_TIMEOUT seconds (rc=$rc)"
+            sleep 20
+            # shellcheck disable=SC2034
+            hana_LSS_Out=$(HANA_CALL --timeout "$HANA_CALL_TIMEOUT" --cmd "python landscapeHostConfiguration.py --sapcontrol=1" 2>/dev/null); rc=$?
+            if [ "$rc" -ge 124 ]; then
+               super_ocf_log warn "RA: landscapeHostConfiguration.py second TIMEOUT after $HANA_CALL_TIMEOUT seconds (rc=$rc)"
+               # TODO PRIO2: How to handle still hanging lss - current solution is to say "FATAL" - Maybe we should return the stored attribute value?
+               rc=0
+            fi
+        fi
+        g_cache_lss="$rc"
+        return "$rc";
+    fi
 } # end function get_hana_landscape_status
 
 #

@@ -1,5 +1,137 @@
-Tue Aug  8 13:33:00 UTC 2023 - fabian.herschel@suse.com
 -------------------------------------------------------------------
+Wed Nov  6 09:50:15 UTC 2024 - abriel@suse.com
+
+- Version bump to 1.2.9
+  * add SAPHanaSR-alert-fencing, an alert agent for cluster fencing
+    alerts.
+  * enhance SAPHanaController with the feature ON_FAIL_ACTION=fence
+    This is part of the 'FAST-STOP' feature of the resource agents.
+    (jsc#SAPSOL-196)
+  * Improve handling of timeout return values for the resource
+    agents
+  * SAPHanaSR-showAttr - adding new option 'sitelist' and new
+    output format 'csv' and 'cache'
+  * new man page:
+    SAPHanaSR-angi-scenarios.7
+    SAPHanaSR-alert-fencing.8
+  * update man pages:
+    SAPHanaSR-angi.7
+    SAPHanaSR.7
+    SAPHanaSR_basic_cluster.7
+    SAPHanaSR-ScaleOut.7
+    SAPHanaSR-ScaleOut_basic_cluster.7
+    SAPHanaController-scale-up.7
+    SAPHanaController-scale-out.7
+    SAPHanaTopology.7
+    SAPHanaFilesystem.7
+    SAPHanaSR_maintenance_examples.7
+    SAPHanaSR_upgrade_to_angi.7
+    SAPHanaSR-upgrade-to-angi-demo.8
+    ocf_suse_SAPHana.7
+    ocf_suse_SAPHanaController.7
+    ocf_suse_SAPHanaTopology.7
+    ocf_suse_SAPHanaFilesystem.7
+    susHanaSR.py.7
+    susHanaSrMultiTarget.py.7
+    susChkSrv.py.7
+    susCostOpt.py.7
+    SAPHanaSR-showAttr.8
+
+- add additional requires for SLE16
+  /usr/bin/sudo and /usr/bin/logger
+
+-------------------------------------------------------------------
+Tue May  7 17:55:56 UTC 2024 - abriel@suse.com
+
+- Version bump to 1.2.7
+  * package SAPHanaSR-angi and SAPHanaFilesystem RA are now
+    in state 'supported'
+    (jsc#PED-6403)
+  * add feature HANA 'FAST-STOP' and parameter 'ON_FAIL_ACTION'
+    (jsc#SAPSOL-133)
+  * new demo script SAPHanaSR-upgrade-to-angi-demo
+  * added crm config examples
+  * susHanaSR.py adapt syntax
+  * Fix the hexdump log for empty node states
+  * catch monitor calls for non-cloned resources and report them as
+    unsupported instead of 'command not found'
+    (bsc#1218333)
+  * susChkSrv.py - relocate function logTimestamp()
+  * susHanaSR.py - catch possible I/O error
+  * security improvements
+    (bsc#1218696, bsc#1218698 and bsc#1218699)
+  * remove instance parameter "REMOVE_SAP_SOCKETS", no longer
+    supported
+  * add detailed timing log messages for runtime information
+  * add cache/live value optimization
+  * new man page:
+    SAPHanaSR_upgrade_to_angi.7
+    SAPHanaSR-upgrade-to-angi-demo.8
+  * update man pages:
+    SAPHanaSR.7
+    SAPHanaSR-ScaleOut.7
+    SAPHanaSR_basic_cluster.7
+    SAPHanaSR-ScaleOut_basic_cluster.7
+    SAPHanaSR_maintenance_examples.7
+    ocf_suse_SAPHana.7
+    ocf_suse_SAPHanaController.7
+    ocf_suse_SAPHanaFilesystem.7
+    susChkSrv.py.7
+    susHanaSR.py.7
+    susHanaSrMultiTarget.py.7
+    SAPHanaSR-manageProvider.8
+    SAPHanaSR-showAttr.8
+    SAPHanaSR-replay-archive.8
+
+-------------------------------------------------------------------
+Fri Dec 15 16:18:36 UTC 2023 - abriel@suse.com
+
+- Version bump to 1.2.3
+  * package is still in status 'technical preview'
+  * SAPHanaFilesystem RA has still POC status
+  * add parameter 'ON_FAIL_ACTION' to SAPHanaFilesystem RA (POC)
+  * improve the usage of SAP virtual hostnames
+  * if the susHanaSR.py hook has successfully reported a SR event
+    to the cluster a still existing fall-back state file will be
+    removed to prevent an override of an already reported
+    SR state.
+    (bsc#1215693)
+  * improve supportability by providing the current process ID of
+    the RA, which is logged in the RA outputs, to HANA tracefiles
+    too.
+    This allows a mapping of the SAP related command invocations
+    from the RA and the HANA executions which might have a delay
+    in between.
+    (bsc#1214613)
+  * avoid explicid and implicid usage of /tmp filesystem to keep
+    the SAPHanaSR resource agents working even in situations with
+    /tmp filesystem full.
+    (bsc#1210728)
+  * SAPHanaController: change default stop timeout from 3600 to 600
+  * SAPHanaController: change default promote timeout from 3600 to
+    900
+  * try to make set_ and get_hana_attribute function more reliable
+    by monitoring the result of the crm_attribute calls
+  * fix typo in example srHook/global.ini_susHanaSR
+  * fix missing trace section in example srHook/global.ini_susChkSrv
+  * update man pages:
+    SAPHanaSR-angi.7
+    SAPHanaSR.7
+    SAPHanaSR-ScaleOut.7
+    SAPHanaSR_basic_cluster.7
+    SAPHanaSR-ScaleOut_basic_cluster.7
+    SAPHanaSR_maintenance_examples.7
+    ocf_suse_SAPHana.7
+    ocf_suse_SAPHanaController.7
+    ocf_suse_SAPHanaTopology.7
+    ocf_suse_SAPHanaFilesystem.7
+    susChkSrv.py.7
+    susHanaSR.py.7
+    susTkOver.py.7
+    SAPHanaSR-showAttr.8
+
+-------------------------------------------------------------------
+Tue Aug  8 13:33:00 UTC 2023 - fabian.herschel@suse.com
 
 - Version bump to 1.2.0
   * SAPHanaFilesystem RA added (poc status)
@@ -29,7 +161,7 @@ Mon Apr 17 07:44:23 UTC 2023 - abriel@suse.com
 - New package name and new version 1.001.4
   * New package SAPHanaSR-angi
     SAP HANA System Replication - A New Generation Interface
-    (jsc#PED-3876)
+    (jsc#PED-6402)
   * support SAPHana ScaleUp and ScaleOut environments with one
     set of resource agents
 - conflicting with the 'old' packages SAPHanaSR and
