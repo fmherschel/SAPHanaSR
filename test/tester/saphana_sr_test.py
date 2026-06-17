@@ -813,18 +813,24 @@ class SaphanasrTest:
         else:
             wait = 2
         loops = 0
-        if 'post' in step:
-            step_action = step['post']
-        else:
-            step_action = ""
+        step_preaction = step.get('pre', "")
+        step_action = step.get('post', "")
         _l_msg = (
                      "PROC:"
                      f" step_id='{step_id}'"
                      f" step_name='{step_name}'"
                      f" step_next='{step_next}'"
                      f" step_action='{step_action}'"
+                     f" step_preaction='{step_preaction}'"
                      f" max_loops='{max_loops}'"
                  )
+
+        if len(step_preaction) != 0:
+            preaction_rc = self.action(step_preaction)
+            step_result.update({'preaction': step_preaction})
+            step_result.update({'preaction_rc': preaction_rc})
+            if preaction_rc != 0:
+                process_result = 1 # set step failed, if pre-action failed
         self.message(_l_msg)
         fatal = False
         self.__min_failed_role_counter__ = 1000
@@ -882,9 +888,9 @@ class SaphanasrTest:
         if self.config['dump_failures'] and fatal is False:
             print("")
         self.message("STATUS: step {} checked in {} loop(s)".format(step_id, loops))
-        if process_result == 0:
+        if process_result == 0: # post-action is only called, if step checks have been passed
             if len(step_action) != 0:
-                action_rc = self.action(step_action) # post-action is only called, if step checks have been passed
+                action_rc = self.action(step_action)
                 step_result.update({'action': step_action})
                 step_result.update({'action_rc': action_rc})
                 if action_rc != 0:
@@ -1040,7 +1046,7 @@ class SaphanasrTest:
             remote = "localhost"
 
         (the_name_ref, cmd, sudo) = self.__node_cmd_and_sudo_resolve__(action_string, action = the_action)
-        self.debug(f"DBG: cmd: {cmd} sudo: {sudo}")
+        self.debug(f"DBG: cmd: {cmd} sudo: {sudo} (the_name_ref  {the_name_ref}")
 
         return self.action_call(action_string, cmd, remote)
 
