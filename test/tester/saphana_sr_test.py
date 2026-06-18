@@ -793,6 +793,8 @@ class SaphanasrTest:
     def process_step(self, step, **kargs):
         """ process a single step including optional loops """
         connect_host = kargs.get('connect_hosts', None)
+        process_result = -1
+        preaction_rc = 0
         step_id = step['step']
         step_name = step['name']
         step_next = step['next']
@@ -829,8 +831,6 @@ class SaphanasrTest:
             preaction_rc = self.action(step_preaction)
             step_result.update({'preaction': step_preaction})
             step_result.update({'preaction_rc': preaction_rc})
-            if preaction_rc != 0:
-                process_result = 1 # set step failed, if pre-action failed
         self.message(_l_msg)
         fatal = False
         self.__min_failed_role_counter__ = 1000
@@ -888,6 +888,8 @@ class SaphanasrTest:
         if self.config['dump_failures'] and fatal is False:
             print("")
         self.message("STATUS: step {} checked in {} loop(s)".format(step_id, loops))
+        if preaction_rc != 0 and process_result == 0:
+            process_result = 1  # set step failed, if pre-action failed
         if process_result == 0: # post-action is only called, if step checks have been passed
             if len(step_action) != 0:
                 action_rc = self.action(step_action)
