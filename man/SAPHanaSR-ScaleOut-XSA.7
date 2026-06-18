@@ -492,11 +492,14 @@ SAPHanaController relies on HANA landscape status at both sites going to okay
 before system replication status. This is not guaranteed for the standalone XSA.
 So, any maintrenance procedure needs to take care for that.
 .PP
+\fB*\fP Please check with SAP whether --suspendPrimary is supported for the XSA
+standalone scenario.
+.PP
 \fB*\fP The sapcontrol function WaitforStopped might return befor the XSA is
 stopped completely. Thus the landscape status needs to be checked explicitely.
 .PP
-\fB*\fP The XSA scenario should be configured as progressive variant. See
-SAPHanaSR-angi-scenarios(7).
+\fB*\fP The XSA standalone scenario should be configured as progressive variant.
+See SAPHanaSR-angi-scenarios(7).
 .PP
 \fB*\fP For requirements of the overall scale-out setup, see also the REQUIREMENTS
 section in SAPHanaSR-ScaleOut(7).
