@@ -1100,10 +1100,9 @@ class SaphanasrTest:
                     '@@SID@@': SID
                   }
 
-        self.message(f'DBG: replace: {replace}')
-        self.message(f'DBG: node (before): {node}')
+        self.debug(f'DBG: node (before): {node}')
         node = self.__resolve__(node, replace = replace)
-        self.message(f'DBG: node (after): {node}')
+        self.debug(f'DBG: node (after): {node}')
 
         self.debug(f'DBG: replace: {replace}')
         self.debug(f'DBG: cmd (before): {cmd}')
