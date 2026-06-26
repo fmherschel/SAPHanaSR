@@ -22,7 +22,7 @@ import json
 import argparse
 import random
 
-# Version: 3.0.20260615
+# Version: 3.1.20260625
 # for ssh remote calls this module uses paramiko
 #from paramiko import SSHClient
 import paramiko
@@ -32,7 +32,7 @@ class SaphanasrTest:
     """
     class to check SAP HANA cluster during tests
     """
-    version = "3.0.20260615"
+    version = "3.1.20260625"
 
     def message(self, msg, **kwargs):
         """
