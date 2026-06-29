@@ -1011,12 +1011,12 @@ class SaphanasrTest:
         remote = self.config['remote_node']
         ignore = False  # tODO for bmt we had ignore = True
 
-        the_name_ref = the_action.get('node', None)
+        #the_name_ref = the_action.get('node', None)
 
-        (the_name_ref, cmd, sudo_cmd) = self.__node_cmd_and_sudo_resolve__(action_name, action = the_action)
+        (remote, cmd, sudo_cmd) = self.__node_cmd_and_sudo_resolve__(action_name, action = the_action)
         self.debug(f"DBG: cmd: {cmd} sudo_cmd: {sudo_cmd}")
 
-        remote = self.topolo[the_name_ref]
+        #remote = self.topolo[the_name_ref]
 
         # ha_or_dr = kargs.get('ha_or_dr', 'HA')
         if self.config['use_sudo']:
@@ -1053,6 +1053,7 @@ class SaphanasrTest:
         return self.action_call(action_string, cmd, remote)
 
     def __node_cmd_and_sudo_resolve__(self,  action_string, **kargs):
+        """ __node_cmd_and_sudo_resolve__ - returns resoved (node, cmd and sudo-cmd) """
         the_action = kargs.get('action', None)
         action_array = action_string.split(" ") # split into name and optional params
         act_param_all = ""
@@ -1080,10 +1081,11 @@ class SaphanasrTest:
 
         cmd = the_action_type.get('cmd', "")
         sudo = the_action_type.get('sudo', "")
-        node = the_action.get('node', "")
+        nodeType = the_action.get('node', "")
         param1 = the_action.get('param1', "")
         param2 = the_action.get('param2', "")
 
+        node = self.topolo.get(nodeType, "")
         replace = {
                     '@@actParam1@@': act_param1,
                     '@@actParam2@@': act_param2,
@@ -1100,9 +1102,8 @@ class SaphanasrTest:
                     '@@SID@@': SID
                   }
 
-        self.debug(f'DBG: node (before): {node}')
-        node = self.__resolve__(node, replace = replace)
-        self.debug(f'DBG: node (after): {node}')
+        if nodeType != "" and node != "":
+            self.message(f'INFO: nodeType: {nodeType} => node: {node}')
 
         self.debug(f'DBG: replace: {replace}')
         self.debug(f'DBG: cmd (before): {cmd}')
