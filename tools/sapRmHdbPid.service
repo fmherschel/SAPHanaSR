@@ -1,0 +1,11 @@
+[Unit]
+Description=Remove hdbdaemon PID files at boot
+Documentation=man:SAPHanaSR-rmHdbPid(7)
+Before=SAPHA1_00.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/SAPHanaSR-rmHdbPid --force
+
+[Install]
+WantedBy=multi-user.target
