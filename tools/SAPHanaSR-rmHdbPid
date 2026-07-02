@@ -28,10 +28,10 @@ function help() {
 
 
 function rm_all() {
+	HOST=$(hostname -s)
 	SAP=$(systemctl list-units | awk '/SAP..._...service/ {print $1}')
 	while read; do
 		rc=1
-		HOST=$(hostname -s)
         SID=${REPLY:3:3}
         sid=${SID,,}
 		INO=${REPLY:7:2}
