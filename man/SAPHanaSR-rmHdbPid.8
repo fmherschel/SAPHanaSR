@@ -75,6 +75,10 @@ request for the component BC-OP-LNX-SUSE.
 .\"
 .SH REQUIREMENTS
 .\"
+.PP
+\fB*\fP This script is needed only when left-over hdbdaemon PID files sporadically
+prevent HANA from starting.
+.PP
 \fB*\fP This script should run as systemd service at boot time.
 It must not be called while HANA is running.
 .PP
