@@ -16,8 +16,7 @@ SAPHanaSR-rmHdbPid \- removes left-over HANA hdbdaemon PID file
 .\"
 SAPHanaSR-rmHdbPid can be used to remove HANA hdbdaemon PID files.
 This might be useful, if a left-over PID file prevents HANA from starting right
-after system boot. The purpose of this script is to be executed as systemd service
-at boot time.
+after system boot.
 .br
 Do not call this script while HANA is running.
 .PP
@@ -46,6 +45,15 @@ Usage, syntax or execution errors.
 .\"
 .SH EXAMPLES
 .\"
+\fB*\fP enable systemd service sapRmHdbPid
+.PP
+# systemctl enable sapRmHdbPid
+.br
+# systemctl list-unit-files | grep -i sapRmHdbPid
+.br
+# systemctl status sapRmHdbPid
+.br
+# systemd-analyze dot | grep sapRmHdbPid
 .PP
 .\"
 .SH FILES

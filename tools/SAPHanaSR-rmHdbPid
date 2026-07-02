@@ -31,12 +31,11 @@ function rm_all() {
 	SAP=$(systemctl list-units | awk '/SAP..._...service/ {print $1}')
 	while read; do
 		rc=1
-        SID=${REPLY:3:3}
+		HOST=$(hostname -s)
+            	SID=${REPLY:3:3}
 		INO=${REPLY:7:2}
 
-        # TODO exit if SAP<SID>_<INO> instance is running
-		# TODO error handling
-        # TODO put path into variable
+		# TODO timeout and error handling
 		#timeout $TIMEOUT ls -l /usr/sap/${SID}/HDB${INO}/${HOST}/lock/hdbdaemon@3${INO}00.pid
 		timeout $TIMEOUT rm -f /usr/sap/${SID}/HDB${INO}/${HOST}/lock/hdbdaemon@3${INO}00.pid
 		rc=$?
