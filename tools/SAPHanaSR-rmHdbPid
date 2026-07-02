@@ -32,12 +32,16 @@ function rm_all() {
 	while read; do
 		rc=1
 		HOST=$(hostname -s)
-            	SID=${REPLY:3:3}
+        SID=${REPLY:3:3}
+        sid=${SID,,}
 		INO=${REPLY:7:2}
 
 		# TODO error handling
-        # TODO exit if SAP<sid>_<ino> instance is running
-		timeout $TIMEOUT rm -f /usr/sap/${SID}/HDB${INO}/${HOST}/lock/hdbdaemon@3${INO}00.pid
+        # TODO skip if SAP<sid>_<ino> instance is running
+        # TODO timeout
+		# su - ${sid}adm -c "sapcontrol -nr $INO -function GetProcessList" |\
+        #   grep "^hdbdaemon, HDB Daemon, GRAY," || break
+        timeout $TIMEOUT rm -f /usr/sap/${SID}/HDB${INO}/${HOST}/lock/hdbdaemon@3${INO}00.pid
 		rc=$?
 		echo "rm -f /usr/sap/${SID}/HDB${INO}/${HOST}/lock/hdbdaemon@3${INO}00.pid: rc=$rc"
 		(( RETCODE = RETCODE + rc ))
