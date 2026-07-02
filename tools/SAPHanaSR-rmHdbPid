@@ -1,0 +1,66 @@
+#!/bin/bash
+#
+# SAPHanaSR-rmHdbPid
+#
+# (c) 2026 SUSE LLC
+# Author: L.Pinne.
+# GNU General Public License v2. No warranty.
+# http://www.gnu.org/licenses/gpl.html
+#
+# Version: 2026-07-02
+#
+
+EXE="$0"
+TIMEOUT=${2:-60}
+RETCODE=0
+
+
+function help() {
+	echo "usage:	$(basename "$EXE") [ --help | --version | --force ]"
+	echo "OPTION:"
+	echo " --help			show help"
+	echo " --version		show version info"
+	echo " --force		remove all hdbdaemon pid files"    
+    echo
+    echo "Do NOT call this script while HANA is running!"
+    echo
+}
+
+
+function rm_all() {
+	SAP=$(systemctl list-units | awk '/SAP..._...service/ {print $1}')
+	while read; do
+		rc=1
+        SID=${REPLY:3:3}
+		INO=${REPLY:7:2}
+
+        # TODO exit if SAP<SID>_<INO> instance is running
+		# TODO error handling
+        # TODO put path into variable
+		#timeout $TIMEOUT ls -l /usr/sap/${SID}/HDB${INO}/${HOST}/lock/hdbdaemon@3${INO}00.pid
+		timeout $TIMEOUT rm -f /usr/sap/${SID}/HDB${INO}/${HOST}/lock/hdbdaemon@3${INO}00.pid
+		rc=$?
+		echo "rm -f /usr/sap/${SID}/HDB${INO}/${HOST}/lock/hdbdaemon@3${INO}00.pid: rc=$rc"
+		(( RETCODE = RETCODE + rc ))
+	done <<< "$SAP"
+
+	(( RETCODE = RETCODE * 10 ))
+	exit $RETCODE
+}
+
+
+# main()
+
+case $1 in
+	-v | --version)
+		echo -n "$(basename "$EXE") "
+		head -11 "$EXE" | grep "^# Version: "
+	;;
+	-f | --force)
+		rm_all
+	;;
+	*)
+		help
+	;;
+esac
+#
