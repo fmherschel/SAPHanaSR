@@ -35,8 +35,8 @@ function rm_all() {
             	SID=${REPLY:3:3}
 		INO=${REPLY:7:2}
 
-		# TODO timeout and error handling
-		#timeout $TIMEOUT ls -l /usr/sap/${SID}/HDB${INO}/${HOST}/lock/hdbdaemon@3${INO}00.pid
+		# TODO error handling
+        # TODO exit if SAP<sid>_<ino> instance is running
 		timeout $TIMEOUT rm -f /usr/sap/${SID}/HDB${INO}/${HOST}/lock/hdbdaemon@3${INO}00.pid
 		rc=$?
 		echo "rm -f /usr/sap/${SID}/HDB${INO}/${HOST}/lock/hdbdaemon@3${INO}00.pid: rc=$rc"
