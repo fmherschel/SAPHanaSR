@@ -516,7 +516,10 @@ function register_hana_secondary() {
         if ocf_is_true "${AUTOMATED_REGISTER}"; then
             # for scale-up we normally should not need that, but for scale-out:
             # before we could register we stop HANA on all nodes of the swarm (maybe some still running)
-            saphana_stop
+            # fhBaustelle
+            if [[ $gNrSiteNode > 1 ]]; then
+                saphana_stop
+            fi
             # TODO PRIO1: NG - change from remoteHost to remoteMNS (remote MasterNameServer)
             # TODO PRIO2: How to get the remoteHost without cluster attribute remoteHost - could we use the master-list attribute?
             local hanaOM=""
