@@ -8,7 +8,7 @@
 # http://www.gnu.org/licenses/gpl.html
 #
 # Version: 2026-07-02
-#
+# set -x
 
 EXE="$0"
 TIMEOUT=${2:-60}
@@ -32,17 +32,18 @@ function rm_all() {
 	SAP=$(systemctl list-units | awk '/SAP..._...service/ {print $1}')
 	while read; do
 		rc=1
-        SID=${REPLY:3:3}
-        sid=${SID,,}
+            	SID=${REPLY:3:3}
+		sid=${SID,,}
 		INO=${REPLY:7:2}
-
+		FILE="/usr/sap/${SID}/HDB${INO}/${HOST}/lock/hdbdaemon@3${INO}00"
+		
 		# TODO error handling
-        # TODO timeout
-		su - ${sid}adm -c "sapcontrol -nr $INO -function GetProcessList" |\
-            grep "^hdbdaemon, HDB Daemon, GRAY, Stopped," || break
-        timeout $TIMEOUT rm -f /usr/sap/${SID}/HDB${INO}/${HOST}/lock/hdbdaemon@3${INO}00.pid
+		# TODO timeout
+		pgrep -U ${sid}adm -a | awk '{print $2}' |\
+			grep "hdb.sap${SID}_HDB${INO}" && break
+		timeout $TIMEOUT mv "$FILE".{pid,old}
 		rc=$?
-		echo "rm -f /usr/sap/${SID}/HDB${INO}/${HOST}/lock/hdbdaemon@3${INO}00.pid: rc=$rc"
+		echo "mv ${FILE}.{pid,old} : rc=$rc"
 		(( RETCODE = RETCODE + rc ))
 	done <<< "$SAP"
 
