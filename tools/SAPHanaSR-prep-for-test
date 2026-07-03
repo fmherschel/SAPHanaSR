@@ -11,16 +11,17 @@
 #
 
 EXE="$0"
+NOT="Do NOT use this script on production clusters!"
 
 function help() {
 	echo "usage:	$(basename "$EXE") [ --help | --version | --force ]"
 	echo "OPTION:"
 	echo " --help		show help"
 	echo " --version	show version info"
-	echo " --force	prepare node for tests"
+	echo " --force	prepare node for cluster tests"
 	echo
 	echo "Do NOT call this script while the cluster is running!"
-	echo "Do NOT use this script on production clusters at all!"
+	echo "$NOT"
 	echo
 }
 
@@ -41,6 +42,7 @@ function chck_pcmk() {
 	systemctl status pacemaker 2>&1 >/dev/null; rc=$?
 	if [[ $rc -eq 0 ]]; then
 		echo "pacemaker already running"
+		echo "### $NOT ###"
 		exit $rc
 	fi
 }
@@ -56,6 +58,7 @@ case $1 in
 		chck_pcmk
 		prep_sbd
 		prep_pcmk
+		echo "### $NOT ###"
 	;;
 	*)
 		help

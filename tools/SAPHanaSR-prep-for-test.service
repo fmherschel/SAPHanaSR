@@ -1,0 +1,12 @@
+[Unit]
+Description=Prepare node for cluster tests
+Documentation=man:SAPHanaSR-prep-for-test(8)
+After=sbd.service
+Wants=sbd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/SAPHanaSR-prep-for-test --force
+
+[Install]
+WantedBy=multi-user.target
