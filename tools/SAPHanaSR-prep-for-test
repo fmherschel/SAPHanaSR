@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# SAPHanaSR-prepare-for-test
+# SAPHanaSR-prep-for-test
 #
 # (c) 2026 SUSE LLC
 # Author: F.Herschel, L.Pinne.
@@ -20,6 +20,7 @@ function help() {
 	echo " --force	prepare node for tests"
 	echo
 	echo "Do NOT call this script while the cluster is running!"
+	echo "Do NOT use this script on production clusters at all!"
 	echo
 }
 
