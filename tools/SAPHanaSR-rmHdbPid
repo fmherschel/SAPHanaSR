@@ -8,6 +8,7 @@
 # http://www.gnu.org/licenses/gpl.html
 #
 # Version: 2026-07-02
+#
 
 EXE="$0"
 
@@ -36,7 +37,7 @@ function rm_all() {
 		if [[ $fPID =~ ^0*([1-9]+) ]]; then 
 			PID="${BASH_REMATCH[1]}"
 		fi 
-		#echo "Info: fPID=$fPID, PID=$PID"
+		# echo "Info: fPID=$fPID, PID=$PID"
 		if [[ -n "$PID" ]]; then
 			if ps -p "$PID" 2>/dev/null; then
 				echo "Keep file $file"
