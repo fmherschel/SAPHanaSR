@@ -47,6 +47,7 @@ Usage, syntax or execution errors.
 .\"
 \fB*\fP enable and check systemd service sapRmHdbPid
 .PP
+.RS 2
 # systemctl enable sapRmHdbPid
 .br
 # systemctl list-unit-files | grep -i sapRmHdbPid
@@ -54,6 +55,7 @@ Usage, syntax or execution errors.
 # systemctl status sapRmHdbPid
 .br
 # systemd-analyze dot | grep sapRmHdbPid
+.RE
 .PP
 .\"
 .SH FILES

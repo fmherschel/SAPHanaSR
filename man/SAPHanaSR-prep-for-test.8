@@ -1,0 +1,106 @@
+.\" Version: 1.2
+.\"
+.TH SAPHanaSR-prep-for-test 8 "02 Jun 2026" "" "SAPHanaSR"
+.\"
+.SH NAME
+.\"
+SAPHanaSR-prep-for-test \- prepare node for cluster tests
+.PP
+.\"
+.SH SYNOPSIS
+.\"
+\fBSAPHanaSR-prep-for-test [ --help | --version | --force ]
+.PP
+.\"
+.SH DESCRIPTION
+.\"
+SAPHanaSR-prep-for-test helps preparing an node for cluster tests.
+TODO
+SAPHanaSR-angi scale-up perf-opt and scale-out perf-opt
+default configuration for production described in setup guide
+clean SBD devices and start pacemaker cluster
+.PP
+.\"
+.SH OPTIONS
+.\"
+.TP 4
+\fB --help\fR
+show help.
+.TP 4
+\fB --version\fR
+show version.
+.TP 4
+\fB --force\fR
+force script execution.
+.PP
+.\"
+.SH RETURN CODES
+.\"
+.B 0
+Successful program execution.
+.br
+.B >0
+Usage, syntax or execution errors.
+.PP
+.\"
+.SH EXAMPLES
+.\"
+\fB*\fP enable and check systemd service SAPHanaSR-prep-for-test
+.PP
+.RS 2
+# systemctl enable SAPHanaSR-prep-for-test
+.br
+# systemctl list-unit-files | grep -i SAPHanaSR-prep-for-test
+.br
+# systemctl status SAPHanaSR-prep-for-test
+.br
+# systemd-analyze dot | grep SAPHanaSR-prep-for-test
+.RE
+.PP
+\fB*\fP show script messages 
+.PP
+.RS 2
+# grep SAPHanaSR-prep-for-test /var/log/messages
+.RE
+.PP
+.\"
+.SH FILES
+.\"
+.TP 4
+/usr/bin/SAPHanaSR-prep-for-test
+the script itself.
+.TP 
+/usr/lib/systemd/system/SAPHanaSR-prep-for-test.service
+the default unit file.
+.PP
+.\"
+.SH BUGS
+.\"
+In case of any problem, please use your favourite SAP support process to open a
+request for the component BC-OP-LNX-SUSE.
+.\" TODO Please report any other feedback and suggestions to feedback@suse.com.
+.PP
+.\"
+.SH REQUIREMENTS
+.\"
+.PP
+.\"
+.SH SEE ALSO
+.\"
+\fBsystemctl\fP(8)
+.PP
+.\"
+.SH AUTHORS
+.\"
+F.Herschel, L.Pinne.
+.PP
+.\"
+.SH COPYRIGHT
+.\"
+(c) 2026 SUSE LLC
+.br
+SAPHanaSR-manageProvider comes with ABSOLUTELY NO WARRANTY.
+.br
+For details see the GNU General Public License at
+http://www.gnu.org/licenses/gpl.html
+.\"
