@@ -45,7 +45,7 @@ Usage, syntax or execution errors.
 .\"
 .SH EXAMPLES
 .\"
-\fB*\fP enable systemd service sapRmHdbPid
+\fB*\fP enable and check systemd service sapRmHdbPid
 .PP
 # systemctl enable sapRmHdbPid
 .br
@@ -60,10 +60,13 @@ Usage, syntax or execution errors.
 .\"
 .TP 4
 /usr/bin/SAPHanaSR-rmHdbPid
-the program itself.
+the script itself.
+.TP 
+/usr/lib/systemd/system/sapRmHdbPid.service
+the default unit file.
 .TP 4
 /usr/sap/<SID>/HDB<INO>/<HOST>/lock/hdbdaemon@3<INO>00.pid
-the PID file.
+the hdbdaemon PID file.
 .PP
 .\"
 .SH BUGS
@@ -83,6 +86,9 @@ prevent HANA from starting.
 It must not be called while HANA is running.
 .PP
 \fB*\fP The systemd service sapRmHdbPid needs to be enabled.
+.PP
+\fB*\fP The directory /usr/sap/<SID>/HDB<INO>/<HOST>/lock/ needs to be accessible
+at boot time. 
 .PP
 .\"
 .SH SEE ALSO
