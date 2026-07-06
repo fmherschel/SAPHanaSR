@@ -52,9 +52,8 @@
             "pSite": [
                 "lss == 1",
                 "srr == P",
-                "lpt >~ 1000000000:(30|20|10)",
-                "srHook ~ (PRIM|SWAIT|SREG)",
-                "srPoll == PRIM"
+                "lpt == 10",
+                "srHook ~ (PRIM|SWAIT|SREG)"
             ],
             "sSite": [
                 "lpt >~ 1000000000:30",
@@ -85,15 +84,15 @@
             "pSite": [
                 "lss == 1",
                 "srr == P",
-                "lpt >~ 1000000000:(30|20|10)",
-                "srHook ~ (PRIM|SWAIT|SREG)",
-                "srPoll == PRIM"
+                "lpt == 10",
+                "srHook == SWAIT",
+                "srPoll == SFAIL"
             ],
             "sSite": "pSiteUp",
             "pHost": [
-                "clone_state ~ (UNDEFINED|DEMOTED)",
-                "roles ~ master1::worker:",
-                "score ~ (90|70|5)"
+                "clone_state == UNDEFINED",
+                "roles == master1::worker:",
+                "score == 90"
             ],
             "sHost": "pHostUp"
         },
@@ -107,9 +106,7 @@
             "pSite": "sSiteUp",
             "sSite": "pSiteUp",
             "pHost": "sHostUp",
-            "sHost": "pHostUp",
-            "pWorker": "sWorkerUp",
-            "sWorker": "pWorkerUp"
+            "sHost": "pHostUp"
         }
     ]
 }
