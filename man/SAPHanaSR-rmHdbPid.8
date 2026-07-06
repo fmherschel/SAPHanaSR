@@ -45,16 +45,16 @@ Usage, syntax or execution errors.
 .\"
 .SH EXAMPLES
 .\"
-\fB*\fP enable and check systemd service sapRmHdbPid
+\fB*\fP enable and check systemd service SAPHanSR-rmHdbPid
 .PP
 .RS 2
-# systemctl enable sapRmHdbPid
+# systemctl enable SAPHanaSR-rmHdbPid
 .br
-# systemctl list-unit-files | grep -i sapRmHdbPid
+# systemctl list-unit-files | grep -i SAPHanaSR-rmHdbPid
 .br
-# systemctl status sapRmHdbPid
+# systemctl status SAPHanaSR-rmHdbPid
 .br
-# systemd-analyze dot | grep sapRmHdbPid
+# systemd-analyze dot | grep SAPHanaSR-rmHdbPid
 .RE
 .PP
 .\"
@@ -63,8 +63,8 @@ Usage, syntax or execution errors.
 .TP 4
 /usr/bin/SAPHanaSR-rmHdbPid
 the script itself.
-.TP 
-/usr/lib/systemd/system/sapRmHdbPid.service
+.TP 4
+/usr/lib/systemd/system/SAPHanaSR-rmHdbPid.service
 the default unit file.
 .TP 4
 /usr/sap/<SID>/HDB<INO>/<HOST>/lock/hdbdaemon@3<INO>00.pid
@@ -87,7 +87,7 @@ prevent HANA from starting.
 \fB*\fP This script should run as systemd service at boot time.
 It must not be called while HANA is running.
 .PP
-\fB*\fP The systemd service sapRmHdbPid needs to be enabled.
+\fB*\fP The systemd service SAPHanaSR-rmHdbPid needs to be enabled.
 .PP
 \fB*\fP The directory /usr/sap/<SID>/HDB<INO>/<HOST>/lock/ needs to be accessible
 at boot time. 
@@ -107,7 +107,7 @@ F.Herschel, L.Pinne.
 .\"
 (c) 2026 SUSE LLC
 .br
-SAPHanaSR-manageProvider comes with ABSOLUTELY NO WARRANTY.
+SAPHanaSR-rmHdbPid comes with ABSOLUTELY NO WARRANTY.
 .br
 For details see the GNU General Public License at
 http://www.gnu.org/licenses/gpl.html
