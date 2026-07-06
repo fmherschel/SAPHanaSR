@@ -52,7 +52,7 @@
             "pSite": [
                 "lss == 1",
                 "srr == P",
-                "lpt == 10",
+                "lpt >~ 1000000000:10",
                 "srHook ~ (PRIM|SWAIT|SREG)"
             ],
             "sSite": [
