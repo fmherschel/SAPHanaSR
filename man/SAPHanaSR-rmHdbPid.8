@@ -57,6 +57,12 @@ Usage, syntax or execution errors.
 # systemd-analyze dot | grep SAPHanaSR-rmHdbPid
 .RE
 .PP
+\fB*\fP show script messages
+.PP
+.RS 2
+# grep SAPHanaSR-rmHdbPid /var/log/messages
+.RE
+.PP
 .\"
 .SH FILES
 .\"
@@ -80,7 +86,6 @@ request for the component BC-OP-LNX-SUSE.
 .\"
 .SH REQUIREMENTS
 .\"
-.PP
 \fB*\fP This script is needed only when left-over hdbdaemon PID files sporadically
 prevent HANA from starting.
 .PP
