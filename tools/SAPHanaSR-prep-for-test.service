@@ -1,8 +1,7 @@
 [Unit]
 Description=Prepare node for cluster tests
 Documentation=man:SAPHanaSR-prep-for-test(8)
-After=sbd.service
-Wants=sbd.service
+Before=sbd.service
 
 [Service]
 Type=oneshot
