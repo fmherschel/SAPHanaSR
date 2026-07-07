@@ -35,7 +35,7 @@
                 "srr == P",
                 "lpt >~ 1000000000:(10|20)",
                 "srHook ~ (PRIM|SWAIT)",
-                "srPoll == (PRIM|SFAIL)"
+                "srPoll ~ (PRIM|SFAIL)"
             ],
             "pHost": [
                 "clone_state ~ (PROMOTED|DEMOTED|UNDEFINED)",
