@@ -11,12 +11,12 @@ import argparse
 
 # json_file="kill_prim_indexserver_fencing_alert.json.out"
 json_file=""
+output_format=""
 step=""
 
 def print_failures(loop_number, failure_list):
+    """ print_failures(loop_number, failure_list) - format 'human', pretty print of failures """
     for fail_obj in failure_list:
-        for key in fail_obj:
-            print(f"{loop_number}: <{key}>")
         area = fail_obj.get("area")
         obj_name = fail_obj.get("object_name")
         expect = fail_obj.get("expect")
@@ -26,13 +26,11 @@ def print_failures(loop_number, failure_list):
         have = fail_obj.get("have")
         have_var = have.get("var")
         have_val = have.get("val")
-        print(f"{area}/{obj_name} {have_var} = {have_val} does not match {expect_var} {expect_comp} {expect_expr}")
+        print(f"loop{loop_number}: {area}/{obj_name} {have_var} = {have_val} does not match check '{expect_var} {expect_comp} {expect_expr}'")
     return 0
 
 def analyze_failures(json_step_step, step):
-
-    #j_steps = json.get('steps',None)
-    #j_step_step = j_steps.get(step, None)
+    """ analyze_failures(json_step_step, step) - """
     #
     # get min and max failures in this steps
     #
@@ -57,12 +55,17 @@ def analyze_failures(json_step_step, step):
                     f_short = l_failures
                     if f_count != 0:
                         f_count = 0
-                        print(f"{l_nr} {f_short} (last failure occured in {f_count} loops")	
-                        print_failures(l_nr, l_failures)
+                        if output_format == "human":
+                            print_failures(l_nr, l_failures)
+                        else:
+                            print(f"{l_nr}: {f_short} (last failure occured in {f_count} loops")	
                         
                     else:
                         if f_len > 0:
-                            print(f"X {l_nr} {f_short}")
+                            if output_format == "human":
+                                print_failures(l_nr, l_failures)
+                            else:
+                                print(f"{l_nr}: {f_short}")
                         else:
                             print(f"{l_nr} Error in check description")
                 else:
@@ -72,9 +75,12 @@ def analyze_failures(json_step_step, step):
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--file", help="specify the json-out file")
+parser.add_argument("--format", help="specify the output format (human, plain)")
 args = parser.parse_args()
 if args.file:
     json_file = args.file
+if args.format:
+    output_format = args.format
 
 try:
     with open(json_file, encoding="utf-8") as json_fh:
