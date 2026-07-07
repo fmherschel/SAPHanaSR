@@ -33,8 +33,8 @@
             "pSite": [
                 "lss == 1",
                 "srr == P",
-                "lpt >~ 1000000000:20",
-                "srHook == PRIM",
+                "lpt >~ 1000000000:(10|20)",
+                "srHook ~ (PRIM|SWAIT)",
                 "srPoll == PRIM"
             ],
             "pHost": [
@@ -45,7 +45,7 @@
         },
         {
             "step": "step30",
-            "name": "secondary takeover - primary still down",
+            "name": "secondary takeover - old primary still down",
             "next": "step40",
             "loop": 120,
             "wait": 2,
@@ -76,7 +76,7 @@
         },
         {
             "step": "step40",
-            "name": "new primary - primary still down",
+            "name": "new primary - old primary still down",
             "next": "final50",
             "loop": 120,
             "wait": 2,
@@ -97,7 +97,7 @@
             "sHost": "pHostUp"
         },
         {
-            "step": "final40",
+            "step": "final50",
             "name": "end recover",
             "next": "END",
             "loop": 240,
