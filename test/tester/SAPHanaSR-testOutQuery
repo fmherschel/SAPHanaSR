@@ -11,7 +11,7 @@ import argparse
 
 # json_file="kill_prim_indexserver_fencing_alert.json.out"
 json_file=""
-output_format=""
+output_format="human"  # other option is plain (print as dictionary)
 step=""
 
 def print_failures(loop_number, failure_list):
