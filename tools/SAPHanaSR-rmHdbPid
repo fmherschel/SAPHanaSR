@@ -37,6 +37,7 @@ function rm_all() {
 		fi 
 		#echo "Info: fPID=$fPID, PID=$PID"
 		if [[ -n "$PID" ]]; then
+            # TODO remove line "PID.TTY.*TIME.CMD" from output
 			if ps -p "$PID" 2>/dev/null; then
 				echo "Keep file $file"
 			else
