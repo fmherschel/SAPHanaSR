@@ -1919,7 +1919,7 @@ function saphana_monitor_clone() {
                 test_rem_sr=$(get_SRHOOK "$gRemSite")
                 if [[ "$test_rem_sr" == "SOK" ]]; then
                     super_ocf_log info "RA monitor() ON_FAIL_ACTION=$ON_FAIL_ACTION, remote site is SOK => BYPASS SCORING HERE"
-                    super_ocf_log info "RA monitor() ON_FAIL_ACTION=$ON_FAIL_ACTION, remote site is SOK and monitor failes => create poison pill file"
+                    super_ocf_log info "RA monitor() ON_FAIL_ACTION=$ON_FAIL_ACTION, remote site is SOK and monitor fails => create poison pill file"
                     saphana_set_poison_pill
                 else
                     super_ocf_log info "RA test_rem_sr=$test_rem_sr != 'SOK'"
