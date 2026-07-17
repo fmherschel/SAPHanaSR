@@ -1,0 +1,21 @@
+[Unit]
+Description=pacemaker.service delayed start
+Documentation=man:SAPHanaSR-pacemaker.timer(5)
+#
+# SBD_STARTMODE=[clean|always]
+# SBD_DELAY_START=no
+# sbd.service enabled
+# corosync.service disabled
+# pacemaker.service disabled
+# pacemaker.timer enabled
+#
+ConditionPathExists=/usr/sbin/pacemakerd
+
+[Timer]
+# TODO EnvironmentFile=/etc/sysconfig/SAPHanaSR-pacemaker.timer to set OnStartupSec?
+OnStartupSec=71
+AccuracySec=5
+Unit=pacemaker.service
+
+[Install]
+WantedBy=multi-user.target
