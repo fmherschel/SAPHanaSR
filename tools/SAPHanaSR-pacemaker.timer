@@ -9,13 +9,18 @@ Documentation=man:SAPHanaSR-pacemaker.timer(5)
 # pacemaker.service disabled
 # pacemaker.timer enabled
 #
+# OnStartupSec disk-based SBD
+#   SBD_DELAY_START = pcmk_delay_max + msgwait + corosync.token + corosync.consensus
+# OnStartupSec diskless SBD
+#   SBD_DELAY_START = 2 * SBD_WATCHDOG_TIMEOUT + corosync.token + corosync.consensus
+# TODO EnvironmentFile=/etc/sysconfig/SAPHanaSR-pacemaker.timer to set OnStartupSec?
+#
 ConditionPathExists=/usr/sbin/pacemakerd
 
 [Timer]
-# TODO EnvironmentFile=/etc/sysconfig/SAPHanaSR-pacemaker.timer to set OnStartupSec?
 OnStartupSec=71
-AccuracySec=5
+AccuracySec=1
 Unit=pacemaker.service
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=timers.target
