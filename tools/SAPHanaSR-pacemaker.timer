@@ -15,7 +15,8 @@ Documentation=man:SAPHanaSR-pacemaker.timer(5)
 #   SBD_DELAY_START = 2 * SBD_WATCHDOG_TIMEOUT + corosync.token + corosync.consensus
 # TODO EnvironmentFile=/etc/sysconfig/SAPHanaSR-pacemaker.timer to set OnStartupSec?
 #
-ConditionPathExists=/usr/sbin/pacemakerd
+ConditionPathExists=/usr/lib/systemd/system/pacemaker.service
+ConditionPathExists=!/usr/systemd/system/multi-user.target.wants/pacemaker.service
 
 [Timer]
 OnStartupSec=71
