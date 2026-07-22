@@ -1,6 +1,6 @@
 .\" Version: 1.2
 .\"
-.TH SAPHanaSR_maintenance_examples 7 "01 Dec 2025" "" "SAPHanaSR"
+.TH SAPHanaSR_maintenance_examples 7 "21 Jul 2026" "" "SAPHanaSR"
 .\"
 .SH NAME
 .\"
@@ -522,6 +522,9 @@ intervals and timeouts.
 \fB*\fR Before doing anything, always check for the Linux cluster's idle status,
 left-over migration constraints, and resource failures as well as the HANA
 landscape status, and the HANA SR status.
+.PP
+\fB*\fR Before leaving the maintenance mode, Linux cluster and HANA need to be in
+sane state. Particularly the HANA pair and replication.
 .PP
 \fB*\fR Maintenance attributes for cluster, nodes and resources must not be mixed.
 .PP
