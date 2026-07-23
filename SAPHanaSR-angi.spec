@@ -50,7 +50,7 @@ BuildRequires:  crmsh
 BuildRequires:  crmsh-scripts
 
 %description
-SAPHanaSR-angi is "SAP HANA SR - An Next Generation Interface" for SUSE high availabilty clusters to manage SAP HANA databases with system replication.
+SAPHanaSR-angi is "SAP HANA SR - Advanced Next Generation Interface" for SUSE high availabilty clusters to manage SAP HANA databases with system replication.
 
 The current version of SAPHanaSR-angi is targeting SAP HANA SR scale-up and scale-out setups.
 
