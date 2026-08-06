@@ -22,5 +22,6 @@ currSecondary=$(sctl_get_curr_secn "${node01}")
 
 echo "==== Block corosync on ${currSecondary} ===="
 # shellcheck disable=SC2029
+# TODO how to block knet?
 sctl_run_iptables "$currSecondary" '-I INPUT -p udp -m multiport --ports 5405 -j DROP &'
 #
