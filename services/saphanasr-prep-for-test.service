@@ -7,7 +7,7 @@ RefuseManualStart=yes
 
 [Service]
 Type=oneshot
-ExecStart=/usr/share/SAPHanaSR-angi/bin/SAPHanaSR-prep-for-test --force
+ExecStart=/usr/share/SAPHanaSR-angi/bin/saphanasr-prep-for-test --force
 RemainAfterExit=yes
 
 [Install]

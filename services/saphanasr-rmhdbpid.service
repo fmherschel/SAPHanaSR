@@ -6,7 +6,7 @@ RefuseManualStart=yes
 
 [Service]
 Type=oneshot
-ExecStart=/usr/share/SAPHanaSR-angi/bin/SAPHanaSR-rmHdbPid --force
+ExecStart=/usr/share/SAPHanaSR-angi/bin/saphanasr-rmhdbpid --force
 RemainAfterExit=yes
 
 [Install]
