@@ -9,8 +9,11 @@ SAPHanaSR-pacemaker.timer \- delay pacemaker start on boot
 .\"
 .SH DESCRIPTION
 .\"
-SAPHanaSR-pacemaker.timer delays pacemaker start on boot
+SAPHanaSR-pacemaker.timer delays pacemaker start on boot.
 .PP
+The timer can be used instead of SBD_DELAY_START, if the delay between corosync
+and pacemaker start at boot interferes with cluster resource takeover actions.
+When using this timer, SBD_DELAY_START=no is needed.
 TODO
 .\"
 .SH RETURN CODES
@@ -36,11 +39,21 @@ Usage, syntax or execution errors.
 # systemd-analyze dot | grep SAPHanaSR-pacemaker.timer
 .RE
 .PP
+\fB*\fP set SBD_DELAY_START
+.PP
+# cp -a /etc/sysconfig/sbd /etc/sysconfig/sbd.$(date +%s)
+.br
+# sed s/^SBD_DELAY_START=.*$/SBD_DELAY_START=no/g -i /etc/sysconfig/sbd
+.PP
+.\"
 .SH FILES
 .\"
 .TP 4
-/usr/lib/systemd/system/SAPHanaSR-prep-for-test.service
-the default unit file.
+/usr/lib/systemd/system/SAPHanaSR-pacemaker.timer
+the timer unit file.
+.TP 4
+/usr/lib/systemd/system/pacemaker.service
+the default pacemaker service unit file.
 .PP
 .\"
 .SH BUGS
@@ -52,7 +65,11 @@ request for the component BC-OP-LNX-SUSE.
 .\"
 .SH REQUIREMENTS
 .\"
-TODO
+* SBD_DELAY_START=no in /etc/sysconfig/sbd.
+.PP
+* The pacemaker service enabled. 
+.PP
+.\"
 .SH SEE ALSO
 .\"
 \fBsystemctl\fP(8), \fBsbd\fP(8), \fBcrm\fP(8)
