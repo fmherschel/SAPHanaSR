@@ -21,7 +21,7 @@ License:        GPL-2.0
 Group:          Productivity/Clustering/HA
 AutoReqProv:    on
 Summary:        Resource agents to control the HANA database in system replication setup
-Version:        1.3.4
+Version:        1.3.5
 Release:        0
 Url:            https://www.suse.com/c/fail-safe-operation-of-sap-hana-suse-extends-its-high-availability-solution/
 
@@ -49,6 +49,11 @@ BuildRequires:  resource-agents >= 4.1.0
 BuildRequires:  crmsh
 BuildRequires:  crmsh-scripts
 
+%package testenv
+Group:          Productivity/Clustering/HA
+Summary:        Testenv for SAPHanaSR-angi - Not for production clusters
+
+
 %description
 SAPHanaSR-angi is "SAP HANA SR - Advanced Next Generation Interface" for SUSE high availabilty clusters to manage SAP HANA databases with system replication.
 
@@ -66,6 +71,9 @@ Authors:
     Angela Briel
     Fabian Herschel
     Lars Pinne
+
+%description testenv
+Test enviroment services. Do not use/install this package on production clusters.
 
 %prep
 tar xf %{S:0}
@@ -118,13 +126,24 @@ install -m 0555 tools/SAPHanaSR-manageProvider %{buildroot}/usr/bin
 install -m 0555 tools/SAPHanaSR-upgrade-to-angi-demo %{buildroot}/usr/share/%{name}/samples
 install -m 0444 tools/saphana_sr_tools.py %{buildroot}/usr/lib/%{name}
 
+# install test env servuces (unit-files and scripts)
+install -d %{buildroot}/usr/share/%{name}/bin
+install -d %{buildroot}/usr/lib/systemd/system
+install -m 0544 services/SAPHanaSR-prep-for-test %{buildroot}/usr/share/%{name}/bin
+install -m 0544 services/SAPHanaSR-rmHdbPid %{buildroot}/usr/share/%{name}/bin
+install -m 0644 services/SAPHanaSR-prep-for-test.service %{buildroot}/usr/lib/systemd/system
+install -m 0644 services/SAPHanaSR-rmHdbPid.service %{buildroot}/usr/lib/systemd/system
+
 %files
 %defattr(-,root,root)
 %dir /usr/lib/ocf
 %dir /usr/lib/ocf/resource.d
 %dir /usr/lib/ocf/resource.d/suse
 /usr/lib/ocf/resource.d/suse/*
-/usr/share/%{name}
+%dir /usr/share/%{name}
+/usr/share/%{name}/sus*.py
+/usr/share/%{name}/samples
+/usr/share/%{name}/icons
 %dir /usr/lib/%{name}
 /usr/lib/%{name}/saphana-*-lib
 /usr/lib/%{name}/saphana_sr_*.py
@@ -140,5 +159,12 @@ install -m 0444 tools/saphana_sr_tools.py %{buildroot}/usr/lib/%{name}
 %doc README.md
 %doc %{_mandir}/man7/*
 %doc %{_mandir}/man8/*
+
+%files testenv
+%dir /usr/share/%{name}
+%dir /usr/share/%{name}/bin
+/usr/share/%{name}/bin/SAPHanaSR*
+%dir /usr/lib/systemd/system
+/usr/lib/systemd/system/*
 
 %changelog
