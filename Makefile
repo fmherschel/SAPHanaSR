@@ -10,6 +10,7 @@ FILE_LIST = LICENSE \
 		icons \
 		man \
 		ra \
+        services \
 		srHook \
 		tools \
 		wizard
