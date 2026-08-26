@@ -80,6 +80,7 @@ tar xf %{S:0}
 
 %build
 gzip man/*
+gzip man-testenv/*
 
 %install
 mkdir -p %{buildroot}/usr/bin
@@ -126,13 +127,14 @@ install -m 0555 tools/SAPHanaSR-manageProvider %{buildroot}/usr/bin
 install -m 0555 tools/SAPHanaSR-upgrade-to-angi-demo %{buildroot}/usr/share/%{name}/samples
 install -m 0444 tools/saphana_sr_tools.py %{buildroot}/usr/lib/%{name}
 
-# install test env servuces (unit-files and scripts)
+# install test env services (unit-files, scripts and man pages)
 install -d %{buildroot}/usr/share/%{name}/bin
 install -d %{buildroot}/usr/lib/systemd/system
-install -m 0544 services/SAPHanaSR-prep-for-test %{buildroot}/usr/share/%{name}/bin
-install -m 0544 services/SAPHanaSR-rmHdbPid %{buildroot}/usr/share/%{name}/bin
-install -m 0644 services/SAPHanaSR-prep-for-test.service %{buildroot}/usr/lib/systemd/system
-install -m 0644 services/SAPHanaSR-rmHdbPid.service %{buildroot}/usr/lib/systemd/system
+install -m 0544 services/saphanasr-prep-for-test %{buildroot}/usr/share/%{name}/bin
+install -m 0544 services/saphanasr-rmhdbpid %{buildroot}/usr/share/%{name}/bin
+install -m 0644 services/saphanasr-prep-for-test.service %{buildroot}/usr/lib/systemd/system
+install -m 0644 services/saphanasr-rmhdbpid.service %{buildroot}/usr/lib/systemd/system
+install -m 0644 man-testenv/*8.gz %{buildroot}%{_mandir}/man8
 
 %files
 %defattr(-,root,root)
@@ -157,14 +159,14 @@ install -m 0644 services/SAPHanaSR-rmHdbPid.service %{buildroot}/usr/lib/systemd
 %license LICENSE
 %dir %{_docdir}/%{name}
 %doc README.md
-%doc %{_mandir}/man7/*
-%doc %{_mandir}/man8/*
+%doc %{_mandir}/man?/{ocf_suse*,SAPHana*,sus[A-Z]*}
 
 %files testenv
 %dir /usr/share/%{name}
 %dir /usr/share/%{name}/bin
-/usr/share/%{name}/bin/SAPHanaSR*
+/usr/share/%{name}/bin/saphanasr*
 %dir /usr/lib/systemd/system
 /usr/lib/systemd/system/*
+%doc %{_mandir}/man?/saphanasr*
 
 %changelog
