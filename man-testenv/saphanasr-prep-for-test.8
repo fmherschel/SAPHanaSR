@@ -1,20 +1,20 @@
 .\" Version: 1.2
 .\"
-.TH SAPHanaSR-prep-for-test 8 "02 Jun 2026" "" "SAPHanaSR"
+.TH saphanasr-prep-for-test 8 "02 Jun 2026" "" "SAPHanaSR"
 .\"
 .SH NAME
 .\"
-SAPHanaSR-prep-for-test \- prepare node for cluster tests
+saphanasr-prep-for-test \- prepare node for cluster tests
 .PP
 .\"
 .SH SYNOPSIS
 .\"
-\fBSAPHanaSR-prep-for-test [ --help | --version | --force ]
+\fBsaphanasr-prep-for-test [ --help | --version | --force ]
 .PP
 .\"
 .SH DESCRIPTION
 .\"
-SAPHanaSR-prep-for-test helps preparing a node for cluster tests.
+saphanasr-prep-for-test helps preparing a node for cluster tests.
 .PP
 Automated cluster tests need fenced nodes booting and joining the cluster
 automatcally after tests. On the other hand, SAPHanaSR-angi scale-up perf-opt and
@@ -22,7 +22,7 @@ scale-out perf-opt default configuration for production described in setup guide
 and manual pages recommend to not start the cluster automatically at boot. At
 least SBD_STARTMODE=clean should be used.
 .PP
-SAPHanaSR-prep-for-tests cleans SBD devices and starts the pacemaker cluster at
+saphanasr-prep-for-tests cleans SBD devices and starts the pacemaker cluster at
 boot time. This script must not be used on production clusters.
 .PP
 .\"
@@ -50,32 +50,32 @@ Usage, syntax or execution errors.
 .\"
 .SH EXAMPLES
 .\"
-\fB*\fP enable and check systemd service SAPHanaSR-prep-for-test
+\fB*\fP enable and check systemd service saphanasr-prep-for-test
 .PP
 .RS 2
-# systemctl enable SAPHanaSR-prep-for-test
+# systemctl enable saphanasr-prep-for-test
 .br
-# systemctl list-unit-files | grep -i SAPHanaSR-prep-for-test
+# systemctl list-unit-files | grep -i saphanasr-prep-for-test
 .br
-# systemctl status SAPHanaSR-prep-for-test
+# systemctl status saphanasr-prep-for-test
 .br
-# systemd-analyze dot | grep SAPHanaSR-prep-for-test
+# systemd-analyze dot | grep saphanasr-prep-for-test
 .RE
 .PP
 \fB*\fP show script messages 
 .PP
 .RS 2
-# grep SAPHanaSR-prep-for-test /var/log/messages
+# grep saphanasr-prep-for-test /var/log/messages
 .RE
 .PP
 .\"
 .SH FILES
 .\"
 .TP 4
-/usr/share/SAPHanaSR/bin/SAPHanaSR-prep-for-test
+/usr/share/SAPHanaSR/bin/saphanasr-prep-for-test
 the script itself.
 .TP 
-/usr/lib/systemd/system/SAPHanaSR-prep-for-test.service
+/usr/lib/systemd/system/saphanasr-prep-for-test.service
 the default unit file.
 .PP
 .\"
@@ -93,7 +93,7 @@ request for the component BC-OP-LNX-SUSE.
 \fB*\fP This script should run as systemd service at boot time.
 It must not be called while the cluster is running.
 .PP
-\fB*\fP The systemd service SAPHanaSR-prep-for-test needs to be enabled.
+\fB*\fP The systemd service saphanasr-prep-for-test needs to be enabled.
 .PP
 .\"
 .SH SEE ALSO
@@ -110,7 +110,7 @@ F.Herschel, L.Pinne.
 .\"
 (c) 2026 SUSE LLC
 .br
-SAPHanaSR-prep-for-test comes with ABSOLUTELY NO WARRANTY.
+saphanasr-prep-for-test comes with ABSOLUTELY NO WARRANTY.
 .br
 For details see the GNU General Public License at
 http://www.gnu.org/licenses/gpl.html
