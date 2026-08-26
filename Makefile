@@ -9,6 +9,7 @@ FILE_LIST = LICENSE \
         crm_cfg \
 		icons \
 		man \
+		man-testenv \
 		ra \
         services \
 		srHook \
