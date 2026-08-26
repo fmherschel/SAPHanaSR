@@ -667,8 +667,7 @@ function saphana_stopSystem() {
                 break;
             else
                 sleep 5
-                timeNow=$(date '+%s')
-                (( timeStop = timeNow - timeBegin ))
+                (( timeStop = SECONDS - timeBegin ))
                 (( timeRemain = HANA_ACTION_TIMEOUT - timeStop ))
                 if [ "$timeRemain" -le 0 ]; then
                     # terminate wait-for-all-nodes-down if time-to-stop in sum expired HANA_ACTION_TIMEOUT
