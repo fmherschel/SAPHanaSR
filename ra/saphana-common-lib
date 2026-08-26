@@ -778,9 +778,9 @@ function chk4systemdsupport() {
     local systemd_unit_name="SAP${SID}_${InstanceNr}.service"
     local rc=1
     if [ -x "$SYSTEMCTL" ]; then
-        if [ -f "/etc/systemd/system/$systemd_unit_name" ]; then
+        if [ -f "/etc/systemd/system/${systemd_unit_name}" ]; then
             rc=0
-        elif "$SYSTEMCTL" list-unit-files | \
+        elif "$SYSTEMCTL" list-unit-files "${systemd_unit_name}" | \
             awk '$1 == service { found=1 } END { if (! found) {exit 1}}' service="${systemd_unit_name}"; then
             rc=0
         else
