@@ -1,6 +1,6 @@
 [Unit]
 Description=Remove hdbdaemon PID files at boot
-Documentation=man:SAPHanaSR-rmHdbPid(8)
+Documentation=man:saphanasr-rmhdbpid(8)
 Before=saphostagent.service
 RefuseManualStart=yes
 
