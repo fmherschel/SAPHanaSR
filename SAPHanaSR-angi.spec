@@ -127,6 +127,11 @@ install -m 0555 tools/SAPHanaSR-manageProvider %{buildroot}/usr/bin
 install -m 0555 tools/SAPHanaSR-upgrade-to-angi-demo %{buildroot}/usr/share/%{name}/samples
 install -m 0444 tools/saphana_sr_tools.py %{buildroot}/usr/lib/%{name}
 
+# install services and/or timers (main package)
+install -d %{buildroot}/usr/lib/systemd/system
+install -m 0644 services/SAPHanaSR-pacemaker.timer %{buildroot}/usr/lib/systemd/system
+
+
 # install test env services (unit-files, scripts and man pages)
 install -d %{buildroot}/usr/share/%{name}/bin
 install -d %{buildroot}/usr/lib/systemd/system
@@ -155,6 +160,8 @@ install -m 0644 man-testenv/*8.gz %{buildroot}%{_mandir}/man8
 /usr/bin/SAPHanaSR-hookHelper
 /usr/bin/SAPHanaSR-manageProvider
 /usr/bin/SAPHanaSR-alert-fencing
+%dir /usr/lib/systemd/system
+/usr/lib/systemd/system/SAP*
 
 %license LICENSE
 %dir %{_docdir}/%{name}
@@ -166,7 +173,7 @@ install -m 0644 man-testenv/*8.gz %{buildroot}%{_mandir}/man8
 %dir /usr/share/%{name}/bin
 /usr/share/%{name}/bin/saphanasr*
 %dir /usr/lib/systemd/system
-/usr/lib/systemd/system/*
+/usr/lib/systemd/system/sap*
 %doc %{_mandir}/man?/saphanasr*
 
 %changelog
