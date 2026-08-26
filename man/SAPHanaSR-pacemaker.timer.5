@@ -39,9 +39,12 @@ Usage, syntax or execution errors.
 # systemd-analyze dot | grep SAPHanaSR-pacemaker.timer
 .RE
 .PP
-\fB*\fP set SBD_DELAY_START
+\fB*\fP set SBD_DELAY_START=no
 .PP
 # cp -a /etc/sysconfig/sbd /etc/sysconfig/sbd.$(date +%s)
+.br
+# grep ^SBD_DELAY_START= /etc/sysconfig/sbd
+.\" TODO use value of SBD_DELAY_START in timer instead of fix 71
 .br
 # sed s/^SBD_DELAY_START=.*$/SBD_DELAY_START=no/g -i /etc/sysconfig/sbd
 .PP
@@ -54,6 +57,9 @@ the timer unit file.
 .TP 4
 /usr/lib/systemd/system/pacemaker.service
 the default pacemaker service unit file.
+.TP 4
+/etc/sysconfig/sbd
+the sbd config file.
 .PP
 .\"
 .SH BUGS
@@ -65,9 +71,9 @@ request for the component BC-OP-LNX-SUSE.
 .\"
 .SH REQUIREMENTS
 .\"
-* SBD_DELAY_START=no in /etc/sysconfig/sbd.
+* SBD_DELAY_START=no in /etc/sysconfig/sbd .
 .PP
-* The pacemaker service enabled. 
+* The pacemaker service enabled.
 .PP
 .\"
 .SH SEE ALSO
