@@ -668,8 +668,8 @@ function get_local_virtual_name() {
     #
     if [ -e /usr/sap/hostctrl/exe/saphostctrl ]; then
         # by intention the timeout here is not HANA_CALL_TIMOUT but fix 10s
-        # using timeout without '--foreground'
-        mapfile -t listInstances < <( timeout -s 9 10 /usr/sap/hostctrl/exe/saphostctrl -function ListInstances )
+        # using timeout with '--foreground' TODO: PRIO3: could we remove --foreground from all timeout calls?
+        mapfile -t listInstances < <( timeout --foreground -s 9 10 /usr/sap/hostctrl/exe/saphostctrl -function ListInstances )
         for lI in "${listInstances[@]}"; do
             # InstInfo : HA1 - 00 - suse-01 - 753,patch1010,changelist2124070
             # bsc#1233972 - hostname may include dashes
