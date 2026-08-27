@@ -322,7 +322,7 @@ function set_hana_site_attribute() {
         set_hana_attribute "$attr_obj" "$attr_value" "$attr_name" "$attr_store"; rc=$?
     fi
     super_ocf_log info "FLOW ${FUNCNAME[0]} rc=$rc"
-    return $rc
+    return "$rc"
 } # end function set_hana_site_attribute
 
 # get_hana_site_attribute <site> <ATTRIBUTE-TEMPLATE>
@@ -336,7 +336,7 @@ function get_hana_site_attribute() {
     local attr_default="$4"
     get_hana_attribute "$attr_obj" "$attr_name" "$attr_store" "$attr_default"; rc=$?
     super_ocf_log info "FLOW ${FUNCNAME[0]} rc=$rc"
-    return $rc
+    return "$rc"
 } # end function get_hana_site_attribute
 
 #
