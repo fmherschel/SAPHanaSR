@@ -664,6 +664,11 @@ function get_local_virtual_name() {
     local -a listInstances
     local lI
     #
+    # TODO PRIO2: sap hostagent ListInstances could hang and should not be used as first option
+    #             on native systemd environemnts we should first use the systemd unit file e.g (SID is HA1, INO is 00):
+    #             mapfile -t sd_file < /etc/systemd/system/SAPHA1_00.service
+    #             for sd_line in "${sd_file[@]}"; do if [[ "$sd_line" =~ ^ExecStart.*pf=.*HA1_HDB00_([a-zA-Z0-9_-]*)( |$) ]]; then echo ${BASH_REMATCH[1]}; fi ; done
+    #
     # step 1 - get virtual host name by saphostagent
     #
     if [ -e /usr/sap/hostctrl/exe/saphostctrl ]; then
