@@ -35,7 +35,6 @@
 SAPHanaTopologyVersion="1.3.3"
 #
 # Initialization:
-timeB=$(date '+%s')
 
 raType="sht_"
 OCF_FUNCTIONS_DIR="${OCF_FUNCTIONS_DIR:-${OCF_ROOT}/lib/heartbeat}"
@@ -91,7 +90,7 @@ case "$ACTION" in
                     exit "$OCF_SUCCESS";;
     *)
                     super_ocf_log info "RA ==== begin action $ACTION$CLACT ($SAPHanaTopologyVersion) ===="
-                    core_init "$SAPHanaTopologyVersion" "$timeB"
+                    core_init "$SAPHanaTopologyVersion" "$SECONDS"
                     ;;
 esac
 "${raType}"init
@@ -133,10 +132,8 @@ case "$ACTION" in
         ra_rc="$OCF_ERR_UNIMPLEMENTED"
         ;;
 esac
-timeE="$(date '+%s')"
-(( timeR = timeE - timeB ))
 set_g_times
-super_ocf_log info "RUNTIME ==== end action $ACTION$CLACT with rc=${ra_rc} ($SAPHanaTopologyVersion) (${timeR}s)===="
-super_ocf_log info "RA ==== end action $ACTION$CLACT with rc=${ra_rc} ($SAPHanaTopologyVersion) (${timeR}s; times=$g_time_proc $g_time_chld)===="
+super_ocf_log info "RUNTIME ==== end action $ACTION$CLACT with rc=${ra_rc} ($SAPHanaTopologyVersion) (${SECONDS}s)===="
+super_ocf_log info "RA ==== end action $ACTION$CLACT with rc=${ra_rc} ($SAPHanaTopologyVersion) (${SECONDS}s; times=$g_time_proc $g_time_chld)===="
 exit "${ra_rc}"
 # set ts=4 sw=4 sts=4 et
