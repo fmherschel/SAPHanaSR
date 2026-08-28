@@ -507,7 +507,9 @@ function sht_monitor_clone() {
         # try to catch:  Inst Info : LNX - 42 - lv9041 - 740, patch 36, changelist 1444691
         # We rely on the following format: SID is word#4, SYSNR is word#6, vHost is word#8
         #### SAP-CALL
-        get_local_virtual_name
+        if [[ -z "$gVirtName" ]]; then
+            get_local_virtual_name
+        fi
         super_ocf_log info "DEC: get_role_by_landscape"
         mapfile -t splitResult < <( get_role_by_landscape "$gVirtName" --multiValue );
         # TODO PRIO2: NG - check for role=<role>, topo=<topo> instead of just assign [0] and [1] and cut of the "<key>="
