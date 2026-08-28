@@ -335,15 +335,7 @@ function sht_monitor() {
     # We rely on the following format: SID is word#4, NR is word#6, vHost is word#8
     #### SAP-CALL
     get_local_virtual_name; vName=${gVirtName}
-    if [ -n "$vName" ]; then
-       set_hana_attribute "${NODENAME}" "$vName" "${ATTR_NAME_HANA_VHOST[@]}" "${NODENAME}"
-    else
-       vName=$(get_hana_attribute "${NODENAME}" "${ATTR_NAME_HANA_VHOST[@]}" "${NODENAME}")
-    fi
-    # last fallback, if neither the HANA call NOR the Attribute "knows" the vName - try the local hostname
-    if [ -z "$vName" ]; then
-       vName=${NODENAME}
-    fi
+    set_hana_attribute "${NODENAME}" "$vName" "${ATTR_NAME_HANA_VHOST[@]}" "${NODENAME}"
     if [ -f "$HA_RSCTMP/SAPHana/SAPTopologyON.${SID}" ]; then
         rc="$OCF_SUCCESS"
     else
