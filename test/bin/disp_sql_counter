@@ -8,7 +8,17 @@
 # License:      GNU General Public License (GPL)
 # Copyright:    (c) 2023-2026 SUSE LLC
 
+SET schema system
 CREATE ROW TABLE fhcounter (timestamp TIMESTAMP, counter BIGINT);
+
+SELECT * 
+FROM XTAB AS a
+WHERE a.LASTID IS NOT NULL
+  AND NOT EXISTS (
+      SELECT 1 
+      FROM XTAB AS b 
+      WHERE b.ID = a.LASTID
+  );
 
 TODO: parameter für "site" und pro LOOP die site ausgeben
 TODO: parameter für "user-key"
@@ -58,6 +68,7 @@ class DbThreads:
         self.userkey = USERKEY_DFLT
         self.connection = None
         self.list=[]
+        self.count_nr = 0
         self.count_sql = None
         self.err_status = False
         # TODO: do we need err_txt AND _err_txt?
@@ -177,7 +188,8 @@ class DbThreads:
 
     def insert(self):
         """ insert timestamp to test table """
-        count = 1
+        count = self.count_nr + 1
+        self.count_nr = count
         time_str = f"{time.strftime('%Y-%m-%d %H:%M:%S')}"
         insert_sql = f"insert into fhcounter (timestamp, counter) VALUES ( '{time_str}', {count} );"
 
