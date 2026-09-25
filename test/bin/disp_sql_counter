@@ -9,7 +9,10 @@
 # Copyright:    (c) 2023-2026 SUSE LLC
 
 SET schema system
-CREATE ROW TABLE fhcounter (timestamp TIMESTAMP, counter BIGINT);
+CREATE ROW TABLE fhcounter (timestamp TIMESTAMP, pid BIGINT, id BIGINT, lastid BIGINT);
+
+TODO: Temporary the name fhcounter is now fhcounter2
+
 
 SELECT * 
 FROM XTAB AS a
@@ -19,6 +22,9 @@ WHERE a.LASTID IS NOT NULL
       FROM XTAB AS b 
       WHERE b.ID = a.LASTID
   );
+
+SELECT * from fhcounter2 AS a WHERE a.LASTID IS NOT NULL AND NOT EXISTS ( SELECT 1 FROM fhcounter2 AS b WHERE b.ID = a.LASTID );
+SELECT t1.* FROM fhcounter2 t1 LEFT JOIN fhcounter2 t2 ON t1."LASTID" = t2."ID" WHERE t2."ID" IS NULL AND t1."LASTID" IS NOT NULL;
 
 TODO: parameter für "site" und pro LOOP die site ausgeben
 TODO: parameter für "user-key"
@@ -46,7 +52,7 @@ except ImportError as e:
     print(f"Module dbapi not found - install the missing SAP Python Driver 'hdbcli' - {e}")
 
 # parameter section
-VERSION = "1.10.2"
+VERSION = "2.02.2"
 USERKEY_DFLT = "TESTER"
 #
 
@@ -78,6 +84,7 @@ class DbThreads:
         self._msg_txt = ""
         self._err_flag = False
         self._msg_flag = False
+        self.pid = os.getpid()
         self.run_time = time.time()
         self.kick_me = False
         self.thread_sql = None
@@ -188,10 +195,11 @@ class DbThreads:
 
     def insert(self):
         """ insert timestamp to test table """
+        oldcount = self.count_nr
         count = self.count_nr + 1
         self.count_nr = count
         time_str = f"{time.strftime('%Y-%m-%d %H:%M:%S')}"
-        insert_sql = f"insert into fhcounter (timestamp, counter) VALUES ( '{time_str}', {count} );"
+        insert_sql = f"insert into fhcounter2 (timestamp, pid, id, lastid) VALUES ( '{time_str}', {self.pid}, {count}, {oldcount} );"
 
         connection = self.connection
         if connection is None or not connection.isconnected():
@@ -215,7 +223,7 @@ class DbThreads:
     # pylint: disable-next=unused-argument
     def count(self, **kargs):
         """ count values in test_table """
-        count_sql = "select count(*) from fhcounter"
+        count_sql = "select count(*) from fhcounter2"
         connection = self.connection
         result = None
         if connection is None or not connection.isconnected():
@@ -230,7 +238,7 @@ class DbThreads:
                 result = row[0]
             if not result is None and result > 1024:
                 try:
-                    delete_sql = "delete from fhcounter"
+                    delete_sql = "delete from fhcounter2"
                     cursor.execute(delete_sql)
                     self._msg_flag = True
                     self._msg_txt = "DATA RESET"
@@ -248,7 +256,7 @@ class DbThreads:
 
     def select(self):
         """ slelect values from test table """
-        select_sql = "SELECT timestamp, counter FROM fhcounter ORDER BY timestamp, counter"
+        select_sql = "SELECT timestamp, id FROM fhcounter2 ORDER BY timestamp, id"
         connection = self.connection
         result = []
         if connection is None or not connection.isconnected():
