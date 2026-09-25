@@ -24,6 +24,8 @@ WHERE a.LASTID IS NOT NULL
   );
 
 SELECT * from fhcounter2 AS a WHERE a.LASTID IS NOT NULL AND NOT EXISTS ( SELECT 1 FROM fhcounter2 AS b WHERE b.ID = a.LASTID );
+SELECT * from fhcounter2 AS a WHERE NOT EXISTS ( SELECT 1 FROM fhcounter2 AS b WHERE (b.ID = a.LASTID) AND (b.PID = a.PID ));
+
 SELECT t1.* FROM fhcounter2 t1 LEFT JOIN fhcounter2 t2 ON t1."LASTID" = t2."ID" WHERE t2."ID" IS NULL AND t1."LASTID" IS NOT NULL;
 
 TODO: parameter für "site" und pro LOOP die site ausgeben
@@ -52,7 +54,7 @@ except ImportError as e:
     print(f"Module dbapi not found - install the missing SAP Python Driver 'hdbcli' - {e}")
 
 # parameter section
-VERSION = "2.02.2"
+VERSION = "2.02.3"
 USERKEY_DFLT = "TESTER"
 #
 
