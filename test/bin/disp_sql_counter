@@ -54,7 +54,7 @@ except ImportError as e:
     print(f"Module dbapi not found - install the missing SAP Python Driver 'hdbcli' - {e}")
 
 # parameter section
-VERSION = "2.02.3"
+VERSION = "2.02.4"
 USERKEY_DFLT = "TESTER"
 #
 
