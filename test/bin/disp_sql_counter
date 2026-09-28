@@ -199,7 +199,6 @@ class DbThreads:
         """ insert timestamp to test table """
         oldcount = self.count_nr
         count = self.count_nr + 1
-        self.count_nr = count
         time_str = f"{time.strftime('%Y-%m-%d %H:%M:%S')}"
         insert_sql = f"insert into fhcounter2 (timestamp, pid, id, lastid) VALUES ( '{time_str}', {self.pid}, {count}, {oldcount} );"
 
@@ -216,6 +215,7 @@ class DbThreads:
             self._err_txt = "I-ERR-02"
         try:
             connection.commit()
+            self.count_nr = count
         except Exception as exerr:
             self._err_flag = True
             self._err_txt = "I-ERR-03"
