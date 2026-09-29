@@ -73,7 +73,7 @@ except ImportError as e:
     print(f"Module dbapi not found - install the missing SAP Python Driver 'hdbcli' - {e}")
 
 # parameter section
-VERSION = "2.02.9"
+VERSION = "2.02.11"
 USERKEY_DFLT = "TESTER"
 #
 
@@ -114,13 +114,13 @@ class DbThreads:
 
     def start_thread_sql(self):
         """ start_thread_sql - start a sql thread """
-        print("-sts-", end='')
+        #print("-sts-", end='')
         self.thread_sql = threading.Thread(target=self.run_sql)
         self.thread_sql.start()
 
     def start_thread_watchdog(self):
         """ start a watchdog thread """
-        print("-stw-", end='')
+        #print("-stw-", end='')
         self.thread_watchdog = threading.Thread(target=self.run_watchdog)
         self.thread_watchdog.start()
 
@@ -170,7 +170,7 @@ class DbThreads:
                 self.msg_txt = self._msg_txt[:]
                 self.run_time = time.time()
                 if self.kick_me:
-                    print('## PRE RETURN#',flush=True)
+                    #print('## PRE RETURN#',flush=True)
                     self.kick_me = False
                     return 0
             time.sleep(sleep_in_sec)
@@ -341,9 +341,17 @@ while True:
     g_status = ""
     g_sleep_in_sec = 2
     # aquire lock and also release it after leaving the with statement
+    with DbThreads.AccessData:
+        if sql.kick_me is True:
+            #print('## PRE JOIN#',flush=True)
+            g_msg = "status=ACT WAIT SQL TERM"
+            print(f"{g_time_str} {sql.userkey:<8}",end='', flush=True)
+            print(f"{g_msg:<22} count={str(sql.count_sql):6} ",end='',flush=True)
+            print()
+    # threading-join must be outside of the locked code sequence
     if sql.kick_me is True:
-        print('## PRE JOIN#',flush=True)
         sql.thread_sql.join()
+    # aquire lock and also release it after leaving the with statement
     with DbThreads.AccessData:
         g_time_str = f"{time.strftime('%Y-%m-%d %H:%M:%S')}"
         g_loop_time = time.time()
@@ -360,6 +368,10 @@ while True:
         print('',flush=True)
         if sql.kick_me is True:
             sql.del_thread_sql()
+            g_msg = "status=ACT SQL RESTART"
+            print(f"{g_time_str} {sql.userkey:<8}",end='', flush=True)
+            print(f"{g_msg:<22} count={str(sql.count_sql):6} ",end='',flush=True)
+            print()
             sql.start_thread_sql()
             sql.kick_me = False
     time.sleep(g_sleep_in_sec)
