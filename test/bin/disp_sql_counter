@@ -73,7 +73,7 @@ except ImportError as e:
     print(f"Module dbapi not found - install the missing SAP Python Driver 'hdbcli' - {e}")
 
 # parameter section
-VERSION = "2.02.13"
+VERSION = "2.02.14"
 USERKEY_DFLT = "TESTER"
 #
 
@@ -146,7 +146,7 @@ class DbThreads:
             self._err_flag = False
             self._msg_flag = False
             self._err_txt = "<>"
-            sleep_in_sec = 2
+            sleep_in_sec = 1
             if _connection is None:
                 #print(f"@@RUN-CONN@@",end='',flush=True)
                 _connection = self.connect()
