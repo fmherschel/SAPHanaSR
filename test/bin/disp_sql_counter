@@ -44,6 +44,7 @@ BACKUP CATALOG DELETE ALL BEFORE BACKUP_ID <BACKUP_ID> COMPLETE;
 
 SELECT * from fhcounter2 AS a WHERE a.LASTID IS NOT NULL AND NOT EXISTS ( SELECT 1 FROM fhcounter2 AS b WHERE b.ID = a.LASTID );
 SELECT * from fhcounter2 AS a WHERE NOT EXISTS ( SELECT 1 FROM fhcounter2 AS b WHERE (b.ID = a.LASTID) AND (b.PID = a.PID ));
+SELECT * from fhcounter2 AS a WHERE a.id != 1 AND NOT EXISTS ( SELECT 1 FROM fhcounter2 AS b WHERE (b.ID = a.LASTID) AND (b.PID = a.PID ));
 
 SELECT t1.* FROM fhcounter2 t1 LEFT JOIN fhcounter2 t2 ON t1."LASTID" = t2."ID" WHERE t2."ID" IS NULL AND t1."LASTID" IS NOT NULL;
 
@@ -73,7 +74,7 @@ except ImportError as e:
     print(f"Module dbapi not found - install the missing SAP Python Driver 'hdbcli' - {e}")
 
 # parameter section
-VERSION = "2.02.14"
+VERSION = "2.02.15"
 USERKEY_DFLT = "TESTER"
 #
 
@@ -274,6 +275,7 @@ class DbThreads:
                     cursor.execute(delete_sql)
                     self._msg_flag = True
                     self._msg_txt = "DATA RESET"
+                    self.count_nr = 0
                 except Exception as d_err:
                     self._err_flag = True
                     self._err_txt = f"D-ERR-01 {d_err}"
