@@ -176,10 +176,10 @@ class DbThreads:
         """
         with DbThreads.AccessData:
             _connection = self.connect()
-            cursor = _connection.cursor()
+            _cursor = _connection.cursor()
             sql_drop = "DELETE FROM fhcounter2;"
             try:
-                _cursor.execute(insert_sql)
+                _cursor.execute(sql_drop)
             except Exception as exerr:
                 self._err_flag = True
                 self._err_txt = "DD-ERR-01"
@@ -440,8 +440,10 @@ class DbThreads:
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--userkey", help="specify sap user key")
-parser.add_argument("--drop_data", help="delete data in the test table at the beginning", action="store_true")
-parser.add_argument("--create_table", help="create the test able at the beginning", action="store_true")
+parser.add_argument("--drop_data", help="delete data in the test table at the beginning",
+                                   action="store_true")
+parser.add_argument("--create_table", help="create the test able at the beginning",
+                                   action="store_true")
 cmd_line_args = parser.parse_args()
 
 db_tester = DbThreads()
