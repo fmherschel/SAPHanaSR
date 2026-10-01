@@ -74,7 +74,7 @@ except ImportError as e:
     print(f"Module dbapi not found - install the missing SAP Python Driver 'hdbcli' - {e}")
 
 # parameter section
-VERSION = "2.03.1"
+VERSION = "3.01.3"
 USERKEY_DFLT = "TESTER"
 #
 
@@ -112,6 +112,7 @@ class DbThreads:
         self.kick_me = False         # stop the run_sql - thread (to start an other)
         self.thread_sql = None
         self.thread_watchdog = None
+        self.__emergency_stop__ = 0
 
     def start_thread_sql(self):
         """ start_thread_sql - start a sql thread """
@@ -138,7 +139,7 @@ class DbThreads:
         """ run sql """
         _connection = self.connect()
         _i = 0
-        _count = None
+        _count = 0
         _list = []
         while True:
             _i += 1
@@ -154,15 +155,34 @@ class DbThreads:
             else:
                 _connection = self.check_and_reconnect(_i)
                 #print(f"@@RUN-INS@@",end='',flush=True)
-                sql.insert()
-                #print(f"@@RUN-CNT@@",end='',flush=True)
-                _count = self.count()
-                #print(f"@@RUN-SEL@@",end='',flush=True)
-                _list = sql.select()
+                with DbThreads.AccessData:
+                    sql.insert()
+                    #print(f"@@RUN-CNT@@",end='',flush=True)
+                    _count = self.count()
+                    #print(f"@@RUN-SEL@@",end='',flush=True)
+                    _list = sql.select()
             # aquire lock and also release it after leaving the with statement
             with DbThreads.AccessData:
                 #print(f"@@RUN-DAT@@",end='',flush=True)
                 self.count_sql = _count
+                #
+                # every n-th available data record check for broken chains
+                #
+                if _count % 10 == 0:
+                    print()
+                    sql_broken_chains="SELECT * FROM fhcounter2 AS a \
+                                                WHERE a.id != -1 AND NOT EXISTS \
+                                                      ( SELECT * FROM fhcounter2 AS b \
+                                                                 WHERE (b.ID = a.LASTID) AND (b.PID = a.PID ) \
+                                                      ); \
+                                      "
+                    _broken_chains = sql.select(sql=sql_broken_chains)
+                    if _broken_chains and len(_broken_chains) > 0:
+                        print(f"#### BROKEN CHAINS FOUND: {_broken_chains}")
+                        self.__emergency_stop__ = 1
+                    else:
+                        print("**** No broken chains - all good ****")
+                    
                 if _list and len(_list) > 0:
                     self.list = _list[:]
                 self.err_status = self._err_flag
@@ -176,6 +196,8 @@ class DbThreads:
                     self.kick_me = False
                     return 0
             time.sleep(sleep_in_sec)
+            if sql.__emergency_stop__ == 1:
+                return 2
         self.disconnect()
 
     def run_watchdog(self):
@@ -194,6 +216,8 @@ class DbThreads:
                     #msg = "current data"
                 #print(f"{time_str}: WDog {msg}", flush=True)
             time.sleep(sleep_in_sec)
+            if sql.__emergency_stop__ == 1:
+                return 2
 
     # TODO: add args, kwargs handling later or remove from connect()
     # pylint: disable-next=unused-argument
@@ -384,6 +408,9 @@ while True:
             print()
             sql.kick_me = False
             sql.start_thread_sql()
+    if sql.__emergency_stop__ == 1:
+         
+        exit(2)
     time.sleep(g_sleep_in_sec)
     # pylint: enable=invalid-name
 sql.disconnect()
