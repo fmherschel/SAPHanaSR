@@ -74,7 +74,7 @@ except ImportError as e:
     print(f"Module dbapi not found - install the missing SAP Python Driver 'hdbcli' - {e}")
 
 # parameter section
-VERSION = "3.01.3"
+VERSION = "3.14"
 USERKEY_DFLT = "TESTER"
 #
 
@@ -169,19 +169,23 @@ class DbThreads:
                 # every n-th available data record check for broken chains
                 #
                 if _count % 10 == 0:
-                    print()
                     sql_broken_chains="SELECT * FROM fhcounter2 AS a \
-                                                WHERE a.id != -1 AND NOT EXISTS \
+                                                WHERE a.id != 1 AND NOT EXISTS \
                                                       ( SELECT * FROM fhcounter2 AS b \
                                                                  WHERE (b.ID = a.LASTID) AND (b.PID = a.PID ) \
                                                       ); \
                                       "
                     _broken_chains = sql.select(sql=sql_broken_chains)
                     if _broken_chains and len(_broken_chains) > 0:
-                        print(f"#### BROKEN CHAINS FOUND: {_broken_chains}")
+                        print()
+                        print("#### BROKEN CHAINS FOUND:")
+                        for _bc_row in _broken_chains:
+                            (ts, pid, id, old_id) = _bc_row
+                            print(f"#### {ts} pid={pid} id={id} old_id={old_id}", flush=True)
                         self.__emergency_stop__ = 1
                     else:
-                        print("**** No broken chains - all good ****")
+                        pass
+                        #print("**** No broken chains - all good ****")
                     
                 if _list and len(_list) > 0:
                     self.list = _list[:]
@@ -319,7 +323,7 @@ class DbThreads:
         kargs:
         sql - complete sql (select) string - default: SELECT timestamp, id FROM fhcounter2 ORDER BY timestamp, id
         """
-        select_sql = kargs.get("sql","SELECT timestamp, id FROM fhcounter2 ORDER BY timestamp, id")
+        select_sql = kargs.get("sql","SELECT timestamp FROM fhcounter2 ORDER BY timestamp, id")
         connection = self.connection
         result = []
         if connection is None or not connection.isconnected():
@@ -331,7 +335,7 @@ class DbThreads:
         try:
             cursor.execute(select_sql)
             for row in cursor:
-                result.append(row[0])
+                result.append(row)
             result.reverse()
         except Exception as exerr:
             self._err_flag = True
@@ -343,7 +347,8 @@ class DbThreads:
         """ list last entries """
         now = time.time()
         out_list = []
-        for element in self.list[0:maxnr]:
+        for row_element in self.list[0:maxnr]:
+            element = row_element[0]
             etime = element.timestamp()
             dtime = now - etime
             if dtime < 70:
