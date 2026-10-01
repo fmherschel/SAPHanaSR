@@ -134,6 +134,8 @@ class DbThreads:
         self.thread_sql = None
         self.thread_watchdog = None
         self.__emergency_stop__ = 0
+        self.init_create_table = False
+        self.init_drop_data = False
 
     def start_thread_sql(self):
         """
@@ -168,6 +170,21 @@ class DbThreads:
         self.start_thread_sql()
         self.start_thread_watchdog()
 
+    def drop_data(self):
+        """
+        drop_data(self)
+        """
+        with DbThreads.AccessData:
+            _connection = self.connect()
+            cursor = _connection.cursor()
+            sql_drop = "DELETE FROM fhcounter2;"
+            try:
+                _cursor.execute(insert_sql)
+            except Exception as exerr:
+                self._err_flag = True
+                self._err_txt = "DD-ERR-01"
+            _cursor.close()
+
     def run_sql(self):
         """
         run_sql(self)
@@ -177,6 +194,8 @@ class DbThreads:
         _i = 0
         _count = 0
         _list = []
+        if self.init_drop_data:
+            self.drop_data()
         while True:
             _i += 1
             lstatus = ""
@@ -358,7 +377,7 @@ class DbThreads:
                 result = row[0]
             if not result is None and result > 1024:
                 try:
-                    delete_sql = "delete from fhcounter2"
+                    delete_sql = "DELETE FROM fhcounter2"
                     cursor.execute(delete_sql)
                     self._msg_flag = True
                     self._msg_txt = "DATA RESET"
@@ -430,9 +449,9 @@ db_tester = DbThreads()
 if cmd_line_args.userkey:
     db_tester.userkey = cmd_line_args.userkey
 if cmd_line_args.drop_data:
-    db_tester.drop_data = True
+    db_tester.init_drop_data = True
 if cmd_line_args.create_table:
-    db_tester.create_table = True
+    db_tester.init_create_table = True
 
 db_tester.start_threads()
 
