@@ -74,7 +74,7 @@ except ImportError as e:
     print(f"Module dbapi not found - install the missing SAP Python Driver 'hdbcli' - {e}")
 
 # parameter section
-VERSION = "2.02.15"
+VERSION = "2.03.1"
 USERKEY_DFLT = "TESTER"
 #
 
@@ -288,9 +288,14 @@ class DbThreads:
         cursor.close()
         return result
 
-    def select(self):
-        """ slelect values from test table """
-        select_sql = "SELECT timestamp, id FROM fhcounter2 ORDER BY timestamp, id"
+    def select(self, **kargs):
+        """ 
+        select(self, **kargs)
+        select values from test table 
+        kargs:
+        sql - complete sql (select) string - default: SELECT timestamp, id FROM fhcounter2 ORDER BY timestamp, id
+        """
+        select_sql = kargs.get("sql","SELECT timestamp, id FROM fhcounter2 ORDER BY timestamp, id")
         connection = self.connection
         result = []
         if connection is None or not connection.isconnected():
