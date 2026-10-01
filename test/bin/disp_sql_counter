@@ -185,6 +185,24 @@ class DbThreads:
                 self._err_txt = "DD-ERR-01"
             _cursor.close()
 
+    def create_table(self):
+        """
+        create_table(self)
+        """
+        print("create table system.fhcounter2")
+        with DbThreads.AccessData:
+            _connection = self.connect()
+            _cursor = _connection.cursor()
+            sql_create = "CREATE ROW TABLE system.fhcounter2\
+                          (timestamp TIMESTAMP, pid BIGINT, id BIGINT, lastid BIGINT);\
+                         "
+            try:
+                _cursor.execute(sql_create)
+            except Exception as exerr:
+                self._err_flag = True
+                self._err_txt = "CT-ERR-01"
+            _cursor.close()
+
     def run_sql(self):
         """
         run_sql(self)
@@ -194,6 +212,8 @@ class DbThreads:
         _i = 0
         _count = 0
         _list = []
+        if self.init_create_table:
+            self.create_table()
         if self.init_drop_data:
             self.drop_data()
         while True:
@@ -223,7 +243,7 @@ class DbThreads:
                 #
                 # every n-th available data record check for broken chains
                 #
-                if _count % 10 == 0:
+                if _count and _count % 10 == 0:
                     sql_broken_chains="SELECT * FROM fhcounter2 AS a \
                                                 WHERE a.id != 1 AND NOT EXISTS \
                                                       ( SELECT * FROM fhcounter2 AS b \
