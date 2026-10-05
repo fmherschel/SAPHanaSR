@@ -32,8 +32,9 @@ function prep_sbd() {
 }
 
 function chck_fs() {
-        file_systems="/hana"
-	max_pct=90
+    file_systems="/hana"
+    max_pct=90
+    # TODO: cleanup actively
 	for fs in $file_systems; do
 	    pct="$(df -P $fs | awk '$6 == "'$fs'" { print $5 }')"
 	    pct_num=${pct%\%}
