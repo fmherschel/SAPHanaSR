@@ -1,15 +1,15 @@
 .\" Version: 1.2
 .\"
-.TH SAPStartSrv-alert-timeout 8 "16 Aug 2026" "" "SAPStartSrv"
+.TH SAPHanaSR-alert-timeout 8 "06 Oct 2026" "" "SAPHanaSR"
 .\"
 .SH NAME
 .\"
-SAPStartSrv-alert-timeout \- Alert agent for cluster resources timeout alerts.
+SAPHanaSR-alert-timeout \- Alert agent for cluster resources timeout alerts.
 .PP
 .\"
 .SH DESCRIPTION
 .\"
-SAPStartSrv-alert-timeout can be used to react on Linux cluster resources timeout
+SAPHanaSR-alert-timeout can be used to react on Linux cluster resources timeout
 alerts.
 .PP
 The Linux cluster provides an interface to initiate external actions when a
@@ -17,12 +17,12 @@ cluster event occurs (alert). Than the cluster calls an external program (an
 alert agent) to handle that alert.
 .PP
 When a Linux cluster resource agent runs into resources timeout, the cluster can
-call SAPStartSrv-alert-timeout on each active cluster node. Main purpose is colleting
+call SAPHanaSR-alert-timeout on each active cluster node. Main purpose is colleting
 data in case of resource agent timeouts.
 .br
-See also manual pages SAPStartSrv-helper(8) and ocf_heartbeat_SAPInstance(7).
+See also manual pages SAPHanaSR-hookHelper(8) and ocf_suse_SAPHanaController(7).
 .PP
-.B SAPStartSrv-alert-timeout is a technology preview.
+.B SAPHanaSR-alert-timeout is a technology preview.
 .PP
 .\"
 .SH SUPPORTED PARAMETERS
@@ -33,25 +33,24 @@ Optional, default "30s", minimum "30s", example "meta timeout=30s".
 .TP
 \fBalert_sid\fR
 SAP SID of the instance to handle. Might be used by custom helper scripts.
-Optional, default "EN2", example "attributes alert_sid=ADA".
+Optional, default "HA1", example "attributes alert_sid=ADA".
 .TP
 \fBalert_ino\fR
 SAP instance number of instance to handle. Might be used by custom helper scripts.
-Optional, default "00", example "attributes alert_ino=22". 
-.TP
+Optional, default "00", example "attributes alert_ino=22".
 .TP
 \fBalert_cmd\fR
 Command to call. Might be used to name a custom helper script.
-SAPStartSrv-alert-timeout calls the command like
+SAPHanaSR-alert-timeout calls the command like
 .br
-(sudo "$alert_cmd" "$alert_subcmd" "$inst_name" "$alert_sid" "$alert_ino" 2>&1).
+(sudo "$alert_cmd" "$alert_subcmd" "$alert_sid" "$alert_ino" 2>&1).
 .br
-Optional, default "/usr/bin/SAPStartSrv-helper", example "alert_cmd=/usr/local/bin/dumpstack".
+Optional, default "/usr/bin/SAPHanaSR-helper", example "alert_cmd=/usr/local/bin/dumpstack".
 .TP
 \fBalert_subcmd\fR
-Subcommand to call SAPStartSrv-helper with.
+Subcommand to call SAPHanaSR-hookHelper with.
 Optional, default "log", example "alert_subcmd=log+stack".
-See manual page SAPStartSrv-helper(8).
+See manual page SAPHanaSR-hookHelper(8).
 .PP
 .\"
 .SH RETURN CODES
@@ -63,16 +62,15 @@ Successful program execution.
 Usage, syntax or execution errors.
 .br
 In addition log entries are written, which can be scanned by using a pattern
-like "SAPStartSrv-alert-timeout".
+like "SAPHanaSR-alert-timeout".
 .PP
-.\"
 .\"
 \fB*\fR Simple example configuration for the resources timeout alert agent.
 .PP
 The following lines needs to be added to the cluster´s CIB:
 .PP
 .RS 2
-alert resources-1 "/usr/bin/SAPStartSrv-alert-timeout" \\
+alert resources-1 "/usr/bin/SAPHanaSR-alert-timeout" \\
 .br
  select resources
 .RE
@@ -84,7 +82,7 @@ Alternate way for configuring the alert agent.
 .RS 2
 # crm configure alert resources-1 \\
 .br
- "/usr/bin/SAPStartSrv-alert-timeout" \\
+ "/usr/bin/SAPHanaSR-alert-timeout" \\
 .br
  select resources
 .RE
@@ -92,26 +90,26 @@ Alternate way for configuring the alert agent.
 \fB*\fR Showing alert agent messages.
 .PP
 .RS 2
-# grep SAPStartSrv-alert-timeout /var/log/messages
+# grep SAPHanaSR-alert-timeout /var/log/messages
 .RE
 .PP
-\fB*\fR Example for sudo permissions in /etc/sudoers.d/SAPStartSrv .
+\fB*\fR Example for sudo permissions in /etc/sudoers.d/SAPHanaSR .
 .PP
-See also manual pages sudoers(5) and SAPStartSrv-helper(8).
+See also manual pages sudoers(5) and SAPHanaSR-hookHelper(8).
 .PP
 .RS 2
-# SAPStartSrv-alert-timeout needs
+# SAPHanaSR-alert-timeout needs
 .br
-hacluster ALL=(ALL) NOPASSWD: /usr/bin/SAPStartSrv-helper *
+hacluster ALL=(ALL) NOPASSWD: /usr/bin/SAPHanaSR-hookHelper --SID=HA1 *
 .RE
 .PP
 .\"
 .SH FILES
 .TP
-/usr/bin/SAPStartSrv-alert-timeout
+/usr/bin/SAPHanaSR-alert-timeout
 the alert agent
 .TP
-/usr/bin/SAPStartSrv-helper
+/usr/bin/SAPHanaSR-hookHelper
 the default agent helper
 .TP
 /etc/sudoers.d/
@@ -119,7 +117,6 @@ directory for sudoers config files
 .PP
 .\"
 .SH REQUIREMENTS
-.\"
 .\"
 * SAPHanaSR-alert-timeout should be activated only, when requested by support.
 .PP
@@ -134,8 +131,8 @@ If a custom script is used, respective permissions might be needed.
 * The customer is responsible for any custom script called by the alert agent.
 Any custom script should return within the alert agent timeout.
 .PP
-* To allow SAPHanaSR-hookHelper command "stack", gdb is needed.
-.PP
+.\" TODO * To allow SAPHanaSR-hookHelper command "stack", gdb is needed.
+.\" .PP
 * To allow SAPHanaSR-hookHelper command "log", ClusterTool2 3.1.4 or newer is needed.
 .PP
 * The alert agent runtime almost completely depends on call-outs to OS and
@@ -167,7 +164,7 @@ F.Herschel, L.Pinne.
 .\"
 (c) 2026 SUSE LLC
 .br
-SAPStartSrv-alert-timeout comes with ABSOLUTELY NO WARRANTY.
+SAPHanaSR-alert-timeout comes with ABSOLUTELY NO WARRANTY.
 .br
 For details see the GNU General Public License at
 http://www.gnu.org/licenses/gpl.html
