@@ -6,7 +6,7 @@
 # Support:      linux@sap.com
 # License:      GNU General Public License (GPL)
 # Copyright:    (c) 2026 SUSE LLC
-# Version:	    2026-10-06_14:51
+# Version:	    2026-10-07_12:10
 #
 # crm configure alert resources-1 "/usr/bin/SAPHanaSR-alert-timeout" select resources attributes alert_sid=HA1 alert_ino=00 alert_cmd="/bin/true"
 # TODO: timeout 30s default okay?
@@ -34,7 +34,7 @@ $logger -i -t "$logger_tag" "AH: begin event '$crm_alert_kind'"
 
 function process_failure()
 {
-    if [ -x "$alert_cmd" ]; then
+    if [[ -x "$alert_cmd" ]]; then
         if [[ "$alert_cmd" == "/usr/bin/SAPHanaSR-hookHelper" ]]; then
             $logger -i -t "$logger_tag" "AH: calling: $alert_cmd --sid=$alert_sid --case=$alert_subcmd"
             alert_cmd_out=$(sudo "$alert_cmd" --sid="$alert_sid" --case="$alert_subcmd" 2>&1); alert_cmd_rc="$?"
