@@ -35,7 +35,7 @@ usage() {
     echo -e "\\t--sid=<SID>: SID (like HA1) of the SAP system"
     echo -e "\\t--ino=<InstanceNumber>: instance number (like 10) of the SAP instance"
     echo -e "\\t--case=<use case>: the use case for the hook helper"
-    echo -e "\\t                   at the moment 'checkTakeover', 'fenceMe', 'echoBe'' and 'alertLog' are supported"
+    echo -e "\\t                   at the moment 'checkTakeover', 'fenceMe', 'echoBe' and 'alertLog' are supported"
     echo -e "\\t--version: show script version"
     echo -e "\\t--help:    show help"
     exit 1
