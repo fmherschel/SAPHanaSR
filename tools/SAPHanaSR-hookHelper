@@ -35,7 +35,7 @@ usage() {
     echo -e "\\t--sid=<SID>: SID (like HA1) of the SAP system"
     echo -e "\\t--ino=<InstanceNumber>: instance number (like 10) of the SAP instance"
     echo -e "\\t--case=<use case>: the use case for the hook helper"
-    echo -e "\\t                   at the moment only 'checkTakeover' and 'fenceMe' is supported"
+    echo -e "\\t                   at the moment 'checkTakeover', 'fenceMe', 'echoBe'' and 'alertLog' are supported"
     echo -e "\\t--version: show script version"
     echo -e "\\t--help:    show help"
     exit 1
@@ -307,6 +307,21 @@ case "$USECASE" in
      fi
      rc=0
      ;;
+"alertLog" )
+    #
+    # needs to run as root
+    #
+    logger -t SAPHanaSR-hookHelper "alertLog: SID=$SID"
+    # TODO function: test -x $X && $X 
+    /usr/sbin/psauxlog /var/log/psaux.log
+    /usr/sbin/meminfolog /var/log/meminfo.log
+    /usr/sbin/vmstatlog /var/log/vmstat.log
+    /usr/sbin/cpustatelog /var/log/cpustate.log
+    /usr/sbin/dstatelog /var/log/dstate.log
+    /usr/sbin/netstatlog /var/log/netstat.log
+    # wildcards do not work for lsof
+    /usr/sbin/lsoflog /var/log/lsof.log "+D/tmp/ +D/hana/shared/${SID}/" 21
+    ;;
 #"nextUsecase")
 #    chk_next_case; rc=$?
 #    ;;

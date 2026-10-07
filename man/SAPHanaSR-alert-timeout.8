@@ -48,8 +48,9 @@ SAPHanaSR-alert-timeout calls the command like
 Optional, default "/usr/bin/SAPHanaSR-helper", example "alert_cmd=/usr/local/bin/dumpstack".
 .TP
 \fBalert_subcmd\fR
-Subcommand to call SAPHanaSR-hookHelper with.
-Optional, default "log", example "alert_subcmd=log+stack".
+Subcommand to call SAPHanaSR-hookHelper or custom script with.
+Optional, default "alertLog".
+.br
 See manual page SAPHanaSR-hookHelper(8).
 .PP
 .\"
@@ -64,6 +65,8 @@ Usage, syntax or execution errors.
 In addition log entries are written, which can be scanned by using a pattern
 like "SAPHanaSR-alert-timeout".
 .PP
+.\"
+.SH EXAMPLES
 .\"
 \fB*\fR Simple example configuration for the resources timeout alert agent.
 .PP
@@ -87,10 +90,34 @@ Alternate way for configuring the alert agent.
  select resources
 .RE
 .PP
+\fB*\fR Advanced example configuration for the resources timeout alert agent.
+.PP
+A custom script /usr/local/bin/dumpstack is used, SID is ADA, instance number 00.
+The resulting call is:
+.br
+ /usr/local/bin/dumpstack trace ADA 00
+.PP
+.RS 2
+alert resources-1 "/usr/bin/SAPHanaSR-alert-timeout" \\
+.br
+ select resources \\
+.br
+ attributes alert_sid=ADA alert_ino=00 \\
+.br 
+ alert_cmd="/usr/local/bin/dumpstack" alert_subcmd="trace"
+.RE
+.PP
+.PP
 \fB*\fR Showing alert agent messages.
 .PP
 .RS 2
 # grep SAPHanaSR-alert-timeout /var/log/messages
+.RE
+.PP
+\fB*\fR Showing alert agent helper messages.
+.PP
+.RS 2
+# grep SAPHanaSR-hookHelper.*alertLog /var/log/messages
 .RE
 .PP
 \fB*\fR Example for sudo permissions in /etc/sudoers.d/SAPHanaSR .
@@ -100,7 +127,7 @@ See also manual pages sudoers(5) and SAPHanaSR-hookHelper(8).
 .RS 2
 # SAPHanaSR-alert-timeout needs
 .br
-hacluster ALL=(ALL) NOPASSWD: /usr/bin/SAPHanaSR-hookHelper --SID=HA1 *
+hacluster ALL=(ALL) NOPASSWD: /usr/bin/SAPHanaSR-hookHelper --sid=HA1 --case=alertLog
 .RE
 .PP
 .\"
@@ -110,7 +137,7 @@ hacluster ALL=(ALL) NOPASSWD: /usr/bin/SAPHanaSR-hookHelper --SID=HA1 *
 the alert agent
 .TP
 /usr/bin/SAPHanaSR-hookHelper
-the default agent helper
+the default alert agent helper
 .TP
 /etc/sudoers.d/
 directory for sudoers config files
@@ -133,7 +160,7 @@ Any custom script should return within the alert agent timeout.
 .PP
 .\" TODO * To allow SAPHanaSR-hookHelper command "stack", gdb is needed.
 .\" .PP
-* To allow SAPHanaSR-hookHelper command "log", ClusterTool2 3.1.4 or newer is needed.
+* To allow SAPHanaSR-hookHelper command "alertLog", ClusterTool2 3.1.4 or newer is needed.
 .PP
 * The alert agent runtime almost completely depends on call-outs to OS and
 Linux cluster. The alert agent timeout should be 30s at least.
