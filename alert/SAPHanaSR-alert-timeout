@@ -35,7 +35,7 @@ $logger -i -t "$logger_tag" "AH: begin event '$crm_alert_kind'"
 function process_failure()
 {
     if [ -x "$alert_cmd" ]; then
-        if [ "$alert_cmd" = "/usr/bin/SAPHanaSR-hookHelper" ]; then
+        if [[ "$alert_cmd" == "/usr/bin/SAPHanaSR-hookHelper" ]]; then
             $logger -i -t "$logger_tag" "AH: calling: $alert_cmd --sid=$alert_sid --case=$alert_subcmd"
             alert_cmd_out=$(sudo "$alert_cmd" --sid="$alert_sid" --case="$alert_subcmd" 2>&1); alert_cmd_rc="$?"
             $logger -i -t "$logger_tag" "AH: alert_cmd_out='$alert_cmd_out': alert_cmd_rc='$alert_cmd_rc'"
