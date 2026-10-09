@@ -133,10 +133,11 @@ function core_init() {
     else
         log_attr_file="/dev/null"
     fi
-    HANA_STATE_PRIMARY="P"     # was 0
-    HANA_STATE_SECONDARY="S"   # was 1
-    HANA_STATE_STANDALONE="N"  # was 2
-    HANA_STATE_DEFECT="D"      # was 3
+    HANA_STATE_PRIMARY="P"
+    HANA_STATE_PRIMARY_SUSPENDED="p"     
+    HANA_STATE_SECONDARY="S"
+    HANA_STATE_STANDALONE="N"
+    HANA_STATE_DEFECT="D"
     # shellcheck disable=SC2034
     HANA_STD_ACTION_TIMEOUT=3600
     log_attributes=false
@@ -595,6 +596,7 @@ function get_local_sr_config() {
     #grSrSuspended=""
     # TODO: PRIO2: for suspended primary detection (lss 3 or 4) we would need hdbnsutil -sr_state)
     hdbState="hdbnsutil -sr_stateConfiguration"
+    hdbState="hdbnsutil -sr_state"
     # hdbMap="hdbnsutil -sr_stateHostMapping"
     #### SAP-CALL
     # hdbnsutil was a bit unstable in some tests so we recall the tool, if it fails to report the srmode
@@ -609,6 +611,8 @@ function get_local_sr_config() {
                 hdbANSWER=$(HANA_CALL --timeout "$HANA_CALL_TIMEOUT" --cmd "python getParameter.py $gpKeys --sapcontrol=1" 2>&1)
                 [[ "$hdbANSWER" =~ "SAPCONTROL-OK: <begin>"(.*)"SAPCONTROL-OK: <end>" ]] && hdbANSWER="${BASH_REMATCH[1]}" || hdbANSWER=""
                 [[ "$hdbANSWER" =~ "/actual_mode"=([^$'\n']+) ]] && gSrMode=${BASH_REMATCH[1]}
+                # [[ "$hdbANSWER" =~ "/isPrimarySuspended"=([^$'\n']+) ]] && gSrModeSuspended=${BASH_REMATCH[1]}
+                # super_ocf_log info "ACT: HALLO: gSrModeSuspended=$gSrModeSuspended"
                 # if 'actual_mode' is not available, fallback to 'mode'
                 if [ -z "$gSrMode" ]; then
                     [[ "$hdbANSWER" =~ "/mode="([^$'\n']+) ]] && gSrMode=${BASH_REMATCH[1]}
@@ -620,6 +624,8 @@ function get_local_sr_config() {
                 hdbANSWER=$(HANA_CALL --timeout "$HANA_CALL_TIMEOUT" --cmd "$hdbState --sapcontrol=1" 2>/dev/null)
                 super_ocf_log info "ACT: HU: hdbANSWER=$hdbANSWER"
                 [[ "$hdbANSWER" =~ (^|$'\n')"mode="([^$'\n']+) ]] && gSrMode="${BASH_REMATCH[2]}"
+                [[ "$hdbANSWER" =~ (^|$'\n')"isPrimarySuspended="([^$'\n']+) ]] && gSrModeSuspended="${BASH_REMATCH[2]}"
+                super_ocf_log info "ACT: HALLO: gSrModeSuspended=$gSrModeSuspended"
                 super_ocf_log debug "ACT: HU: hdbANSWER=$hdbANSWER"
                 ;;
         esac
@@ -627,7 +633,12 @@ function get_local_sr_config() {
             primary )
               # we can leave the loop as we already got a result
               # shellcheck disable=SC2034
-              gSrr="P"
+              case "$gSrModeSuspended" in
+                  true ) gSrr="p"
+			super_ocf_log info "ACT: HALLO: gSrModeSuspended=$gSrModeSuspended - SUSPENDED PRIMARY DETECTED"
+				;;
+                  *    ) gSrr="P";;
+              esac
               break
               ;;
             syncmem | sync | async )
@@ -748,10 +759,27 @@ function check_for_primary() {
     case "$gSrMode" in
         primary )
               super_ocf_log info "DEC: ${FUNCNAME[0]} state=HANA_STATE_PRIMARY"
-              state="$HANA_STATE_PRIMARY";;
+              state="$HANA_STATE_PRIMARY"
+	      if [[ "$gSrModeSuspended" == "true" ]]; then
+	           state="$HANA_STATE_PRIMARY_SUSPENDED"
+                   super_ocf_log info "ACT: HALLO: set state=$state"
+              fi
+              # if we also check for suspended primary...
+              # * resource param flag ADDON must be set (c4sp)
+              # 
+              ADDON=${OCF_RESKEY_ADDON}
+              if [[ "$ADDON" == "c4sp" ]]; then
+                  # if lss > 1 check life status 
+                  echo 1  
+
+              fi 
+            
+              ;;
         syncmem | sync | async )
               super_ocf_log info "DEC: ${FUNCNAME[0]} state=HANA_STATE_SECONDARY"
-              state="$HANA_STATE_SECONDARY";;
+              state="$HANA_STATE_SECONDARY"
+              # TODO PRIO5: Later we might check, if also add code for detecting a secondary, which is takeover process
+              ;;
         none )
               # TODO PRIO1: NG - Should we set SFAIL? or SNA? or ...
               super_ocf_log info "DEC: ${FUNCNAME[0]} state=HANA_STATE_STANDALONE"

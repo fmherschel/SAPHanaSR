@@ -336,6 +336,7 @@ function saphana_init_scoring_tables() {
        "[234]   S [^:]*:[?:-]          .*         0             'secondary - running, but nameserver role not detected'"
        "[015-9] S [^:]*:[?:-]          .*        -1             'secondary - not running and nameserver role not detected'"
        ".*      S [^:]*:[?:-]          .*        -2             'secondary - unknown lss'"
+       "[234]   p [^:]*:master         .*        -2             'suspended primary detected'"
        ".*      . .*                   .*        -3             'any case, not catched before'"
     )
     # shellcheck disable=SC2034

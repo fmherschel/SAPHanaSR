@@ -495,6 +495,7 @@ function sht_monitor_clone() {
         # First check, if we are PRIMARY or SECONDARY
         #
         hanaPrim="$(check_for_primary "cache")";
+        super_ocf_log info "ACT: HALLO: hanaPrim=$hanaPrim"
         sht_monitor; rc="$?"
         # try to catch:  Inst Info : LNX - 42 - lv9041 - 740, patch 36, changelist 1444691
         # We rely on the following format: SID is word#4, SYSNR is word#6, vHost is word#8
@@ -533,7 +534,7 @@ function sht_monitor_clone() {
         # TODO PRIO2: NG - COULD/SHOULD WE LIMIT THE SET OF THE LSS/SRR ATTRIBUTE TO ONLY THE_MASTER nodes?
         # ignore timeout (124, 137) and "ignore" (5) as return code from the landscapeHostConfiguration call
         case "$hanaPrim" in
-            P ) ;;
+            P | p ) ;;
             S ) # only secondary may propagate its sync status
                 # TODO PRIO2: NG - need to be multi site specific.
                 #      maybe setting this attribute for the OLD primary during a begin of a promote (as getting P) for the register which could follow?
