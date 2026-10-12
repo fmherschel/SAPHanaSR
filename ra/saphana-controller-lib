@@ -516,7 +516,6 @@ function register_hana_secondary() {
         if ocf_is_true "${AUTOMATED_REGISTER}"; then
             # for scale-up we normally should not need that, but for scale-out:
             # before we could register we stop HANA on all nodes of the swarm (maybe some still running)
-            # fhBaustelle
             if [[ $gNrSiteNode > 1 ]]; then
                 saphana_stop
             fi
@@ -2108,7 +2107,7 @@ function saphana_promote_clone() {
                         # check: SAP HANA is now PRIMARY? 
                         # TODO: PRIO3: check, if we need to differ between HANA_STATE_PRIMARY, HANA_STATE_SECONDARY, HANA_STATE_DEFECT
                         primary_status="$(check_for_primary "live")"
-                        if [[ "$primary_status" == "P" ]]; then
+                        if [[ "$primary_status" == "$HANA_STATE_PRIMARY" ]]; then
                             rc="$OCF_SUCCESS";
                             # DONE: PRIO0: !!!
                             super_ocf_log info "ACT: SAP HANA TAKEOVER: MARK FORMER PRIMARY AS SWAIT"
