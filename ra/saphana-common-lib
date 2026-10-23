@@ -424,7 +424,7 @@ function saphana_init_get_remote_site() {
 function HANA_CALL() {
     # called by: TODO
     #
-    # TODO: PRIO 5: remove 'su - ${sidadm} later, when SAP HANA resoled issue with
+    # TODO: PRIO 5: remove 'su - ${sidadm} later, when SAP HANA resolved issue with
     #       root-user-called hdbnsutil -sr_state (which creates root-owned shared memory file in /var/lib/hdb/SID/shmgrp)
     #       would hdbnsutil -sr_stateConfiguration also create such a shared memory file?
     # TODO: PRIO 5: Maybe make "su" optional by a parameter
@@ -440,7 +440,7 @@ function HANA_CALL() {
     while [ $# -gt 0 ]; do
         case "$1" in
             --timeout ) timeOut=$2; shift;;
-            --use-su  ) use_su=1;;
+            --use-su  ) use_su=1;;           # is now sudo
             --cmd ) shift; cmd="$*"; break;;
         esac
         shift
@@ -467,7 +467,7 @@ function HANA_CALL() {
                             output=$(bash -c "$pre_script; $cmd"); rc="$?"
                             ;;
                       su )
-                            output=$(su - "${sid}adm" -c "$pre_script; $cmd"); rc="$?"
+                            output=$(sudo -i -u "${sid}adm" bash -c "$pre_script; $cmd"); rc="$?"
                             ;;
                   esac
                   ;;
@@ -480,10 +480,15 @@ function HANA_CALL() {
 
                   case "$pre_cmd_type" in
                       bash )
-                            output=$(timeout --foreground -s 9 "$timeOut" bash -c "($pre_script; $cmd > $cmd_out_log) >& $cmd_err_log" 2>"$su_err_log"); rc="$?"
+                            output=$(timeout -s 9 "$timeOut" bash -c "($pre_script; $cmd > $cmd_out_log) >& $cmd_err_log" 2>"$su_err_log"); rc="$?"
                             ;;
                       su )
-                            output=$(timeout --foreground -s 9 "$timeOut" su - "${sid}adm" -c "($pre_script; $cmd > $cmd_out_log) >& $cmd_err_log" 2>"$su_err_log"); rc="$?"
+                            # bsc#1286377
+                            # timeout was blocking in special cases (cmd in D-State)
+                            # fix: - construction with sudo instead of su
+                            #      - remove parameter --foreground
+                            #      - remove outer cmd redirection, because output is be set by the content of file $cmd_out_log
+                            timeout -s 9 "$timeOut" sudo -i -u "${sid}adm" bash -c "($pre_script; $cmd > $cmd_out_log) >& $cmd_err_log" 2>"$su_err_log"; rc="$?"
                             ;;
                   esac
                   if [[ -f "$cmd_out_log" ]]; then output=$(<"$cmd_out_log"); rm -f "$cmd_out_log"; fi
