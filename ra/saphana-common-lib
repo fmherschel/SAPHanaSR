@@ -488,6 +488,7 @@ function HANA_CALL() {
                             # fix: - construction with sudo instead of su
                             #      - remove parameter --foreground
                             #      - remove outer cmd redirection, because output is be set by the content of file $cmd_out_log
+                            output=""
                             timeout -s 9 "$timeOut" sudo -i -u "${sid}adm" bash -c "($pre_script; $cmd > $cmd_out_log) >& $cmd_err_log" 2>"$su_err_log"; rc="$?"
                             ;;
                   esac
