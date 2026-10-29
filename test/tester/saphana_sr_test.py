@@ -1013,6 +1013,8 @@ class SaphanasrTest:
         the_action = kargs.get('action', None)
         remote = self.config['remote_node']
         ignore = False  # tODO for bmt we had ignore = True
+        if action_name == "bmt":
+            ignore = True   # TODO: Quick-Hack. bmt -> ignore = True should come from actions-def-file
 
         #the_name_ref = the_action.get('node', None)
 
