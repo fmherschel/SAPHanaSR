@@ -86,6 +86,7 @@ function super_ocf_log() {
 function cluster_commands_init() {
     # globals: CRM_NODE(w), NODENAME(w), CRM_PROMO(w), CRM_PROMO_PARAMS(w)
     # called by: TODO
+    rc=0
     CRM_NODE="crm_node"
     # shellcheck disable=SC2034
     CRM_PROMO="crm_attribute";
@@ -94,10 +95,11 @@ function cluster_commands_init() {
     # TODO PRIO3: NG - check, if NODENAME set here is not a duplicate
     NODENAME="$("$CRM_NODE" -n)"
     super_ocf_log info "RUNTIME ${FUNCNAME[0]} rc=$rc"
+    return "$rc"
 } # end function cluster_commands_init
 
 function core_init() {
-    # function core_init - lightwight variable initialization without SAP HANA interaction
+    # function core_init - lightweight variable initialization without SAP HANA interaction
     # params: raVersion timeBegin log_attributes
     # globals: SID(w) sidadm(w) InstanceName(w) InstanceNr(w) SAPVIRHOST(w) DIR_EXECUTABLE(w) SAPSTARTSRV(w) SAPCONTROL(w) DIR_PROFILE(w) SAPSTARTPROFILE(w) SAPHanaFilter(w) HANA_STATE_*(w) HANA_STD_ACTION_TIMEOUT(w) log_attributes(w)
     # called by: TODO
