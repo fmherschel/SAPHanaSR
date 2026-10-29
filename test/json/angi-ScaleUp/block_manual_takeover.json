@@ -19,6 +19,7 @@
             "loop": 1,
             "wait": 1,
             "post": "bmt",
+            "mstRsc": "mstRscReady",
             "pSite": "pSiteUp",
             "sSite": "sSiteUp",
             "pHost": "pHostUp",
