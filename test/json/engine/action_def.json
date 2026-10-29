@@ -28,7 +28,7 @@
         "kill_secn_nameserver": { "type": "hana", "ha_dr": "HA", "node": "sWorker", "action_type": "kill_sap_service", "param1": "hdbnameserver"},
         "kill_prim_xsengine": { "type": "hana", "ha_dr": "HA", "node": "pHost", "action_type": "kill_sap_service", "param1": " hdbxsengine"},
         "kill_secn_xsengine": { "type": "hana", "ha_dr": "HA", "node": "sHost", "action_type": "kill_sap_service", "param1": " hdbxsengine"},
-        "bmt": { "type": "hana", "ha_dr": "HA", "node": "sHost", "action_type": "hana_takeover"},
+        "bmt": { "type": "hana", "ha_dr": "HA", "node": "sHost", "action_type": "hana_takeover", "ignore": 1 },
         "comment02": "### hana DRregion ###",
         "kill_third_inst": { "type": "hana", "ha_dr": "DR", "node": "tHost", "action_type": "kill_inst"},
         "kill_third_worker_inst": { "type": "hana", "ha_dr": "DR", "node": "xx", "implemented": 0, "action_type": "kill_inst"},
