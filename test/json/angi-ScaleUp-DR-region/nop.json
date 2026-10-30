@@ -20,6 +20,7 @@
             "loop": 1,
             "wait": 1,
             "post": "sleep 240",
+            "global": "globalUp",
             "mstRsc": "mstRscReady",
             "tSite": "tSiteUp",
             "fSite": "fSiteUp",
