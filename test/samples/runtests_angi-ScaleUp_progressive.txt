@@ -12,5 +12,5 @@ PRIMCAS="block_sr_and_freeze_prim_fs freeze_prim_fs_fencing kill_prim_indexserve
 #
 BOTHCAS="nop"
 #
-TCASES="flup $SECNCAS free_log_area $PRIMCAS free_log_area $BOTHCAS free_log_area"
+TCASES="flup free_log_area $SECNCAS free_log_area $PRIMCAS free_log_area $BOTHCAS free_log_area"
 #

@@ -24,5 +24,5 @@ BOTHCAS="restart_cluster restart_cluster_hana_running restart_cluster_turn_hana
 maintenance_cluster_hana_running maintenance_cluster_turn_hana maintenance_with_standby_nodes
 split_brain_prio nop"
 #
-TCASES="flup $SECNCAS free_log_area $PRIMCAS free_log_area $BOTHCAS free_log_area"
+TCASES="flup free_log_area $SECNCAS free_log_area $PRIMCAS free_log_area $BOTHCAS free_log_area"
 #

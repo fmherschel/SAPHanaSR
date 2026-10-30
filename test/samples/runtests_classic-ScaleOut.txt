@@ -18,5 +18,5 @@ kill_prim_node kill_prim_worker_node maintenance_prim_crmreport maintenance_prim
 #
 BOTHCAS="maintenance_cluster_turn_hana nop"
 #
-TCASES="flup $SECNCAS free_log_area $PRIMCAS free_log_area $BOTHCAS free_log_area"
+TCASES="flup free_log_area $SECNCAS free_log_area $PRIMCAS free_log_area $BOTHCAS free_log_area"
 #
