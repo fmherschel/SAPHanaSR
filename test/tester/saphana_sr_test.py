@@ -22,7 +22,7 @@ import json
 import argparse
 import random
 
-# Version: 3.1.20260708
+# Version: 3.2.20261030
 # for ssh remote calls this module uses paramiko
 #from paramiko import SSHClient
 import paramiko
@@ -32,7 +32,7 @@ class SaphanasrTest:
     """
     class to check SAP HANA cluster during tests
     """
-    version = "3.1.20260708"
+    version = "3.2.20261030"
 
     def message(self, msg, **kwargs):
         """
@@ -744,6 +744,9 @@ class SaphanasrTest:
             topolo = self.topolo
             if topology_object_name in topolo:
                 object_name = topolo[topology_object_name]
+                rc_checks = self.run_checks(checks, area_name, object_name, step.get('step',''), list_of_failures=list_of_failures)
+            elif topology_object_name == "global":
+                object_name = "global"
                 rc_checks = self.run_checks(checks, area_name, object_name, step.get('step',''), list_of_failures=list_of_failures)
             else:
                 self.message(f"ERROR: Object {topology_object_name} missing in topology but used in checks")
