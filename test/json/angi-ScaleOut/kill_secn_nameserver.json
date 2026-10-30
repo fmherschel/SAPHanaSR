@@ -38,8 +38,7 @@
                 "srHook == SFAIL"
             ],
             "pHost": "pHostUp",
-            "pWorker": "pWorkerUp",
-            "sWorker": "sWorkerUp"
+            "pWorker": "pWorkerUp"
         },
         {
             "step": "final40",
