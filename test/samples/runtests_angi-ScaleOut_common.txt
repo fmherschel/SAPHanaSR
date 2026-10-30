@@ -17,6 +17,7 @@ PRIMCAS="block_manual_takeover block_sr block_prim_site_network
 kill_prim_ipaddr
 kill_prim_pacemakerd kill_prim_worker_pacemakerd
 kill_prim_saphostexec
+kill_prim_site_nodes
 standby_prim_node stop_prim_inst
 maintenance_prim_crmreport maintenance_prim_supportconfig"
 #
