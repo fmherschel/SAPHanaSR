@@ -1,0 +1,27 @@
+#
+# SAPHanaSR-tester: angi-ScaleOut - common
+# example tests from SAPHanaSR-tests-angi-ScaleOut(7), common for both variants
+#
+PROPERTIES="./properties_angi-ScaleOut.json"
+ASTROOT=/usr/share/SAPHanaSR-tester/json/angi-ScaleOut
+LOGFILE="runtests.log"
+#
+SECNCAS="block_secn_site_network
+kill_secn_nameserver
+kill_secn_pacemakerd kill_secn_worker_pacemakerd
+kill_secn_site_nodes
+standby_secn_node
+maintenance_secn_crmreport maintenance_secn_supportconfig"
+#
+PRIMCAS="block_manual_takeover block_sr block_prim_site_network
+kill_prim_ipaddr
+kill_prim_pacemakerd kill_prim_worker_pacemakerd
+kill_prim_saphostexec
+maintenance_prim_crmreport maintenance_prim_supportconfig
+standby_prim_node stop_prim_inst"
+#
+BOTHCAS="maintenance_cluster_hana_running maintenance_cluster_turn_hana
+restart_cluster restart_cluster_hana_running restart_cluster_turn_hana nop"
+#
+TCASES="flup $SECNCAS free_log_area $PRIMCAS free_log_area $BOTHCAS free_log_area"
+#
