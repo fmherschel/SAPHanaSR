@@ -13,7 +13,7 @@
  Copyright:    (c) 2023-2026 SUSE LLC
 """
 
-# Version: 3.1.20260625
+# Version: 3.2.20261030
 # pylint: disable=unused-import
 import time
 import re
@@ -29,8 +29,6 @@ from saphana_sr_test import SaphanasrTest
 #pylint: enable=wrong-import-position
 
 # TODO: impement test sequences instead of "only" repeating the same test
-test01 = SaphanasrTest(cmdparse=False)
-test01.start_time = time.time()
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--testFile", help="specify the test file")
@@ -55,10 +53,21 @@ parser.add_argument("--onFail", help="tester reaction after a failed step. possi
 parser.add_argument("--skip_hostcheck", help="only for private environments - skip check of known_hosts", action="store_true")
 parser.add_argument("--sudo", help="use ssh+sudo for remote commands", action="store_true")
 args = parser.parse_args()
+
 if args.version:
-    print(f"SAPHanaSR-tester {test01.version}")
+    print(f"SAPHanaSR-tester {SaphanasrTest.version}")
     sys.exit(0)
+#
+test01 = SaphanasrTest(cmdparse=False)
+test01.start_time = time.time()
 test01.message(f"INIT: {test01.version}")
+if test01.run.get('test_rc', 0) != 0:
+    #
+    # something in the init failed, exit!
+    #
+    test01.message("TEST: Object initialization failed - exit")
+    sys.exit(2)
+#
 if args.testFile:
     test01.message("PARAM: testFile: {}".format(args.testFile))
     test01.config['test_file'] = args.testFile
