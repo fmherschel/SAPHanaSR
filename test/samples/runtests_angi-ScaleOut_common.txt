@@ -17,10 +17,11 @@ PRIMCAS="block_manual_takeover block_sr block_prim_site_network
 kill_prim_ipaddr
 kill_prim_pacemakerd kill_prim_worker_pacemakerd
 kill_prim_saphostexec
-maintenance_prim_crmreport maintenance_prim_supportconfig
-standby_prim_node stop_prim_inst"
+standby_prim_node stop_prim_inst
+maintenance_prim_crmreport maintenance_prim_supportconfig"
 #
-BOTHCAS="maintenance_cluster_hana_running maintenance_cluster_turn_hana
+BOTHCAS="stop_hana_resource
+maintenance_cluster_hana_running maintenance_cluster_turn_hana
 restart_cluster restart_cluster_hana_running restart_cluster_turn_hana nop"
 #
 TCASES="flup free_log_area $SECNCAS free_log_area $PRIMCAS free_log_area $BOTHCAS free_log_area"
