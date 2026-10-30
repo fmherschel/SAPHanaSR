@@ -56,7 +56,7 @@
             ],
             "sWorker": [
                 "clone_state == UNDEFINED",
-                "roles == slave::worker:",
+                "roles == slave::none:",
                 "score ~ (-12200|-INFINITY)" 
             ]
         },
