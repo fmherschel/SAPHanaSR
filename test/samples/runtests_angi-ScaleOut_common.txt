@@ -18,7 +18,6 @@ kill_prim_ipaddr
 kill_prim_pacemakerd kill_prim_worker_pacemakerd
 kill_prim_saphostexec
 kill_prim_site_nodes
-stop_prim_inst
 maintenance_prim_crmreport maintenance_prim_supportconfig"
 #
 BOTHCAS="stop_hana_resource
