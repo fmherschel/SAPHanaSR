@@ -154,13 +154,20 @@ class SaphanasrTest:
 
     def __actions_load__(self):
         """ __actions_load__(self) - load the action definitions from the given json file """
-        with open(self.config['actions_file'], encoding="utf-8") as dc_fh:
-            action_def = json.load(dc_fh)
-        action_types = action_def.get('action_types', {})
-        actions = action_def.get('actions', {})
+        try:
+            with open(self.config['actions_file'], encoding="utf-8") as dc_fh:
+                action_def = json.load(dc_fh)
+            action_types = action_def.get('action_types', {})
+            actions = action_def.get('actions', {})
 
-        self.action_types = action_types
-        self.actions = actions
+            self.action_types = action_types
+            self.actions = actions
+        except Exception as e:
+            print(f"exception {e}")
+            self.run['test_rc'] = 2  # mark emergency exit (test failed)
+            #sys.exit(2)
+            return 2
+        return 0
 
     def __actions_hardcoded__(self):
         # TODO: move action and action_type dictionary to a config file
