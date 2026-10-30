@@ -29,7 +29,7 @@ kill_prim_worker_xscontrl kill_prim_worker_xsexecagnt kill_prim_worker_xsuaasrvr
 kill_prim_worker_pacemakerd
 kill_prim_worker_inst_fencing_alert kill_prim_worker_node_fencing_alert
 kill_prim_site_nodes
-standby_prim_node stop_prim_inst
+stop_prim_inst
 maintenance_prim_crmreport maintenance_prim_supportconfig"
 #
 BOTHCAS="stop_hana_resource
