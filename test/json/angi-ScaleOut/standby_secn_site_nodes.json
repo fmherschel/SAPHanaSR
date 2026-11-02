@@ -39,8 +39,16 @@
             "pHost": "pHostUp",
             "pWorker": "pWorkerUp",
             "sSite": "sSiteDown",
-            "sHost": "sHostStandby",
-            "sWorker": "sWorkerStandby"
+            "sHost": [
+                "clone_state == UNDEFINED",
+                "roles == master1::worker:",
+                "score == -32300"
+            ],
+            "sWorker": [
+                "clone_state == UNDEFINED",
+                "roles == slave::worker:",
+                "score == -32300"
+            ]
         },
         {
             "step": "step30",
