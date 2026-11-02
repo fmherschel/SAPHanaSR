@@ -1235,25 +1235,25 @@ SR SFAIL and finally SOK. No takeover. No fencing.
 Comment: Admin mistake on scale-out, sub-optimal procedure on scale-up.
 .RE
 .PP
-.\" \fBstandby_secn_site_nodes\fP
-.\" .RS 2
-.\" Descr: Set secondary site nodes standby and online again.
-.\" .br
-.\" Topology: ScaleOut.
-.\" .br
-.\" Prereq: Cluster and HANA are up and running, all good.
-.\" .br
-.\" Test: TODO
-.\" .br
-.\" Expect: Secondary nodes standby and finally online.
-.\" HANA primary stays online.
-.\" HANA secondary nodes clone_state temporarily UNDEFINED.
-.\" SR SFAIL and finally SOK. No takeover. No fencing.
-.\" .br
-.\" .br
-.\" Comment: Sub-optimal admin procedure.
-.\" .RE
-.\" .PP 
+\fBstandby_secn_site_nodes\fP
+.RS 2
+Descr: Set all econdary site nodes standby and online again.
+.br
+Topology: ScaleOut.
+.br
+Prereq: Cluster and HANA are up and running, all good.
+.br
+Test: crm node standby <master> & crm node standby <worker>
+.br
+crm node online <master> & crm node standby <worker>
+.br
+Expect: Secondary nodes standby and finally online.
+HANA primary stays online.
+HANA secondary nodes clone_state temporarily UNDEFINED.
+SR SFAIL and finally SOK. No takeover. No fencing.
+.br
+Comment: Sub-optimal admin procedure.
+.RE
 .PP
 \fBstandby_secn_worker_node\fP
 .RS 2
