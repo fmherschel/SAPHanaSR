@@ -51,19 +51,9 @@
             "pSite": "pSiteUp",
             "pHost": "pHostUp",
             "pWorker": "pWorkerUp",
-            "sSite": [
-                "lpt == 10",
-                "lss == 1",
-                "srr == S",
-                "srHook == SWAIT",
-                "srPoll == SFAIL"
-            ],
-            "sHost": [
-                "clone_state == DEMOTED",
-                "roles == master1::worker:",
-                "score ~ (-INFINITY|0)",
-                "standby == off"
-            ]
+            "sSite": "sSiteDown",
+            "sHost": "sHostStandby",
+            "sWorker": "sWorkerStandby"
         },
         {
             "step": "final40",
