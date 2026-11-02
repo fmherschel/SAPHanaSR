@@ -16,13 +16,9 @@ source .test_properties
 currSecondary=$(sctl_get_curr_secn "${node01}")
 currSecnWorker=$(sctl_get_curr_secn_worker "${node01}")
 
-# shellcheck disable=SC2029
-sctl_run_crm "${node01}" "resource cleanup $mstResource"
-sctl_run_cs_wf_idle "${node01}" "-s 2"
-
 echo "==== SUSE cluster online on secondary site node ${currSecondary} ===="
 # shellcheck disable=SC2029
-sctl_run_online "${currSecondary}" "node online" &
+sctl_run_crm "${currSecondary}" "node online" &
 echo "==== SUSE cluster online on secondary site node ${currSecnWorker} ===="
-sctl_run_online "${currSecnWorker}" "node online" &
+sctl_run_crm "${currSecnWorker}" "node online" &
 #
