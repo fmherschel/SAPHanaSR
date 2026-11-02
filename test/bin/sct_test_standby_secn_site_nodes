@@ -25,4 +25,6 @@ echo "==== SUSE cluster standby on secondary site node ${currSecondary} ===="
 sctl_run_crm "${currSecondary}" "node standby" &
 echo "==== SUSE cluster standby on secondary site node ${currSecnWorker} ===="
 sctl_run_crm "${currSecnWorker}" "node standby" &
+echo "sleep 120"
+sleep 120
 #
