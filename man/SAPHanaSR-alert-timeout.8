@@ -32,7 +32,7 @@ If the alert agent does not complete within this amount of time, it will be term
 Optional, default "30s", minimum "30s", example "meta timeout=30s".
 .TP
 \fBalert_sid\fR
-SAP SID of the instance to handle. Might be used by custom helper scripts.
+SAP SID of the instance to handle. Usually needed by helper scripts.
 Optional, default "HA1", example "attributes alert_sid=ADA".
 .TP
 \fBalert_ino\fR
@@ -70,24 +70,28 @@ like "SAPHanaSR-alert-timeout".
 .\"
 \fB*\fR Simple example configuration for the resources timeout alert agent.
 .PP
-The following lines needs to be added to the cluster´s CIB:
+The following lines needs to be added to the cluster´s CIB. Example SID is HA1.
 .PP
 .RS 2
 alert resources-1 "/usr/bin/SAPHanaSR-alert-timeout" \\
 .br
- select resources
+ select resources \\
+.br
+ attributes alert_sid=HA1
 .RE
 .PP
 \fB*\fR Simple example for configuring the alert agent by using crm.
 .PP
-Alternate way for configuring the alert agent.
+Alternate way for configuring the alert agent. Example SID is HA1.
 .PP
 .RS 2
 # crm configure alert resources-1 \\
 .br
  "/usr/bin/SAPHanaSR-alert-timeout" \\
 .br
- select resources
+ select resources \\
+.br
+ attributes alert_sid=HA1
 .RE
 .PP
 \fB*\fR Advanced example configuration for the resources timeout alert agent.
