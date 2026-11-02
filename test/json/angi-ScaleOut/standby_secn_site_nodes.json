@@ -41,7 +41,6 @@
             "sSite": "sSiteDown",
             "sHost": "sHostStandby",
             "sWorker": "sWorkerStandby"
-            ]
         },
         {
             "step": "step30",
