@@ -33,7 +33,7 @@
             "step": "step20",
             "name": "nodes are standby",
             "next": "step30",
-            "loop": 240,
+            "loop": 180,
             "wait": 2,
             "post": "shell sct_test_online_secn_site_nodes",
             "pSite": "pSiteUp",
