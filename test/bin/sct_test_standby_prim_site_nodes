@@ -25,6 +25,4 @@ echo "==== SUSE cluster standby on primary site node ${currPrimary} ===="
 sctl_run_crm "${currPrimary}" "node standby" &
 echo "==== SUSE cluster standby on primary site node ${currPrimWorker} ===="
 sctl_run_crm "${currPrimWorker}" "node standby" &
-echo "sleep 60"
-sleep 60
 #

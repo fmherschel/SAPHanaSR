@@ -32,10 +32,11 @@
         },
         {
             "step": "step20",
-            "name": "nodes are standby",
+            "name": "takeover on secondary",
             "next": "step30",
             "loop": 180,
             "wait": 2,
+            "post": "shell sct_test_online_prim_site_nodes",
             "pSite": [
                 "lss == 1",
                 "srr == P",
@@ -44,27 +45,8 @@
             ],
             "pHost": "pHostStandby",
             "pWorker": "pWorkerStandby",
-            "sHost": "sHostUp",
-            "sWorker": "sWorkerUp" 
-        },
-        {
-            "step": "step30",
-            "name": "takeover on secondary",
-            "next": "step40",
-            "loop": 180,
-            "wait": 2,
-            "post": "shell sct_test_online_prim_site_nodes",
-            "pSite": [
-                "lss == 1",
-                "srr == P",
-                "lpt == 10",
-                "srHook == SWAIT"
-            ],
-            "pHost": "pHostStandby",
-            "pWorker": "pWorkerStandby",
-            "sSite": "pSiteUp",
             "sHost": "pHostUp",
-            "sWorker": "pWorkerUp"
+            "sWorker": "pWorkerUp" 
         },
         {
             "step": "step30",
@@ -83,7 +65,6 @@
                 "standby != on"
             ],
             "sHost": "pHostUp",
-            "pWorker": "sWorkerUp",
             "sWorker": "pWorkerUp" 
         },
         {
