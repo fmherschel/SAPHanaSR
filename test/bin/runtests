@@ -1,0 +1,126 @@
+#!/bin/bash
+# runtests
+#
+# runtests --case <case> | --caseFile <caseFile> | 
+#          [ --testCases <test-cases> ] \
+#          --remoteNodes <nodes>
+#  
+#
+# 2026-11-02
+#
+
+paramMode="basic"
+remoteNodes=""
+testCases=""
+seperator=" "
+
+while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+        --case ) 
+            masterCase="$2"
+            shift
+            paramMode="basic"
+            ;;
+        --caseFile )
+            caseFile="$2"            
+            shift
+            paramMode="basic"
+            ;;
+        --testCases )
+            paramMode="testCases"
+            ;;
+        --remoteNodes )
+            paramMode="remoteNodes"
+            ;;
+        * )
+            newValue="$1"
+            case "$paramMode" in
+                testCases )
+                    testCases="${testCases:+$testCases$seperator}$newValue"
+                    ;;
+                remoteNodes )
+                    remoteNodes="${remoteNodes:+$remoteNodes$seperator}$newValue"
+                    ;;
+            esac
+            ;;
+    esac
+    shift
+done
+
+echo "masterCase=$masterCase"
+echo "caseFile=$caseFile"
+echo "remoteNodes=$remoteNodes"
+echo "testCases=$testCases"
+
+if [[ -n "$caseFile" ]]; then
+    CASFILE="$caseFile"
+elif [[ -n "$masterCase" ]]; then
+    CASFILE="/usr/share/SAPHanaSR-tester/samples/runtests_${masterCase}.txt"
+else
+    echo "Neither masterCase nor caseFile specified, exit"
+    exit 1
+fi
+
+if [[ -n "$remoteNodes" ]]; then
+   echo "No remoteNodes specified, exit"
+   exit 1
+fi
+
+source "$CASFILE" || exit 1
+
+REMOTENODES="$remoteNodes"
+SLEEP=120
+
+exec 3>&1
+exec 1>>"$LOGFILE"
+
+A_TCASES=( $TCASES )
+NR_TCASES=${#A_TCASES[*]}
+
+TESTS_PASSED=""
+TESTS_FAILED=""
+
+i=0
+rc=0
+while [[ "$i" -lt "$NR_TCASES" ]]; do
+  TEST="${A_TCASES[$i]}"
+  (( i++ ))
+  echo "#### $(date +%Y-%m-%d" "%H:%M:%S) run test: $TEST ####"
+  echo "$(date +%Y-%m-%d" "%H:%M:%S) TEST $i/$NR_TCASES - $TEST" >&3
+  if true; then
+      SAPHanaSR-testCluster --testFile "$ASTROOT/$TEST.json" \
+                            --remoteNodes $REMOTENODES --defaultsFile "$ASTROOT/defaults.json" \
+                            --logFile "$TEST.log" --jsonOut "$TEST.json.out" \
+                            --onFail exit \
+                            --properties "$PROPERTIES" --dumpFailures >&3; rc=$?
+      echo "#### $(date +%Y-%m-%d" "%H:%M:%S) end test: $TEST rc: $rc ####"
+      if [[ "$rc" != "0" ]]; then
+          TESTS_FAILED="$TESTS_FAILED $TEST"
+          rc=1
+          break
+      else
+          TESTS_PASSED="$TESTS_PASSED $TEST"
+          echo "$(date +%Y-%m-%d" "%H:%M:%S) TESTS_PASSED=$TESTS_PASSED" >&3
+          if [[ "$TEST" =~ "flup" ]]; then
+              echo "sleep 1" >&3
+              sleep 1
+          elif [[ "$i" -ge "$NR_TCASES" ]]; then
+                  echo "no sleep" >&3
+          else
+                  echo "sleep ${SLEEP}" >&3
+                  echo "$(date +%Y-%m-%d" "%H:%M:%S) TEST $i/$NR_TCASES - $TEST - sequence took ${SECONDS}s" >&3
+                  sleep $SLEEP
+          fi
+      fi
+  else
+      ls -l "$ASTROOT/$TEST.json.out" 1>&2
+  fi
+  echo "$(date +%Y-%m-%d" "%H:%M:%S) TEST $i/$NR_TCASES - $TEST - sequence took ${SECONDS}s" >&3
+done
+echo "$(date +%Y-%m-%d" "%H:%M:%S) TESTS_PASSED=$TESTS_PASSED" >&3
+if [[ "$rc" != 0 ]]; then
+	echo "$(date +%Y-%m-%d" "%H:%M:%S) TESTS_FAILED=$TESTS_FAILED" >&3
+fi
+echo "$(date +%Y-%m-%d" "%H:%M:%S) Runtime: $SECONDS" >&3
+exit "$rc"
+#
