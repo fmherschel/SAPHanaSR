@@ -10,7 +10,8 @@
         "site",
         "node",
         "master",
-        "worker"
+        "worker",
+        "standby"
     ],
     "start": "prereq10",
     "steps": [
@@ -51,9 +52,16 @@
             "pSite": "pSiteUp",
             "pHost": "pHostUp",
             "pWorker": "pWorkerUp",
-            "sSite": "sSiteDown",
-            "sHost": "sHostStandby",
-            "sWorker": "sWorkerStandby"
+            "sHost": [
+                "clone_state == UNDEFINED",
+                "roles == master1::worker:",
+                "standby != on"
+            ],
+            "sWorker": [
+                "clone_state == UNDEFINED",
+                "roles == slave::worker:",
+                "standby != on"
+            ]
         },
         {
             "step": "final40",
