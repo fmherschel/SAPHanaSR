@@ -1197,6 +1197,28 @@ One takeover. No fencing.
 Comment: Sub-optimal procedure on scale-up.
 .RE
 .PP
+\fBstandby_prim_site_nodes\fP
+.RS 2
+Descr: Set all primary site nodes standby and online again.
+.br
+Topology: ScaleOut.
+.br
+Prereq: Cluster and HANA are up and running, all good.
+.br
+Test: crm node standby <master> & crm node standby <worker>
+.br
+crm node online <master> & crm node standby <worker>
+.br
+Expect: All nodes stay online.
+HANA primary nodes standby and finally back online.
+HANA primary stopped and finally started as secondary.
+HANA secondary finally primary by takeover.
+SR SFAIL and finally SOK.
+One takeover. No fencing.
+.br
+Comment: Sub-optimal admin procedure.
+.RE
+.PP
 \fBstandby_prim_worker_node\fP
 .RS 2
 Descr: Set primary worker node standby and online again.
@@ -1237,7 +1259,7 @@ Comment: Admin mistake on scale-out, sub-optimal procedure on scale-up.
 .PP
 \fBstandby_secn_site_nodes\fP
 .RS 2
-Descr: Set all econdary site nodes standby and online again.
+Descr: Set all secondary site nodes standby and online again.
 .br
 Topology: ScaleOut.
 .br
