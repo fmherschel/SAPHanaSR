@@ -52,7 +52,7 @@
             "step": "step30",
             "name": "nodes back online",
             "next": "final50",
-            "loop": 180,
+            "loop": 120,
             "wait": 2,
             "pHost": [
                 "clone_state == UNDEFINED",
