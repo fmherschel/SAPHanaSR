@@ -4,7 +4,7 @@
 .\"
 .SH NAME
 .\"
-sct_runtests \- SAPHanaSR-testCluster from inside a container.
+sct_runtests \-  run SAPHanaSR-testCluster inside a container.
 .PP
 .\"
 .SH SYNOPSIS
@@ -14,11 +14,12 @@ sct_runtests \- SAPHanaSR-testCluster from inside a container.
 \fBsct_runtests\fR --case \fICASE\fR [ --testCases \fITESTS\fR ] --remoteNodes \fINODES\fR
 .br
 \fBsct_runtests\fR --caseFile \fIFILE\fR [ --testCases \fITESTS\fR ] --remoteNodes \fINODES\fR
+.\" TODO \fBsct_runtests\fR --listCases
 .PP
 .SH DESCRIPTION
 .\"
 sct_runtests runs SAPHanaSR-testCluster inside a container.
-It is given as argument to podman when starting the container. 
+It is given as cmdline argument to podman when starting the container. 
 .PP
 .\"
 .SH OPTIONS
@@ -35,6 +36,9 @@ test case defined in /usr/share/SAPHanaSR-tester/samples/runtests_\fICASE\fR.txt
 .TP
 --caseFile \fIFILE\fR
 file with scenario and tests, see above
+.\" TP
+.\" TODO --listCases
+.\" list all case files, scenarios and test cases
 .TP
 --testCases \fITEST\fR [ \fITEST\fR [ ... ]]
 tests to execute
@@ -72,10 +76,12 @@ cluster nodes are 'node1' and 'node2'.
 .\"
 .SH FILES
 .\"
-.TP \fI$PWD\fR/
+.TP
+\fI$PWD\fR/
 project directory
-.TP \fI$PWD\fR/work/
-work directory, shared between container and host, /work inside the container
+.TP
+\fI$PWD\fR/work/
+work directory, shared between container and host, /work/ inside the container
 .TP
 \fICONTAINER\fR:/usr/bin/sct_runtests
 the script itself, inside the container
@@ -84,7 +90,7 @@ the script itself, inside the container
 directory with sets of tests, inside the container
 .TP
 \fICONTAINER\fR:/usr/share/SAPHanaSR-tester/json/
-directory with scenarios and its test definitions, inside the container
+directory with scenarios and their test definitions, inside the container
 .PP
 .\"
 .SH REQUIREMENTS
@@ -94,7 +100,7 @@ directory with scenarios and its test definitions, inside the container
 .\"
 .SH BUGS
 .\"
-sct_runtests is under development. Syntax and formats are subject to change.
+sct_runtests is under development. Syntax and features are subject to change.
 .br
 .\" In case of any problem, please use your favourite SAP support process to open
 .\" a request for the component BC-OP-LNX-SUSE.
