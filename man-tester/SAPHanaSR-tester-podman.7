@@ -28,11 +28,11 @@ Shared work directory is 'work', container name is 'saphanasr-tester'.
 .\"
 .SH FILES
 .\"
-.TP $DIR
+.TP $PWD/
 project directory
-.TP $DIR/Containerfile
+.TP $PWD/Containerfile
 container build description
-.TP $DIR/work
+.TP $PWD/work/
 work directory, shared between container and host
 .PP
 .\"
@@ -47,8 +47,7 @@ work directory, shared between container and host
 .\"
 .SH BUGS
 .\"
-The SAPHanaSR-tester is under development. Syntax and formats are subject to
-change.
+SAPHanaSR-tester is under development.
 .br
 .\" In case of any problem, please use your favourite SAP support process to open
 .\" a request for the component BC-OP-LNX-SUSE.
@@ -59,6 +58,7 @@ Please report any other feedback and suggestions to feedback@suse.com.
 .\"
 \fBSAPHanaSR-tester\fP(7) , \fBSAPHanaSR-testCluster\fP(8) ,
 \fBSAPHanaSR-testCluster-output\fP(5) , \fBsct_runtests\fP(8) , \fBpodman\fP(1) ,
+\fBContainerfile\fP(5) ,
 .br
 https://registry.suse.com/
 .PP
