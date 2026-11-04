@@ -21,7 +21,8 @@ kill_prim_saphostexec
 kill_prim_worker_indexserver kill_prim_worker_inst kill_prim_worker_node
 kill_prim_worker_pacemakerd
 kill_prim_site_nodes
-standby_prim_node standby_prim_worker_node stop_prim_inst
+stop_prim_inst
+standby_prim_node standby_prim_site_nodes
 maintenance_prim_crmreport maintenance_prim_supportconfig"
 #
 BOTHCAS="stop_hana_resource
