@@ -1,0 +1,123 @@
+.\" Version: 1.2
+.\"
+.TH sct_runtests 8 "4 Nov 2026" "" "SAPHanaSR-angi"
+.\"
+.SH NAME
+.\"
+sct_runtests \- SAPHanaSR-testCluster from inside a container.
+.PP
+.\"
+.SH SYNOPSIS
+.\"
+\fBsct_runtests\fR [ --help | --version ]
+.br
+\fBsct_runtests\fR --case \fICASE\fR [ --testCases \fITESTS\fR ] --remoteNodes \fINODES\fR
+.br
+\fBsct_runtests\fR --caseFile \fIFILE\fR [ --testCases \fITESTS\fR ] --remoteNodes \fINODES\fR
+.PP
+.SH DESCRIPTION
+.\"
+sct_runtests runs SAPHanaSR-testCluster inside a container.
+It is given as argument to podman when starting the container. 
+.PP
+.\"
+.SH OPTIONS
+.\"
+.TP
+--help
+show help
+.TP
+--version
+show version
+.TP
+--case \fICASE\fR
+test case defined in /usr/share/SAPHanaSR-tester/samples/runtests_\fICASE\fR.txt, inside container
+.TP
+--caseFile \fIFILE\fR
+file with scenario and tests, see above
+.TP
+--testCases \fITEST\fR [ \fITEST\fR [ ... ]]
+tests to execute
+.TP
+--remoteNodes \fINODE\fR [ \fINODE\fR ]
+cluster nodes
+.PP
+.\
+.SH EXAMPLES
+.\"
+\fB*\fR Running container with one explicitely defined test.
+.PP
+.PP
+\fB*\fR Running container with a predefined set of tests.
+.PP
+TODO
+Shared work directory is 'work', container name is 'saphanasr-tester', scenario
+and tests are taken from 'runtests_angi-ScaleUp_conservative',
+cluster nodes are 'node1' and 'node2'.
+.PP
+.RS 2
+# podman run --rm \\
+.br
+ -v ".work:work:z" \\
+.br
+ -v ~/.ssh/id_rsa:/root/.ssh/id_rsa:ro,z \\
+.br
+ -v ~/.ssh/known_hosts:/root/.ssh/known_hosts:ro,z \\
+.br
+ saphanasr-tester "cd /work; /usr/bin/sct_runtests \\
+.br
+ --case angi-ScaleUp_conservative --remoteNodes node1 node2"
+.RE
+.PP
+.\"
+.SH FILES
+.\"
+.TP \fI$DIR\fR
+project directory
+.TP \fI$DIR\fR/work
+work directory, shared between container and host, /work inside the container
+.TP
+\fICONTAINER\fR:/usr/bin/sct_runtests
+the script itself, inside the container
+.TP
+\fICONTAINER\fR:/usr/share/SAPHanaSR-tester/samples/
+directory with sets of tests, inside the container
+.TP
+\fICONTAINER\fR:/usr/share/SAPHanaSR-tester/json/
+directory with scenarios and its test definitions, inside the container
+.PP
+.\"
+.SH REQUIREMENTS
+.\"
+\fB*\fP TODO
+.PP
+.\"
+.SH BUGS
+.\"
+sct_runtests is under development. Syntax and formats are subject to change.
+.br
+.\" In case of any problem, please use your favourite SAP support process to open
+.\" a request for the component BC-OP-LNX-SUSE.
+Please report any other feedback and suggestions to feedback@suse.com.
+.PP
+.\"
+.SH SEE ALSO
+.\"
+\fBSAPHanaSR-tester\fP(7) , \fBSAPHanaSR-testCluster\fP(8) ,
+  , \fBpodman\fP(1) ,
+.PP
+.\"
+.SH AUTHORS
+.\"
+F.Herschel, L.Pinne.
+.PP
+.\"
+.SH COPYRIGHT
+.\"
+(c) 2026 SUSE LLC
+.br
+The package SAPHanaSR-tester comes with ABSOLUTELY NO WARRANTY.
+.br
+For details see the GNU General Public License at
+http://www.gnu.org/licenses/gpl.html
+.\"
