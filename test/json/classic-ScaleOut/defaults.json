@@ -84,10 +84,32 @@
             "roles == slave:slave:worker:slave",
             "score == -10000"
         ],
+        "pWorkerDown": [
+            "clone_state == DEMOTED",
+            "roles == slave::worker:",
+            "score == -10000"
+        ],
+        "pWorkerStandby": [
+            "clone_state == UNDEFINED",
+            "roles == slave::worker:",
+            "score < 0",
+            "standby == on"
+        ],
         "sWorkerUp": [
             "clone_state == DEMOTED",
             "roles == slave:slave:worker:slave",
             "score == -12200"
+        ],
+        "sWorkerDown": [
+            "clone_state == DEMOTED",
+            "roles == slave::worker:",
+            "score == -22200"
+        ],
+        "sWorkerStandby": [
+            "clone_state == UNDEFINED",
+            "roles == slave::worker:",
+            "score < 0",
+            "standby == on"
         ],
         "xHostOut": [
              "clone_state is None",
