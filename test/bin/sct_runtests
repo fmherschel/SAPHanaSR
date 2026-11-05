@@ -1,18 +1,76 @@
-#!/bin/bash
-# runtests
+#!/usr/bin/bash
 #
-# runtests --case <case> | --caseFile <caseFile> | 
-#          [ --testCases <test-cases> ] \
-#          --remoteNodes <nodes>
-#  
+# sct_runtests
 #
-# 2026-11-02
+# (c) 2026 SUSE LLC
+# Author: F.Herschel, L.Pinne.
+# GNU General Public License v2. No warranty.
+# http://www.gnu.org/licenses/gpl.html
 #
 
+myVersion="2026-11-05"
 paramMode="basic"
 remoteNodes=""
 testCases=""
 seperator=" "
+
+
+function f_version() {
+    /usr/bin/rpm -q SAPHanaSR-tester || echo "sct_runtests $myVersion"
+}
+
+function f_help() {
+    case "$1" in
+        topics)
+            /usr/bin/rpm -ql SAPHanaSR-tester |\
+            /usr/bin/awk -F"/" '$4=="man" {print $6}' |\
+            while read; do echo ${REPLY::-5}; done
+        ;;
+        self)
+            echo
+            echo "usage     $EXE --version"
+            echo "usage     $EXE --help [ topics | <topic> ]"
+            echo "usage     $EXE --case <case> [ --testCases <tests> ] --remoteNodes <nodes>"
+            echo "usage     $EXE --caseFile <file> [ --testCases <tests> ] --remoteNodes <nodes>"
+            echo
+            echo " --help           show help"
+            echo " --version        show version"
+            echo " --case           predefined test case"
+            echo " --caseFile       file with scenario and tests"
+            echo " --testCases      tests to execute"
+            echo " --remoteNodes    cluster nodes"
+            echo
+        ;;
+        *)
+            /usr/bin/man "$1"
+        ;;
+    esac
+}
+
+
+# main()
+
+if [[ "$#" -eq 0 ]]; then
+    f_help self
+    exit
+fi
+case "$1" in
+        -v|--version)
+            f_version
+            exit
+        ;;
+        -h|--help)
+            if [[ "$#" -eq 1 ]]; then
+                f_help self
+                exit
+            fi
+            shift
+            f_help "$*"
+            exit
+        ;;
+esac
+
+# TODO below in function
 
 while [[ "$#" -gt 0 ]]; do
     case "$1" in
@@ -88,30 +146,31 @@ while [[ "$i" -lt "$NR_TCASES" ]]; do
   echo "#### $(date +%Y-%m-%d" "%H:%M:%S) run test: $TEST ####"
   echo "$(date +%Y-%m-%d" "%H:%M:%S) TEST $i/$NR_TCASES - $TEST" >&3
   if true; then
-      SAPHanaSR-testCluster --testFile "$ASTROOT/$TEST.json" \
-                            --remoteNodes $REMOTENODES --defaultsFile "$ASTROOT/defaults.json" \
-                            --logFile "$TEST.log" --jsonOut "$TEST.json.out" \
-                            --onFail exit \
-                            --properties "$PROPERTIES" --dumpFailures >&3; rc=$?
+      /usr/bin/SAPHanaSR-testCluster \
+            --testFile "$ASTROOT/$TEST.json" \
+            --remoteNodes $REMOTENODES --defaultsFile "$ASTROOT/defaults.json" \
+            --logFile "$TEST.log" --jsonOut "$TEST.json.out" \
+            --onFail exit \
+            --properties "$PROPERTIES" --dumpFailures >&3; rc=$?
       echo "#### $(date +%Y-%m-%d" "%H:%M:%S) end test: $TEST rc: $rc ####"
-      if [[ "$rc" != "0" ]]; then
-          TESTS_FAILED="$TESTS_FAILED $TEST"
-          rc=1
-          break
-      else
-          TESTS_PASSED="$TESTS_PASSED $TEST"
-          echo "$(date +%Y-%m-%d" "%H:%M:%S) TESTS_PASSED=$TESTS_PASSED" >&3
-          if [[ "$TEST" =~ "flup" ]]; then
-              echo "sleep 1" >&3
-              sleep 1
-          elif [[ "$i" -ge "$NR_TCASES" ]]; then
-                  echo "no sleep" >&3
-          else
-                  echo "sleep ${SLEEP}" >&3
-                  echo "$(date +%Y-%m-%d" "%H:%M:%S) TEST $i/$NR_TCASES - $TEST - sequence took ${SECONDS}s" >&3
-                  sleep $SLEEP
-          fi
-      fi
+    if [[ "$rc" != "0" ]]; then
+        TESTS_FAILED="$TESTS_FAILED $TEST"
+        rc=1
+        break
+    else
+        TESTS_PASSED="$TESTS_PASSED $TEST"
+        echo "$(date +%Y-%m-%d" "%H:%M:%S) TESTS_PASSED=$TESTS_PASSED" >&3
+        if [[ "$TEST" =~ "flup" ]]; then
+            echo "sleep 1" >&3
+            sleep 1
+        elif [[ "$i" -ge "$NR_TCASES" ]]; then
+             echo "no sleep" >&3
+        else
+            echo "sleep ${SLEEP}" >&3
+            echo "$(date +%Y-%m-%d" "%H:%M:%S) TEST $i/$NR_TCASES - $TEST - sequence took ${SECONDS}s" >&3
+            sleep $SLEEP
+        fi
+    fi
   else
       ls -l "$ASTROOT/$TEST.json.out" 1>&2
   fi
