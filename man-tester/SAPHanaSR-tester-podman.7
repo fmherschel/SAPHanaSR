@@ -20,6 +20,7 @@ TODO
 Shared work directory is 'work', container name is 'saphanasr-tester'.
 .PP
 .RS 2
+.\" TODO Containerfile ?
 # mkdir -p $PWD/work
 .br
 # podman build --net=host --no-cache --pull -t saphanasr-tester
@@ -60,7 +61,26 @@ is 'angi_ScaleUp', test is 'split_brain_prio.json', setup properties are
  --dumpFailures
 .RE
 .PP
-Note: For running predfined sets of tests, see manual page sct_runtests(8).
+\fB*\fR Running container with a predefined set of tests.
+.PP
+TODO
+Shared work directory is 'work', container name is 'saphanasr-tester', scenario
+and tests are taken from 'runtests_angi-ScaleUp_conservative',
+cluster nodes are 'node1' and 'node2'.
+.PP
+.RS 2
+# podman run --rm \\
+.br
+ -v ".work:work:z" \\
+.br
+ -v ~/.ssh/id_rsa:/root/.ssh/id_rsa:ro,z \\
+.br
+ -v ~/.ssh/known_hosts:/root/.ssh/known_hosts:ro,z \\
+.br
+ saphanasr-tester "cd /work; /usr/bin/sct_runtests \\
+.br
+ --case angi-ScaleUp_conservative --remoteNodes node1 node2"
+.RE
 .PP
 .\"
 .SH FILES
@@ -71,22 +91,34 @@ project directory
 .TP
 $PWD/Containerfile
 container build description
-.\" TODO $PED/runtests/ ?
+.\" TODO $PWD/runtests/ ?
 .TP
 $PWD/work/
 work directory, shared between container and host
 .TP
 $PWD/work/properties_<\fIscenario\fR>.json
-test environment (cluster) data, f.e. properties_ScaleUp.json
+test cluster properties, f.e. properties_ScaleUp.json
 .TP
 $PWD/work/runtests.log
 testrun overall log
 .TP
 $PWD/work/<\fItest\fR.log
-per test log, f.e. split_brain_prio.log
+per test log, repeating tests will append
 .TP
 $PWD/work/<\fItest\fR.json.out
-per test JSON output, f.e. split_brain_prio.json.out
+per test JSON output, repeating tests will overwrite
+.TP
+\fICONTAINER\fR:/work/
+work directory, shared between container and host, inside the container
+.TP
+\fICONTAINER\fR:/usr/bin/sct_runtests
+the script itself, inside the container
+.TP
+\fICONTAINER\fR:/usr/share/SAPHanaSR-tester/samples/
+directory with sets of tests, inside the container
+.TP
+\fICONTAINER\fR:/usr/share/SAPHanaSR-tester/json/
+directory with scenarios and their test definitions, inside the container
 .PP
 .\"
 .SH REQUIREMENTS
