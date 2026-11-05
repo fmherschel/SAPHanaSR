@@ -71,23 +71,23 @@ if [[ "$#" -eq 0 ]]; then
     exit
 fi
 case "$1" in
-        -v|--version)
-            f_version
-            exit
+    -v|--version)
+        f_version
+        exit
         ;;
-        -h|--help)
-            if [[ "$#" -eq 1 ]]; then
-                f_help self
-                exit
-            fi
-            shift
-            f_help "$*"
+    -h|--help)
+        if [[ "$#" -eq 1 ]]; then
+            f_help self
             exit
+        fi
+        shift
+        f_help "$*"
+        exit
         ;;
-        -s|--sample)
-            shift
-            f_sample "$1"
-            exit
+    -s|--sample)
+        shift
+        f_sample "$1"
+        exit
         ;;
 esac
 
@@ -203,7 +203,7 @@ while [[ "$i" -lt "$NR_TCASES" ]]; do
 done
 echo "$(date +%Y-%m-%d" "%H:%M:%S) TESTS_PASSED=$TESTS_PASSED" >&3
 if [[ "$rc" != 0 ]]; then
-	echo "$(date +%Y-%m-%d" "%H:%M:%S) TESTS_FAILED=$TESTS_FAILED" >&3
+    echo "$(date +%Y-%m-%d" "%H:%M:%S) TESTS_FAILED=$TESTS_FAILED" >&3
 fi
 echo "$(date +%Y-%m-%d" "%H:%M:%S) Runtime: $SECONDS" >&3
 exit "$rc"
