@@ -8,7 +8,7 @@
 # http://www.gnu.org/licenses/gpl.html
 #
 
-myVersion="2026-11-05"
+myVersion="3.2.1 2026-11-05"
 paramMode="basic"
 remoteNodes=""
 testCases=""
@@ -21,24 +21,26 @@ function f_version() {
 
 function f_help() {
     case "$1" in
-        topics)
+        pages)
             /usr/bin/rpm -ql SAPHanaSR-tester |\
             /usr/bin/awk -F"/" '$4=="man" {print $6}' |\
             while read; do echo ${REPLY::-5}; done
         ;;
         self)
             echo
-            echo "usage     $EXE --version"
-            echo "usage     $EXE --help [ topics | <topic> ]"
             echo "usage     $EXE --case <case> [ --testCases <tests> ] --remoteNodes <nodes>"
             echo "usage     $EXE --caseFile <file> [ --testCases <tests> ] --remoteNodes <nodes>"
+            echo "usage     $EXE --sample [ samples | <sample> ]"
+            echo "usage     $EXE --help [ pages | <page> ]"
+            echo "usage     $EXE --version"
             echo
-            echo " --help           show help"
-            echo " --version        show version"
             echo " --case           predefined test case"
-            echo " --caseFile       file with scenario and tests"
+            echo " --caseFile       sample file with scenario and tests"
             echo " --testCases      tests to execute"
             echo " --remoteNodes    cluster nodes"
+            echo " --sample         show sample"
+            echo " --help           show help"
+            echo " --version        show version"
             echo
         ;;
         *)
@@ -50,11 +52,14 @@ function f_help() {
 function f_sample() {
     case "$1" in
         samples)
-            ls /usr/share/SAPHanaSR-tester/samples/runtests_* |\
-            while read; do basename $REPLY ".txt"; done
+            # txt: Text eXecution Template
+            /usr/bin/ls /usr/share/SAPHanaSR-tester/samples/runtests_*.txt |\
+            while read; do /usr/bin/basename $REPLY ".txt"; done
         ;;
         *)
-            cat /usr/share/SAPHanaSR-tester/samples/"$1".txt
+            if [[ -n "$1" ]]; then
+                /usr/bin/cat /usr/share/SAPHanaSR-tester/samples/"$1".txt
+            fi
         ;;
     esac
 }

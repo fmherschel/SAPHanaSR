@@ -15,7 +15,7 @@ sct_runtests \-  run predefined sets of tests.
 .br
 \fBsct_runtests\fR --sample [ samples | \fISAMPLE\fR ]
 .br
-\fBsct_runtests\fR --help [ topics | \fITOPIC\fR ]
+\fBsct_runtests\fR --help [ pages | \fIPAGE\fR ]
 .br
 \fBsct_runtests\fR --version
 .PP
@@ -30,19 +30,18 @@ For running sct_runtests inside a podman container, see SAPHanaSR-tester-podman(
 .SH OPTIONS
 .\"
 .TP
---help [ topics | \fITOPIC\fR ]
-show usage, or list of topics, or topic manual page
-.TP
+--help [ pages | \fIPAGE\fR ]
+show usage, or list of manual pages, or given page
 .TP
 --case \fICASE\fR
-test case defined in /usr/share/SAPHanaSR-tester/samples/runtests_\fICASE\fR.txt
+TODO
 .TP
 --caseFile \fIFILE\fR
-file with scenario and tests, see above
+sample file with scenario and tests
 .TP
 .\" TODO sample vs. case ?
-.--sample [ samples | \fISAMPLE\fR ]
-show list of samples, or sample file
+--sample [ samples | \fISAMPLE\fR ]
+show list of samples, or show file for given sample
 .TP
 --testCases \fITEST\fR [ \fITEST\fR [ ... ]]
 tests to execute
