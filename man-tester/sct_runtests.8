@@ -13,7 +13,7 @@ sct_runtests \-  run predefined sets of tests.
 .br
 \fBsct_runtests\fR --caseFile \fIFILE\fR [ --testCases \fITESTS\fR ] --remoteNodes \fINODES\fR
 .br
-\fBsct_runtests\fR --sample [ samples | \fISAMPLE\fR ]
+\fBsct_runtests\fR --sample [ samples | \fICASE\fR ]
 .br
 \fBsct_runtests\fR --help [ pages | \fIPAGE\fR ]
 .br
@@ -34,14 +34,14 @@ For running sct_runtests inside a podman container, see SAPHanaSR-tester-podman(
 show usage, or list of manual pages, or given page
 .TP
 --case \fICASE\fR
-TODO
+case sample with scenario and tests, defined in /usr/share/SAPHanaSR-tester/samples/runtests_\fICASE\fR.txt
 .TP
 --caseFile \fIFILE\fR
 sample file with scenario and tests
 .TP
 .\" TODO sample vs. case ?
---sample [ samples | \fISAMPLE\fR ]
-show list of samples, or show file for given sample
+--sample [ samples | \fICASE\fR ]
+show list of case samples, or show file for given sample
 .TP
 --testCases \fITEST\fR [ \fITEST\fR [ ... ]]
 tests to execute
@@ -55,16 +55,25 @@ show version
 .\"
 .SH EXAMPLES
 .\"
-\fB*\fR Show list of hopefully helpful manual pages.
+\fB*\fR Show list of predefined tests samples.
 .PP
 .RS 2
-# /usr/bin/sct_runtests --help pages
+# /usr/bin/sct_runtests --sample samples 
+.RE
+.PP
+\fB*\fR Show predefined test sample angi_scaleUp_common.
+.PP
+This test are common for SAPHanaSR-angi scale-up in conservative and progressive
+variant.
+.PP
+.RS 2
+# /usr/bin/sct_runtests --sample angi-scaleUp_common
 .RE
 .PP
 \fB*\fR Run a predefined set of tests.
 .PP
 TODO
-properties file, scenario and tests are taken from 'runtests_angi-ScaleUp_conservative',
+properties file, scenario and tests are taken from sample 'angi-ScaleUp_conservative',
 cluster nodes are 'nose1' and 'nose2'.
 .PP
 .RS 2
@@ -73,6 +82,12 @@ cluster nodes are 'nose1' and 'nose2'.
 # /usr/bin/sct_runtests --case angi-ScaleUp_conservative \\
 .br
  --remoteNodes nose1 nose2
+.RE
+.PP
+\fB*\fR Show list of hopefully helpful manual pages.
+.PP
+.RS 2
+# /usr/bin/sct_runtests --help pages
 .RE
 .PP
 .\"
@@ -94,10 +109,10 @@ test cluster properties, f.e. properties_ScaleUp.json
 \fI$PWD\fR/runtests.log
 testrun overall log
 .TP
-\fI$PWD\fR/<\fItest\fR>.log
+\fI$PWD\fR/<\fITEST\fR>.log
 per test log (test flow), repeating tests will append
 .TP
-\fI$PWD\fR/<\fItest\fR>.json.out
+\fI$PWD\fR/<\fITEST\fR>.json.out
 per test JSON output (status details), repeating tests will overwrite
 .PP
 .\"
