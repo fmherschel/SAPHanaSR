@@ -21,9 +21,15 @@ Shared work directory is 'work', container name is 'saphanasr-tester'.
 .PP
 .RS 2
 .\" TODO Containerfile ?
+# cat $PWD/Containerfile
+.br
 # mkdir -p $PWD/work
 .br
-# podman build --net=host --no-cache --pull -t saphanasr-tester
+# podman build --net=host --no-cache --pull=newer \\
+.br
+ --build-arg PKG_VERSION=3.2.1-9.1 \\
+.br
+ -t saphanasr-tester
 .RE
 .PP
 \fB*\fR Running container with one explicitely defined test.
@@ -103,10 +109,10 @@ $PWD/work/runtests.log
 testrun overall log
 .TP
 $PWD/work/<\fITEST\fR.log
-per test log, repeating tests will append
+per test log (test flow), repeating tests will append
 .TP
 $PWD/work/<\fITEST\fR.json.out
-per test JSON output, repeating tests will overwrite
+per test JSON output (status details), repeating tests will overwrite
 .TP
 \fICONTAINER\fR:/work/
 work directory, shared between container and host, inside the container
@@ -115,10 +121,10 @@ work directory, shared between container and host, inside the container
 the script itself, inside the container
 .TP
 \fICONTAINER\fR:/usr/share/SAPHanaSR-tester/samples/
-directory with sets of tests, inside the container
+directory with sample sets of tests, inside the container
 .TP
 \fICONTAINER\fR:/usr/share/SAPHanaSR-tester/json/
-directory with scenarios and their test definitions, inside the container
+directory with HA scenarios and their test definitions, inside the container
 .PP
 .\"
 .SH REQUIREMENTS
