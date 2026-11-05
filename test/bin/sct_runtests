@@ -61,12 +61,16 @@ else
     exit 1
 fi
 
-if [[ -n "$remoteNodes" ]]; then
+if [[ -z "$remoteNodes" ]]; then
    echo "No remoteNodes specified, exit"
    exit 1
 fi
 
 source "$CASFILE" || exit 1
+
+if [[ -n "$testCases" ]]; then
+    TCASES="$testCases"
+fi 
 
 REMOTENODES="$remoteNodes"
 SLEEP=120
@@ -107,8 +111,8 @@ while [[ "$i" -lt "$NR_TCASES" ]]; do
           elif [[ "$i" -ge "$NR_TCASES" ]]; then
                   echo "no sleep" >&3
           else
-                  echo "sleep ${SLEEP}" >&3
                   echo "$(date +%Y-%m-%d" "%H:%M:%S) TEST $i/$NR_TCASES - $TEST - sequence took ${SECONDS}s" >&3
+                  echo "$(date +%Y-%m-%d" "%H:%M:%S) sleep ${SLEEP}" >&3
                   sleep $SLEEP
           fi
       fi
