@@ -55,22 +55,24 @@ show version
 .\"
 .SH EXAMPLES
 .\"
-\fB*\fR Showing list of help topics.
+\fB*\fR Show list of hopefully helpful manual pages.
 .PP
 .RS 2
-# /usr/bin/sct_runtests --help topics
+# /usr/bin/sct_runtests --help pages
 .RE
 .PP
-\fB*\fR Running a predefined set of tests.
+\fB*\fR Run a predefined set of tests.
 .PP
 TODO
 properties file, scenario and tests are taken from 'runtests_angi-ScaleUp_conservative',
-cluster nodes are 'node1' and 'node2'.
+cluster nodes are 'nose1' and 'nose2'.
 .PP
 .RS 2
+# cat ./properties_ScaleUp.json
+.br
 # /usr/bin/sct_runtests --case angi-ScaleUp_conservative \\
 .br
- --remoteNodes node1 node2
+ --remoteNodes nose1 nose2
 .RE
 .PP
 .\"
@@ -81,12 +83,12 @@ cluster nodes are 'node1' and 'node2'.
 the script itself
 .TP
 /usr/share/SAPHanaSR-tester/samples/
-directory with sets of tests
+directory with samples of tests
 .TP
 /usr/share/SAPHanaSR-tester/json/<\fISCENARIO\fR>/
 directories with scenarios and their test definitions
 .TP
-\fI$PWD\fR/properties_<\fIscenario\fR>.json
+\fI$PWD\fR/properties_<\fISCENARIO\fR>.json
 test cluster properties, f.e. properties_ScaleUp.json
 .TP
 \fI$PWD\fR/runtests.log
@@ -116,7 +118,7 @@ Please report any other feedback and suggestions to feedback@suse.com.
 .SH SEE ALSO
 .\"
 \fBSAPHanaSR-tester\fP(7) , \fBSAPHanaSR-testCluster\fP(8) ,
-\fBSAPHanaSR-testCluster-output\fP(5) 
+\fBSAPHanaSR-testCluster-output\fP(5)
 .PP
 .\"
 .SH AUTHORS
