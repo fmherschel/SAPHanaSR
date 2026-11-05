@@ -9,13 +9,15 @@ sct_runtests \-  run predefined sets of tests.
 .\"
 .SH SYNOPSIS
 .\"
-\fBsct_runtests\fR [ --help | --version ]
-.\" TODO \fBsct_runtests\fR --help [ topics | \fITOPIC\fR ]
-.br
 \fBsct_runtests\fR --case \fICASE\fR [ --testCases \fITESTS\fR ] --remoteNodes \fINODES\fR
 .br
 \fBsct_runtests\fR --caseFile \fIFILE\fR [ --testCases \fITESTS\fR ] --remoteNodes \fINODES\fR
-.\" TODO \fBsct_runtests\fR --show [ objects | \fIOBJECT\fR ]
+.br
+\fBsct_runtests\fR --sample [ samples | \fISAMPLE\fR ]
+.br
+\fBsct_runtests\fR --help [ topics | \fITOPIC\fR ]
+.br
+\fBsct_runtests\fR --version
 .PP
 .SH DESCRIPTION
 .\"
@@ -28,30 +30,38 @@ For running sct_runtests inside a podman container, see SAPHanaSR-tester-podman(
 .SH OPTIONS
 .\"
 .TP
---help
-show help
+--help [ topics | \fITOPIC\fR ]
+show usage, or list of topics, or topic manual page
 .TP
---version
-show version
 .TP
 --case \fICASE\fR
 test case defined in /usr/share/SAPHanaSR-tester/samples/runtests_\fICASE\fR.txt
 .TP
 --caseFile \fIFILE\fR
 file with scenario and tests, see above
-.\" TP
-.\" TODO --show [ objects | \fIOBJECT\fR ]
-.\" show case files, scenarios and test cases
+.TP
+.\" TODO sample vs. case ?
+.--sample [ samples | \fISAMPLE\fR ]
+show list of samples, or sample file
 .TP
 --testCases \fITEST\fR [ \fITEST\fR [ ... ]]
 tests to execute
 .TP
 --remoteNodes \fINODE\fR [ \fINODE\fR ]
 cluster nodes
+.TP
+--version
+show version
 .PP
 .\"
 .SH EXAMPLES
 .\"
+\fB*\fR Showing list of help topics.
+.PP
+.RS 2
+# /usr/bin/sct_runtests --help topics
+.RE
+.PP
 \fB*\fR Running a predefined set of tests.
 .PP
 TODO

@@ -47,6 +47,17 @@ function f_help() {
     esac
 }
 
+function f_sample() {
+    case "$1" in
+        samples)
+            ls /usr/share/SAPHanaSR-tester/samples/runtests_* |\
+            while read; do basename $REPLY ".txt"; done
+        ;;
+        *)
+            cat /usr/share/SAPHanaSR-tester/samples/"$1".txt
+        ;;
+    esac
+}
 
 # main()
 
@@ -66,6 +77,11 @@ case "$1" in
             fi
             shift
             f_help "$*"
+            exit
+        ;;
+        -s|--sample)
+            shift
+            f_sample "$1"
             exit
         ;;
 esac
