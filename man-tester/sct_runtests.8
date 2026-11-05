@@ -55,25 +55,24 @@ show version
 .\"
 .SH EXAMPLES
 .\"
-\fB*\fR Show list of predefined tests samples.
+\fB*\fR Show list of predefined tests sample sets.
 .PP
 .RS 2
 # /usr/bin/sct_runtests --sample samples 
 .RE
 .PP
-\fB*\fR Show predefined test sample angi_scaleUp_common.
+\fB*\fR Show predefined test sample set details.
 .PP
-This test are common for SAPHanaSR-angi scale-up in conservative and progressive
-variant.
+Test case sample is angi_scaleUp_common. This tests are common for SAPHanaSR-angi
+scale-up in conservative and progressive variant.
 .PP
 .RS 2
 # /usr/bin/sct_runtests --sample angi-scaleUp_common
 .RE
 .PP
-\fB*\fR Run a predefined set of tests.
+\fB*\fR Run a predefined test sample set.
 .PP
-TODO
-properties file, scenario and tests are taken from sample 'angi-ScaleUp_conservative',
+Properties file, scenario and tests are taken from sample 'angi-ScaleUp_conservative',
 cluster nodes are 'nose1' and 'nose2'.
 .PP
 .RS 2
@@ -98,10 +97,10 @@ cluster nodes are 'nose1' and 'nose2'.
 the script itself
 .TP
 /usr/share/SAPHanaSR-tester/samples/
-directory with samples of tests
+directory with test sample sets
 .TP
 /usr/share/SAPHanaSR-tester/json/<\fISCENARIO\fR>/
-directories with scenarios and their test definitions
+directories with HA scenarios and their test definitions
 .TP
 \fI$PWD\fR/properties_<\fISCENARIO\fR>.json
 test cluster properties, f.e. properties_ScaleUp.json
