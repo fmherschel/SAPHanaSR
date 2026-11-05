@@ -25,15 +25,68 @@ Shared work directory is 'work', container name is 'saphanasr-tester'.
 # podman build --net=host --no-cache --pull -t saphanasr-tester
 .RE
 .PP
+\fB*\fR Running container with one explicitely defined test.
+.PP
+TODO
+See manual page SAPHanaSR-testCluster(8) for details.
+.br
+Shared work directory is 'work', container name is 'saphanasr-tester', scenario
+is 'angi_ScaleUp', test is 'split_brain_prio.json', setup properties are
+ 'properties_ScaleUp.json', cluster nodes are 'node1' and 'node2'.
+.PP
+.RS 2
+# podman run --rm \\
+.br
+ -v ".work:work:z" \\
+.br
+ -v ~/.ssh/id_rsa:/root/.ssh/id_rsa:ro,z \\
+.br
+ -v ~/.ssh/known_hosts:/root/.ssh/known_hosts:ro,z \\
+.br
+ saphanasr-tester "cd /work; /usr/bin/SAPHanaSR-testCluster \\
+.br
+ --properties ./properties_ScaleUp.json \\
+.br
+ --remoteNodes nose1 nose2 \\
+.br
+ --testFile /usr/share/SAPHanaSR-tester/json/angi_ScaleUp/split_brain_prio.json \\
+.br
+ --defaultsFile /usr/share/SAPHanaSR-tester/json/angi_ScaleUp/defaults.json \\
+.br
+ --logFile split_brain_prio.log \\
+.br
+ --jsonOut split_brain_prio.json.out \\
+.br
+ --dumpFailures
+.RE
+.PP
+Note: For running predfined sets of tests, see manual page sct_runtests(8).
+.PP
 .\"
 .SH FILES
 .\"
-.TP $PWD/
+.TP
+$PWD/
 project directory
-.TP $PWD/Containerfile
+.TP
+$PWD/Containerfile
 container build description
-.TP $PWD/work/
+.\" TODO $PED/runtests/ ?
+.TP
+$PWD/work/
 work directory, shared between container and host
+.TP
+$PWD/work/properties_<\fIscenario\fR>.json
+test environment (cluster) data, f.e. properties_ScaleUp.json
+.TP
+$PWD/work/runtests.log
+testrun overall log
+.TP
+$PWD/work/<\fItest\fR.log
+per test log, f.e. split_brain_prio.log
+.TP
+$PWD/work/<\fItest\fR.json.out
+per test JSON output, f.e. split_brain_prio.json.out
 .PP
 .\"
 .SH REQUIREMENTS

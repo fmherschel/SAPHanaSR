@@ -10,11 +10,12 @@ sct_runtests \-  run SAPHanaSR-testCluster inside a container.
 .SH SYNOPSIS
 .\"
 \fBsct_runtests\fR [ --help | --version ]
+.\" TODO \fBsct_runtests\fR --help [ topics | \fITOPIC\fR ]
 .br
 \fBsct_runtests\fR --case \fICASE\fR [ --testCases \fITESTS\fR ] --remoteNodes \fINODES\fR
 .br
 \fBsct_runtests\fR --caseFile \fIFILE\fR [ --testCases \fITESTS\fR ] --remoteNodes \fINODES\fR
-.\" TODO \fBsct_runtests\fR --listCases
+.\" TODO \fBsct_runtests\fR --show [ objects | \fIOBJECT\fR ]
 .PP
 .SH DESCRIPTION
 .\"
@@ -37,8 +38,8 @@ test case defined in /usr/share/SAPHanaSR-tester/samples/runtests_\fICASE\fR.txt
 --caseFile \fIFILE\fR
 file with scenario and tests, see above
 .\" TP
-.\" TODO --listCases
-.\" list all case files, scenarios and test cases
+.\" TODO --show [ objects | \fIOBJECT\fR ]
+.\" show case files, scenarios and test cases
 .TP
 --testCases \fITEST\fR [ \fITEST\fR [ ... ]]
 tests to execute
@@ -49,9 +50,6 @@ cluster nodes
 .\
 .SH EXAMPLES
 .\"
-\fB*\fR Running container with one explicitely defined test.
-.PP
-.PP
 \fB*\fR Running container with a predefined set of tests.
 .PP
 TODO
@@ -73,15 +71,34 @@ cluster nodes are 'node1' and 'node2'.
  --case angi-ScaleUp_conservative --remoteNodes node1 node2"
 .RE
 .PP
+Note: For running single highly specified tests, see manual pages
+SAPHanaSR-tester-podman(7) and SAPHanaSR-testCluster(8).
+.PP
 .\"
 .SH FILES
 .\"
 .TP
 \fI$PWD\fR/
 project directory
+.\" TODO $PWD/runtets/ ?
 .TP
 \fI$PWD\fR/work/
-work directory, shared between container and host, /work/ inside the container
+work directory, shared between container and host
+.TP
+\fI$PWD\fR/work/properties_<\fIscenario\fR>.json
+test environment (cluster) data, f.e. properties_angi-Scalep_common.log
+.TP
+\fI$PWD\fR/work/runtests.log
+testrun overall log
+.TP
+\fI$PWD\fR/work/<\fItest\fR>.log
+per test log (test flow), f.e. split_brain_prio.log - repeating tests will be apended
+.TP
+\fI$PWD\fR/work/<\fItest\fR>.json.out
+per test JSON output (status details), f.e. split_brain_prio.json.out - repeating tests will overwrite
+.TP
+\fICONTAINER\fR:/work/
+work directory, shared between container and host, inside the container
 .TP
 \fICONTAINER\fR:/usr/bin/sct_runtests
 the script itself, inside the container
