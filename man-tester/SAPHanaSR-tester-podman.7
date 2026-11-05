@@ -1,0 +1,170 @@
+.\" Version: 1.2
+.\"
+.TH SAPHanaSR-tester-podman 7 "4 Nov 2026" "" "SAPHanaSR-angi"
+.\"
+.SH NAME
+.\"
+SAPHanaSR-tester-podman \- podman container for SAPHanaSR-tester.
+.PP
+.\"
+.SH DESCRIPTION
+.\"
+SAPHanaSR-tester-podman TODO
+.PP
+.\"
+.SH EXAMPLES
+.\"
+\fB*\fR Building podman container with SAPHanaSR-tester.
+.PP
+TODO
+Shared work directory is 'work', container name is 'saphanasr-tester'.
+.PP
+.RS 2
+.\" TODO Containerfile ?
+# cat $PWD/Containerfile
+.br
+# mkdir -p $PWD/work
+.br
+# podman build --net=host --no-cache --pull=newer \\
+.br
+ --build-arg PKG_VERSION=3.2.1-9.1 \\
+.br
+ -t saphanasr-tester
+.RE
+.PP
+\fB*\fR Running container with one explicitely defined test.
+.PP
+TODO
+See manual page SAPHanaSR-testCluster(8) for details.
+.br
+Shared work directory is 'work', container name is 'saphanasr-tester', scenario
+is 'angi_ScaleUp', test is 'split_brain_prio.json', setup properties are
+ 'properties_ScaleUp.json', cluster nodes are 'node1' and 'node2'.
+.PP
+.RS 2
+# podman run --rm \\
+.br
+ -v ".work:work:z" \\
+.br
+ -v ~/.ssh/id_rsa:/root/.ssh/id_rsa:ro,z \\
+.br
+ -v ~/.ssh/known_hosts:/root/.ssh/known_hosts:ro,z \\
+.br
+ saphanasr-tester "cd /work; /usr/bin/SAPHanaSR-testCluster \\
+.br
+ --properties ./properties_ScaleUp.json \\
+.br
+ --remoteNodes nose1 nose2 \\
+.br
+ --testFile /usr/share/SAPHanaSR-tester/json/angi_ScaleUp/split_brain_prio.json \\
+.br
+ --defaultsFile /usr/share/SAPHanaSR-tester/json/angi_ScaleUp/defaults.json \\
+.br
+ --logFile split_brain_prio.log \\
+.br
+ --jsonOut split_brain_prio.json.out \\
+.br
+ --dumpFailures
+.RE
+.PP
+\fB*\fR Running container with a predefined set of tests.
+.PP
+TODO
+Shared work directory is 'work', container name is 'saphanasr-tester', scenario
+and tests are taken from sample angi-ScaleUp_conservative',
+cluster nodes are 'node1' and 'node2'.
+.PP
+.RS 2
+# podman run --rm \\
+.br
+ -v ".work:work:z" \\
+.br
+ -v ~/.ssh/id_rsa:/root/.ssh/id_rsa:ro,z \\
+.br
+ -v ~/.ssh/known_hosts:/root/.ssh/known_hosts:ro,z \\
+.br
+ saphanasr-tester "cd /work; /usr/bin/sct_runtests \\
+.br
+ --case angi-ScaleUp_conservative --remoteNodes node1 node2"
+.RE
+.PP
+.\"
+.SH FILES
+.\"
+.TP
+$PWD/
+project directory
+.TP
+$PWD/Containerfile
+container build description
+.\" TODO $PWD/runtests/ ?
+.TP
+$PWD/work/
+work directory, shared between container and host
+.TP
+$PWD/work/properties_<\fISCENARIO\fR>.json
+test cluster properties, f.e. properties_ScaleUp.json
+.TP
+$PWD/work/runtests.log
+testrun overall log
+.TP
+$PWD/work/<\fITEST\fR.log
+per test log (test flow), repeating tests will append
+.TP
+$PWD/work/<\fITEST\fR.json.out
+per test JSON output (status details), repeating tests will overwrite
+.TP
+\fICONTAINER\fR:/work/
+work directory, shared between container and host, inside the container
+.TP
+\fICONTAINER\fR:/usr/bin/sct_runtests
+the script itself, inside the container
+.TP
+\fICONTAINER\fR:/usr/share/SAPHanaSR-tester/samples/
+directory with sample sets of tests, inside the container
+.TP
+\fICONTAINER\fR:/usr/share/SAPHanaSR-tester/json/
+directory with HA scenarios and their test definitions, inside the container
+.PP
+.\"
+.SH REQUIREMENTS
+.\"
+\fB*\fP podman TODO
+.PP
+\fB*\fP Repositories TODO
+.PP
+\fB*\fP Disk space TODO
+.PP
+.\"
+.SH BUGS
+.\"
+SAPHanaSR-tester is under development.
+.br
+.\" In case of any problem, please use your favourite SAP support process to open
+.\" a request for the component BC-OP-LNX-SUSE.
+Please report any other feedback and suggestions to feedback@suse.com.
+.PP
+.\"
+.SH SEE ALSO
+.\"
+\fBSAPHanaSR-tester\fP(7) , \fBSAPHanaSR-testCluster\fP(8) ,
+\fBSAPHanaSR-testCluster-output\fP(5) , \fBsct_runtests\fP(8) , \fBpodman\fP(1) ,
+\fBContainerfile\fP(5) ,
+.br
+https://registry.suse.com/
+.PP
+.\"
+.SH AUTHORS
+.\"
+F.Herschel, L.Pinne.
+.PP
+.\"
+.SH COPYRIGHT
+.\"
+(c) 2026 SUSE LLC
+.br
+The package SAPHanaSR-tester comes with ABSOLUTELY NO WARRANTY.
+.br
+For details see the GNU General Public License at
+http://www.gnu.org/licenses/gpl.html
+.\"

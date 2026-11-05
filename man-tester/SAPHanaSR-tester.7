@@ -242,13 +242,13 @@ program to run a predefined testcase.
 shell scripts for un-easy tasks on the cluster nodes.
 .TP
 /usr/bin/SAPHanaSR-showAttr
-SAPHanaSR-showAttr on all Linux cluster nodes, compatible to SAPHanaSR-angi and SAPHanaSR-tester.
+SAPHanaSR-showAttr on all cluster nodes, compatible to SAPHanaSR-angi and SAPHanaSR-tester.
 .TP
 /etc/ssh/sshd_config.d/30-SAPHanaSR-tester-crypto.conf
-custom crypto policies on all Linux cluster nodes, for openssh-server and python3-paramiko.
+custom crypto policies on all cluster nodes, for openssh-server and python3-paramiko.
 .TP
 /etc/sudoers.d/SAPHanaSR-tester
-sudo permissions, in case tests are done via proxy user.
+sudo permissions on all cluster nodes, in case tests are done via proxy user.
 .PP
 .\"
 .SH REQUIREMENTS
@@ -343,13 +343,19 @@ Please report any other feedback and suggestions to feedback@suse.com.
 .SH SEE ALSO
 .\"
 \fBSAPHanaSR-testCluster\fP(8) , \fBSAPHanaSR-testCluster-output\fP(5) ,
-\fBSAPHanaSR-tests-syntax\fP(5) , \fBSAPHanaSR-tests-description\fP(7) ,
+\fBSAPHanaSR-tests-syntax\fP(5) , \fBSAPHanaSR-tester.sudo\fR(5) ,
+\fBSAPHanaSR-tests-description\fP(7) ,
 \fBSAPHanaSR-tests-description_on-fail-fence\fP(7) ,
-\fBSAPHanaSR-tests-angi-ScaleUp\fP(7) , \fBSAPHanaSR-tests-angi-ScaleOut\fP(7) ,
+\fBSAPHanaSR-tests-description_angi-XSA\fR(7) ,
+\fBSAPHanaSR-tests-description_angi-DR-region\fR(7) ,
+\fBSAPHanaSR-tests-angi-ScaleUp\fP(7) ,
+\fBSAPHanaSR-tests-angi-ScaleUp_on-fail-fence\fR(7) ,
+\fB\fBSAPHanaSR-tests-angi-ScaleOut\fP(7) ,
+\fBSAPHanaSR-tests-angi-ScaleOut_on-fail-fence\fR(7) ,
 \fBSAPHanaSR-tests-classic-ScaleUp\fP(7) , \fBSAPHanaSR-tests-classic-ScaleOut\fP(7) ,
 \fBSAPHanaSR-angi\fP(7) , \fBSAPHanaSR\fP(7) , \fBSAPHanaSR-ScaleOut\fP(7) ,
 \fBSAPHanaSR-showAttr\fP(8) , \fBSAPHanaSR-alert-fencing\fP(8) ,
-\fBcrm_mon\fP(8) , \fBselinux(8)\fP , \fBssh-keygen\fP(1) ,
+\fBcrm_mon\fP(8) , \fBselinux(8)\fP , \fBcs_ssh\fR(1) , \fBssh-keygen\fP(1) ,
 \fBssh-copy-id\fP(1) , \fBsshd_config(5)\fP, \fBcrypto-policies(7)\fP ,
 .br
 https://documentation.suse.com/sbp/sap/ ,

@@ -18,10 +18,10 @@ kill_prim_ipaddr
 kill_prim_pacemakerd kill_prim_worker_pacemakerd
 kill_prim_saphostexec
 kill_prim_site_nodes
+standby_prim_site_nodes
 maintenance_prim_crmreport maintenance_prim_supportconfig"
 #
 BOTHCAS="stop_hana_resource
-standby_prim_site_nodes
 maintenance_cluster_hana_running maintenance_cluster_turn_hana
 restart_cluster restart_cluster_hana_running restart_cluster_turn_hana
 nop"

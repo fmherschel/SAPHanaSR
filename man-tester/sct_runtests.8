@@ -1,0 +1,151 @@
+.\" Version: 1.2
+.\"
+.TH sct_runtests 8 "4 Nov 2026" "" "SAPHanaSR-angi"
+.\"
+.SH NAME
+.\"
+sct_runtests \-  run predefined sets of tests.
+.PP
+.\"
+.SH SYNOPSIS
+.\"
+\fBsct_runtests\fR --case \fICASE\fR [ --testCases \fITESTS\fR ] --remoteNodes \fINODES\fR
+.br
+\fBsct_runtests\fR --caseFile \fIFILE\fR [ --testCases \fITESTS\fR ] --remoteNodes \fINODES\fR
+.br
+\fBsct_runtests\fR --sample [ samples | \fICASE\fR ]
+.br
+\fBsct_runtests\fR --help [ pages | \fIPAGE\fR ]
+.br
+\fBsct_runtests\fR --version
+.PP
+.SH DESCRIPTION
+.\"
+sct_runtests runs SAPHanaSR-testCluster with predefined sets of tests.
+.br
+For running single highly specified tests, see manual page SAPHanaSR-testCluster(8).
+For running sct_runtests inside a podman container, see SAPHanaSR-tester-podman(7).
+.PP
+.\"
+.SH OPTIONS
+.\"
+.TP
+--help [ pages | \fIPAGE\fR ]
+show usage, or list of manual pages, or given page
+.TP
+--case \fICASE\fR
+case sample with scenario and tests, defined in /usr/share/SAPHanaSR-tester/samples/runtests_\fICASE\fR.txt
+.TP
+--caseFile \fIFILE\fR
+sample file with scenario and tests
+.TP
+.\" TODO sample vs. case ?
+--sample [ samples | \fICASE\fR ]
+show list of tests samples, or show file for given sample
+.TP
+--testCases \fITEST\fR [ \fITEST\fR [ ... ]]
+tests to execute
+.TP
+--remoteNodes \fINODE\fR [ \fINODE\fR ]
+cluster nodes
+.TP
+--version
+show version
+.PP
+.\"
+.SH EXAMPLES
+.\"
+\fB*\fR Show list of predefined tests sample sets.
+.PP
+.RS 2
+# /usr/bin/sct_runtests --sample samples 
+.RE
+.PP
+\fB*\fR Show predefined tests sample set details.
+.PP
+Test cases sample is angi_scaleUp_common. This tests are common for SAPHanaSR-angi
+scale-up in conservative and progressive variant.
+.PP
+.RS 2
+# /usr/bin/sct_runtests --sample angi-scaleUp_common
+.RE
+.PP
+\fB*\fR Run a predefined tests sample set.
+.PP
+Properties file, scenario and tests are taken from sample 'angi-ScaleUp_conservative',
+cluster nodes are 'nose1' and 'nose2'.
+.PP
+.RS 2
+# cat ./properties_ScaleUp.json
+.br
+# /usr/bin/sct_runtests --case angi-ScaleUp_conservative \\
+.br
+ --remoteNodes nose1 nose2
+.RE
+.PP
+\fB*\fR Show list of hopefully helpful manual pages.
+.PP
+.RS 2
+# /usr/bin/sct_runtests --help pages
+.RE
+.PP
+.\"
+.SH FILES
+.\"
+.TP
+/usr/bin/sct_runtests
+the script itself
+.TP
+/usr/share/SAPHanaSR-tester/samples/
+directory with test sample sets
+.TP
+/usr/share/SAPHanaSR-tester/json/<\fISCENARIO\fR>/
+directories with HA scenarios and their test definitions
+.TP
+\fI$PWD\fR/properties_<\fISCENARIO\fR>.json
+test cluster properties, f.e. properties_ScaleUp.json
+.TP
+\fI$PWD\fR/runtests.log
+testrun overall log
+.TP
+\fI$PWD\fR/<\fITEST\fR>.log
+per test log (test flow), repeating tests will append
+.TP
+\fI$PWD\fR/<\fITEST\fR>.json.out
+per test JSON output (status details), repeating tests will overwrite
+.PP
+.\"
+.SH REQUIREMENTS
+.\"
+\fB*\fP TODO
+.PP
+.\"
+.SH BUGS
+.\"
+sct_runtests is under development. Syntax and features are subject to change.
+.br
+.\" In case of any problem, please use your favourite SAP support process to open
+.\" a request for the component BC-OP-LNX-SUSE.
+Please report any other feedback and suggestions to feedback@suse.com.
+.PP
+.\"
+.SH SEE ALSO
+.\"
+\fBSAPHanaSR-tester\fP(7) , \fBSAPHanaSR-testCluster\fP(8) ,
+\fBSAPHanaSR-testCluster-output\fP(5)
+.PP
+.\"
+.SH AUTHORS
+.\"
+F.Herschel, L.Pinne.
+.PP
+.\"
+.SH COPYRIGHT
+.\"
+(c) 2026 SUSE LLC
+.br
+The package SAPHanaSR-tester comes with ABSOLUTELY NO WARRANTY.
+.br
+For details see the GNU General Public License at
+http://www.gnu.org/licenses/gpl.html
+.\"
