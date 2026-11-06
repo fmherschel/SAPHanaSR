@@ -30,7 +30,7 @@ Source0:        %{name}-%{version}.tgz
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
-Requires:       python3 python3-base python3-paramiko openssh-clients /usr/bin/awk /usr/bin/find /usr/bin/man
+Requires:       python3 python3-base python3-paramiko openssh-clients /usr/bin/awk /usr/bin/find
 
 %package client
 Group:          Productivity/Clustering/HA
