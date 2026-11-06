@@ -25,7 +25,7 @@ function f_help() {
             /usr/bin/rpm -ql SAPHanaSR-tester |\
             /usr/bin/awk -F"/" '$4=="man" {print $6}' |\
             while read; do echo ${REPLY::-5}; done
-        ;;
+            ;;
         self)
             echo
             echo "usage     $EXE --case <case> [ --testCases <tests> ] --remoteNodes <nodes>"
@@ -42,10 +42,10 @@ function f_help() {
             echo " --help           show help"
             echo " --version        show version"
             echo
-        ;;
+            ;;
         *)
             /usr/bin/man "$1"
-        ;;
+            ;;
     esac
 }
 
@@ -55,12 +55,12 @@ function f_sample() {
             # txt: Text eXecution Template
             /usr/bin/ls /usr/share/SAPHanaSR-tester/samples/runtests_*.txt |\
             while read; do /usr/bin/basename $REPLY ".txt"; done
-        ;;
+            ;;
         *)
             if [[ -n "$1" ]]; then
                 /usr/bin/cat /usr/share/SAPHanaSR-tester/samples/"$1".txt
             fi
-        ;;
+            ;;
     esac
 }
 
