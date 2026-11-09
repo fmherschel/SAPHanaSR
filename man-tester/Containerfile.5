@@ -30,13 +30,13 @@ ARG REPO_NAME="SAPHanaSrTester"
 .br
 ARG WORK="/work"
 .br
-RUN echo VERSION ${VERSION} \
+RUN echo VERSION ${VERSION} \\
 .br
- && echo REPO_URL ${REPO_URL} \
+ && echo REPO_URL ${REPO_URL} \\
 .br
- && echo REPO_NAME ${REPO_NAME} \
+ && echo REPO_NAME ${REPO_NAME} \\
 .br
- && echo WORK ${WORK} \
+ && echo WORK ${WORK} \\
 .br
  && sleep 10
 .br
