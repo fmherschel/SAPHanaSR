@@ -516,8 +516,7 @@ function register_hana_secondary() {
         if ocf_is_true "${AUTOMATED_REGISTER}"; then
             # for scale-up we normally should not need that, but for scale-out:
             # before we could register we stop HANA on all nodes of the swarm (maybe some still running)
-            # fhBaustelle
-            if [[ $gNrSiteNode -gt 1 ]]; then
+            if [[ $gNrSiteNode -gt 1 ]]; then # do not call saphana_stop for scale-up as SAP HANA must already be down (lss 1)
                 saphana_stop
             fi
             # TODO PRIO1: NG - change from remoteHost to remoteMNS (remote MasterNameServer)
