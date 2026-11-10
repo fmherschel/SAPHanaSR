@@ -34,17 +34,37 @@
             "wait": 2,
             "post": "start_hana_resource",
             "pSite": "pSiteDown",
-            "sSite": "sSiteDown",
-            "pHost": "pHostDown",
-            "sHost": "sHostDown",
-            "pWorker": "pWorkerDown",
-            "sWorker": "sWorkerDown"
+            "sSite": [
+                "lpt == 10",
+                "lss == 1",
+                "srr == S",
+                "srHook ~ (SFAIL|SOK)",
+                "srPoll ~ (SFAIL|SOK)"
+            ],
+            "pHost": [
+                "clone_state == UNDEFINED",
+                "score == 70"
+            ],
+            "sHost": [
+                "clone_state == UNDEFINED",
+                "roles == master1::worker:",
+                "score ~ (0|-32300)"
+            ],
+            "pWorker": [
+                "clone_state == UNDEFINED",
+                "score ~ (101|-INFINITY)"
+            ],
+            "sWorker": [
+                "clone_state == UNDEFINED",
+                "roles == slave::worker:",
+                "score ~ (-12200|-INFINITY)" 
+            ]
         },
         {
             "step": "final40",
-            "name": "still running",
+            "name": "running again",
             "next": "END",
-            "loop": 180,
+            "loop": 240,
             "wait": 2,
             "pSite": "pSiteUp",
             "sSite": "sSiteUp",

@@ -1,0 +1,15 @@
+
+target=ibs
+
+#
+# angi and tester to obs or ibs
+#
+if [[ "$target" == "ibs" ]]; then
+    make copy REL=15 OBSPROJ='./ibs/home:fmherschel/SAPHanaSR-angi'
+    make -f Makefile-tester copy REL=15 OBSPROJ='./ibs/home:fmherschel/SAPHanaSR-tester'
+else
+    make copy REL=15 OBSPROJ=./obs/SAPHanaSR-angi
+    make -f Makefile-tester copy REL=15 OBSPROJ=./obs/SAPHanaSR-tester
+fi
+
+

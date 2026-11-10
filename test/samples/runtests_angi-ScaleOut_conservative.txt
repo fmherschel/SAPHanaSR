@@ -10,7 +10,7 @@ SECNCAS="block_secn_site_network
 kill_secn_inst kill_secn_nameserver
 kill_secn_pacemakerd kill_secn_pacemkr-attrd kill_secn_pacemkr-based kill_secn_pacemkr-ctrld kill_secn_worker_pacemakerd
 kill_secn_node kill_secn_worker_node kill_secn_site_nodes
-standby_secn_node standby_secn_worker_node
+standby_secn_node standby_secn_worker_node standby_secn_side_nodes
 maintenance_secn_crmreport maintenance_secn_supportconfig"
 # freeze_secn_site_nfs
 #
@@ -18,13 +18,16 @@ PRIMCAS="block_manual_takeover block_sr block_prim_site_network
 kill_prim_ipaddr kill_prim_indexserver kill_prim_inst kill_prim_node
 kill_prim_pacemakerd kill_prim_pacemkr-attrd kill_prim_pacemkr-based kill_prim_pacemkr-ctrld
 kill_prim_saphostexec
-maintenance_prim_crmreport maintenance_prim_supportconfig
 kill_prim_worker_indexserver kill_prim_worker_inst kill_prim_worker_node
 kill_prim_worker_pacemakerd
-standby_prim_node standby_prim_worker_node stop_prim_inst"
+kill_prim_site_nodes
+stop_prim_inst
+standby_prim_node standby_prim_site_nodes
+maintenance_prim_crmreport maintenance_prim_supportconfig"
 #
-BOTHCAS="maintenance_cluster_hana_running maintenance_cluster_turn_hana
+BOTHCAS="stop_hana_resource
+maintenance_cluster_hana_running maintenance_cluster_turn_hana
 restart_cluster restart_cluster_hana_running restart_cluster_turn_hana nop"
 #
-TCASES="flup $SECNCAS free_log_area $PRIMCAS free_log_area $BOTHCAS free_log_area"
+TCASES="flup free_log_area $SECNCAS free_log_area $PRIMCAS free_log_area $BOTHCAS free_log_area"
 #

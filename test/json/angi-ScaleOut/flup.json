@@ -18,6 +18,7 @@
             "loop": 1,
             "wait": 1,
             "post": "sleep 4",
+            "global": "globalUp",
             "mstRsc": "mstRscReady",
             "pSite": "pSiteUp",
             "sSite": "sSiteUp",

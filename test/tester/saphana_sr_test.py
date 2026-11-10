@@ -22,7 +22,7 @@ import json
 import argparse
 import random
 
-# Version: 3.1.20260708
+# Version: 3.2.20261102
 # for ssh remote calls this module uses paramiko
 #from paramiko import SSHClient
 import paramiko
@@ -32,7 +32,7 @@ class SaphanasrTest:
     """
     class to check SAP HANA cluster during tests
     """
-    version = "3.1.20260708"
+    version = "3.2.20261102"
 
     def message(self, msg, **kwargs):
         """
@@ -154,13 +154,20 @@ class SaphanasrTest:
 
     def __actions_load__(self):
         """ __actions_load__(self) - load the action definitions from the given json file """
-        with open(self.config['actions_file'], encoding="utf-8") as dc_fh:
-            action_def = json.load(dc_fh)
-        action_types = action_def.get('action_types', {})
-        actions = action_def.get('actions', {})
+        try:
+            with open(self.config['actions_file'], encoding="utf-8") as dc_fh:
+                action_def = json.load(dc_fh)
+            action_types = action_def.get('action_types', {})
+            actions = action_def.get('actions', {})
 
-        self.action_types = action_types
-        self.actions = actions
+            self.action_types = action_types
+            self.actions = actions
+        except Exception as e:
+            print(f"exception {e}")
+            self.run['test_rc'] = 2  # mark emergency exit (test failed)
+            #sys.exit(2)
+            return 2
+        return 0
 
     def __actions_hardcoded__(self):
         # TODO: move action and action_type dictionary to a config file
@@ -170,7 +177,7 @@ class SaphanasrTest:
                         'kill_node': { 'cmd': "/usr/bin/systemctl reboot --force", 'sudo': "sudo -u root @@cmd@@"},
                         'cluster_node': { 'cmd': "/usr/sbin/crm node @@param1@@ @@node@@", 'sudo': "sudo -u root @@cmd@@"},
                         'cluster_resource': { 'cmd': "/usr/sbin/crm resource @@param1@@ @@param2@@", 'sudo': "sudo -u root @@cmd@@" },
-                        'hana_takeover': { 'cmd': "su - @@sis@@adm -c 'hdbnsutil -sr_takeover'", 'sudo': "sudo -u @@sid@@adm --login /usr/sap/@@SID@@/HDB@@INO@@/exe/hdbnsutil -sr_takeover" },
+                        'hana_takeover': { 'cmd': "su - @@sid@@adm -c 'hdbnsutil -sr_takeover'", 'sudo': "sudo -u @@sid@@adm --login /usr/sap/@@SID@@/HDB@@INO@@/exe/hdbnsutil -sr_takeover" },
                         'block_ip': { 'cmd': "/usr/bin/iptables -I INPUT -s @@pHost@@ -j DROP", 'sudo': "sudo -u root @@cmd@@" },
                         'sleep': { 'cmd': "sleep @@actParam1@@" },
                         'shell': { 'cmd': "@@actParamAll@@" }
@@ -745,6 +752,9 @@ class SaphanasrTest:
             if topology_object_name in topolo:
                 object_name = topolo[topology_object_name]
                 rc_checks = self.run_checks(checks, area_name, object_name, step.get('step',''), list_of_failures=list_of_failures)
+            elif topology_object_name == "global":
+                object_name = "global"
+                rc_checks = self.run_checks(checks, area_name, object_name, step.get('step',''), list_of_failures=list_of_failures)
             else:
                 self.message(f"ERROR: Object {topology_object_name} missing in topology but used in checks")
                 rc_checks = 1
@@ -1013,6 +1023,9 @@ class SaphanasrTest:
         the_action = kargs.get('action', None)
         remote = self.config['remote_node']
         ignore = False  # tODO for bmt we had ignore = True
+        if the_action:
+            if the_action.get('ignore', 0) == 1:
+                ignore = True
 
         #the_name_ref = the_action.get('node', None)
 

@@ -86,7 +86,7 @@
         ],
         "pWorkerStandby": [
             "clone_state == UNDEFINED",
-            "roles == slave:slave:worker:worker",
+            "roles == slave::worker:",
             "score < 0",
             "standby == on"
         ],

@@ -20,6 +20,7 @@
             "wait": 1,
             "post": "sleep 240",
             "global": "globalUp",
+            "mstRsc": "mstRscReady",
             "pSite": "pSiteUp",
             "sSite": "sSiteUp",
             "pHost": "pHostUp",

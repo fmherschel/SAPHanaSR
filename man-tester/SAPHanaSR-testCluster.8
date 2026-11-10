@@ -21,6 +21,7 @@ given test cluster. For that purpose it is called with options specifying the
 test case and the properties of the cluster to be tested.
 SAPHanaSR-testCluster can be seen as low-level command to be used in scripts
 and test automation frameworks.
+For running predfined sets of tests, see manual page sct_runtests(8).
 .PP
 .\"
 .SH OPTIONS
@@ -56,7 +57,7 @@ print test properties and exit, see also SAPHanaSR-tests-syntax(5).
 --properties \fIFILE\fP
 path to poperties file.
 .TP
---remoteNode \fINODE\fP [ \fINODE\fP ... ]
+--remoteNode \fINODE\fP [ \fINODE\fP ]
 cluster nodes to use for ssh connection, must not be last option in cmdline.
 .TP
 --repeat \fIINTEGER\fP
@@ -68,12 +69,11 @@ only simulate, do not call actions.
 --testFile \fIFILE\fP
 path to testcase description file.
 .TP
---user
+--user \fIUSER\fP
 proxy user with password-less login to cluster nodes.
 .TP
---use_sudo
-use sudo for running tests, needed for proxy user.
-.\" TODO --useSudo or --sudo ?
+--sudo
+use sudo plus ssh for running tests, needed for proxy user.
 .TP
 --version
 print version and exit.

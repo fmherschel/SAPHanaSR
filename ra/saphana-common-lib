@@ -86,6 +86,7 @@ function super_ocf_log() {
 function cluster_commands_init() {
     # globals: CRM_NODE(w), NODENAME(w), CRM_PROMO(w), CRM_PROMO_PARAMS(w)
     # called by: TODO
+    rc=0
     CRM_NODE="crm_node"
     # shellcheck disable=SC2034
     CRM_PROMO="crm_attribute";
@@ -94,10 +95,11 @@ function cluster_commands_init() {
     # TODO PRIO3: NG - check, if NODENAME set here is not a duplicate
     NODENAME="$("$CRM_NODE" -n)"
     super_ocf_log info "RUNTIME ${FUNCNAME[0]} rc=$rc"
+    return "$rc"
 } # end function cluster_commands_init
 
 function core_init() {
-    # function core_init - lightwight variable initialization without SAP HANA interaction
+    # function core_init - lightweight variable initialization without SAP HANA interaction
     # params: raVersion timeBegin log_attributes
     # globals: SID(w) sidadm(w) InstanceName(w) InstanceNr(w) SAPVIRHOST(w) DIR_EXECUTABLE(w) SAPSTARTSRV(w) SAPCONTROL(w) DIR_PROFILE(w) SAPSTARTPROFILE(w) SAPHanaFilter(w) HANA_STATE_*(w) HANA_STD_ACTION_TIMEOUT(w) log_attributes(w)
     # called by: TODO
@@ -230,15 +232,15 @@ function get_hana_attribute() {
         if [[ "$rc" == "0" ]]; then # cluster did answer
             break
         else
-            super_ocf_log warn "DEC ${FUNCNAME[0]}: cluster did not answer on crm_attribute GET $attr_name call try ($repeat/$max_repeat);  rc=$rc"
+            super_ocf_log warn "DEC: ${FUNCNAME[0]}: cluster did not answer on crm_attribute GET $attr_name call try ($repeat/$max_repeat);  rc=$rc"
         fi
         sleep "$sleep_between"
     done
     if [[ "$rc" != "0" ]]; then
-        super_ocf_log warn "DEC ${FUNCNAME[0]}: cluster did not answer on crm_attribute GET $attr_name calls for $max_repeat retries; last rc=$rc"
+        super_ocf_log warn "DEC: ${FUNCNAME[0]}: cluster did not answer on crm_attribute GET $attr_name calls for $max_repeat retries; last rc=$rc"
     else
         if [[ "$repeat" -gt 1 ]]; then
-            super_ocf_log warn "DEC ${FUNCNAME[0]}: cluster did finally answer on crm_attribute GET $attr_name call after ($repeat/$max_repeat) retries;  rc=$rc"
+            super_ocf_log warn "DEC: ${FUNCNAME[0]}: cluster did finally answer on crm_attribute GET $attr_name call after ($repeat/$max_repeat) retries;  rc=$rc"
         fi
     fi
     super_ocf_log info "FLOW ${FUNCNAME[0]} rc=$rc"
@@ -288,15 +290,15 @@ function set_hana_attribute() {
             if [[ "$rc" == "0" ]]; then # cluster did answer
                 break
             else
-                super_ocf_log warn "DEC ${FUNCNAME[0]}: cluster did not answer on crm_attribute SET $attr_name call try ($repeat/$max_repeat);  rc=$rc"
+                super_ocf_log warn "DEC: ${FUNCNAME[0]}: cluster did not answer on crm_attribute SET $attr_name call try ($repeat/$max_repeat);  rc=$rc"
             fi
             sleep "$sleep_between"
         done
         if [[ "$rc" != "0" ]]; then
-            super_ocf_log warn "DEC ${FUNCNAME[0]}: cluster did not answer on crm_attribute SET $attr_name calls for $max_repeat retries; last rc=$rc"
+            super_ocf_log warn "DEC: ${FUNCNAME[0]}: cluster did not answer on crm_attribute SET $attr_name calls for $max_repeat retries; last rc=$rc"
         else
             if [[ "$repeat" -gt 1 ]]; then
-                super_ocf_log warn "DEC ${FUNCNAME[0]}: cluster did finally answer on crm_attribute SET $attr_name call after ($repeat/$max_repeat) retries;  rc=$rc"
+                super_ocf_log warn "DEC: ${FUNCNAME[0]}: cluster did finally answer on crm_attribute SET $attr_name call after ($repeat/$max_repeat) retries;  rc=$rc"
             fi
         fi
     else
@@ -425,7 +427,7 @@ function saphana_init_get_remote_site() {
 function HANA_CALL() {
     # called by: TODO
     #
-    # TODO: PRIO 5: remove 'su - ${sidadm} later, when SAP HANA resoled issue with
+    # TODO: PRIO 5: remove 'su - ${sidadm} later, when SAP HANA resolved issue with
     #       root-user-called hdbnsutil -sr_state (which creates root-owned shared memory file in /var/lib/hdb/SID/shmgrp)
     #       would hdbnsutil -sr_stateConfiguration also create such a shared memory file?
     # TODO: PRIO 5: Maybe make "su" optional by a parameter
@@ -441,7 +443,7 @@ function HANA_CALL() {
     while [ $# -gt 0 ]; do
         case "$1" in
             --timeout ) timeOut=$2; shift;;
-            --use-su  ) use_su=1;;
+            --use-su  ) use_su=1;;           # is now sudo
             --cmd ) shift; cmd="$*"; break;;
         esac
         shift
@@ -468,7 +470,7 @@ function HANA_CALL() {
                             output=$(bash -c "$pre_script; $cmd"); rc="$?"
                             ;;
                       su )
-                            output=$(su - "${sid}adm" -c "$pre_script; $cmd"); rc="$?"
+                            output=$(sudo -i -u "${sid}adm" bash -c "$pre_script; $cmd"); rc="$?"
                             ;;
                   esac
                   ;;
@@ -481,10 +483,16 @@ function HANA_CALL() {
 
                   case "$pre_cmd_type" in
                       bash )
-                            output=$(timeout --foreground -s 9 "$timeOut" bash -c "($pre_script; $cmd > $cmd_out_log) >& $cmd_err_log" 2>"$su_err_log"); rc="$?"
+                            output=$(timeout -s 9 "$timeOut" bash -c "($pre_script; $cmd > $cmd_out_log) >& $cmd_err_log" 2>"$su_err_log"); rc="$?"
                             ;;
                       su )
-                            output=$(timeout --foreground -s 9 "$timeOut" su - "${sid}adm" -c "($pre_script; $cmd > $cmd_out_log) >& $cmd_err_log" 2>"$su_err_log"); rc="$?"
+                            # bsc#1286377
+                            # timeout was blocking in special cases (cmd in D-State)
+                            # fix: - construction with sudo instead of su
+                            #      - remove parameter --foreground
+                            #      - remove outer cmd redirection, because output is be set by the content of file $cmd_out_log
+                            output=""
+                            timeout -s 9 "$timeOut" sudo -i -u "${sid}adm" bash -c "($pre_script; $cmd > $cmd_out_log) >& $cmd_err_log" 2>"$su_err_log"; rc="$?"
                             ;;
                   esac
                   if [[ -f "$cmd_out_log" ]]; then output=$(<"$cmd_out_log"); rm -f "$cmd_out_log"; fi
@@ -685,8 +693,8 @@ function get_local_virtual_name() {
     #
     if [ -e /usr/sap/hostctrl/exe/saphostctrl ]; then
         # by intention the timeout here is not HANA_CALL_TIMOUT but fix 10s
-        # using timeout with '--foreground' TODO: PRIO3: could we remove --foreground from all timeout calls?
-        mapfile -t listInstances < <( timeout --foreground -s 9 10 /usr/sap/hostctrl/exe/saphostctrl -function ListInstances )
+        # DONE: PRIO3: remove --foreground from all timeout calls
+        mapfile -t listInstances < <( timeout -s 9 10 /usr/sap/hostctrl/exe/saphostctrl -function ListInstances )
         for lI in "${listInstances[@]}"; do
             # InstInfo : HA1 - 00 - suse-01 - 753,patch1010,changelist2124070
             # bsc#1233972 - hostname may include dashes

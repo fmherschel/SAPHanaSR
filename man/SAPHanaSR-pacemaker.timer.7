@@ -41,12 +41,14 @@ Usage, syntax or execution errors.
 .PP
 \fB*\fP set SBD_DELAY_START=no
 .PP
+.RS 2
 # cp -a /etc/sysconfig/sbd /etc/sysconfig/sbd.$(date +%s)
 .br
 # grep ^SBD_DELAY_START= /etc/sysconfig/sbd
 .\" TODO use value of SBD_DELAY_START in timer instead of fix 71
 .br
 # sed s/^SBD_DELAY_START=.*$/SBD_DELAY_START=no/g -i /etc/sysconfig/sbd
+.RE
 .PP
 .\"
 .SH FILES

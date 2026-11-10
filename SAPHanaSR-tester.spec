@@ -20,7 +20,7 @@ License:        GPL-2.0
 Group:          Productivity/Clustering/HA
 AutoReqProv:    on
 Summary:        Test suite for SAPHanaSR clusters
-Version:        3.1.0
+Version:        3.2.1
 Release:        0
 Url:            https://www.suse.com/c/fail-safe-operation-of-sap-hana-suse-extends-its-high-availability-solution/
 
@@ -30,7 +30,7 @@ Source0:        %{name}-%{version}.tgz
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
-Requires:       python3
+Requires:       python3 python3-base python3-paramiko openssh-clients /usr/bin/awk /usr/bin/find
 
 %package client
 Group:          Productivity/Clustering/HA

@@ -326,7 +326,7 @@ function shfs_monitor() {
             super_ocf_log info "DEC: check directory as secondary is in sync (timeout=$timeout)"
             export -f shfs_test_directory # shfs_test_directory to be usable for sub-processes
             export td_hana_shared
-            timeout --foreground -s 9 "$timeout" bash -c "shfs_test_directory"; test_rc="$?"
+            timeout -s 9 "$timeout" bash -c "shfs_test_directory"; test_rc="$?"
         else
             super_ocf_log info "DEC: SKIP check directory (test_loc_sr=$test_loc_sr, test_rem_sr=$test_rem_sr)"
             test_rc=0

@@ -1,0 +1,111 @@
+\" Version: 1.2
+.\"
+.TH SAPHanaSR-tester.sudo 5 "04 Nov 2026" "" "SAPHanaSR-angi"
+.\"
+.SH NAME
+.\"
+SAPHanaSR-tester.sudo \- sudo permissions for SAPHanaSR-tester.
+.PP
+.\"
+.SH DESCRIPTION
+.\"
+SAPHanaSR-tester.sudo describes sudo permissions needed on cluster nodes, if
+SAPHanaSR-testCluster logs in as non-root user.
+<\fIsidadm\fR> is <sid>adm, <\fISID\fR> is SID (uppercase), <\fIsid\fR> is sid
+(lowercase), <\fINR\fR> is instance number.
+.PP
+.RS 2
+<\fIsidadm\fR> ALL=(ALL) NOPASSWD: /usr/bin/SAPHanaSR-hookHelper --sid=<\fISID\fR> *
+.br
+<\fIsidadm\fR> ALL=(ALL) NOPASSWD: /usr/sbin/SAPHanaSR-hookHelper --sid=<\fISID\fR> *
+.br
+<\fIsidadm\fR> ALL=(ALL) NOPASSWD: /usr/sbin/crm_attribute -n hana_<\fIsid\fR>_*
+.br
+<\fIsidadm\fR> ALL=(ALL) NOPASSWD: /usr/bin/SAPHanaSR-showAttr *
+.br
+<\fIsidadm\fR> ALL=(ALL) NOPASSWD: /usr/sbin/crm --force node fence *
+.br
+<\fIsidadm\fR> ALL=(ALL) NOPASSWD: /usr/sap/<\fISID\fR>/HDB<\fINR\fR>/HDB *
+.br
+<\fIsidadm\fR> ALL=(ALL) NOPASSWD: /usr/sap/<\fISID\fR>/HDB<\fINR\fR>/exe/hdbnsutil *
+.br
+<\fIsidadm\fR> ALL=(ALL) NOPASSWD: /usr/bin/systemctl *
+.RE
+.PP
+Note: Permissions might be granted more granular, if needed.
+.PP
+.\"
+.SH EXAMPLES
+.\"
+.PP
+\fB*\fP Show SAPHanaSR-tester.sudo example, shipped with SAPHanaSR-tester.
+.PP
+.RS 2
+# cat /usr/SAPHanaSR-tester/samples/SAPHanaSR-tester.sudo
+.RE
+.PP
+\fB*\fP Copy SAPHanaSR-tester.sudo to cluster nodes.
+.PP
+Example nodes are 'nose1' and 'nose2'.
+.PP
+.RS 2
+# scp /usr/SAPHanaSR-tester/samples/SAPHanaSR-tester.sudo \\
+.br
+ nose1:/etc/sudoers.d/SAPHanaSR-tester
+.br
+# scp /usr/SAPHanaSR-tester/samples/SAPHanaSR-tester.sudo \\
+.br
+ nose1:/etc/sudoers.d/SAPHanaSR-tester
+.RE
+.PP
+.\"
+.SH FILES
+.\"
+.TP
+/usr/SAPHanaSR-tester/samples/SAPHanaSR-tester.sudo
+example for sudo permissions, on test controller
+.TP
+/etc/sudoers.d/SAPHanaSR-tester
+effective sudo permissions file on cluster nodes
+.PP
+.\"
+.\"
+.SH REQUIREMENTS
+.\"
+\fB*\fR root permission is needed on the cluster nodes to put the file there.
+.PP
+\fB*\fR If permission are granted more granular, the customer needs to make sure
+the tester still will work.
+.PP
+See also the REQUIREMENTS section in SAPHanaSR-tester(7).
+.PP
+.\"
+.SH BUGS
+.\"
+The SAPHanaSR-tester is under development. Syntax and formats are subject to
+change.
+.br
+.\" In case of any problem, please use your favourite SAP support process to open
+.\" a request for the component BC-OP-LNX-SUSE.
+Please report any other feedback and suggestions to feedback@suse.com.
+.PP
+.\"
+.SH SEE ALSO
+.\"
+\fBSAPHanaSR-tester\fP(7) , \fBSAPHanaSR-testCluster\fP(8) , \fBcs_ssh\fP(1)
+.PP
+.\"
+.SH AUTHORS
+.\"
+F.Herschel, L.Pinne.
+.PP
+.\"
+.SH COPYRIGHT
+.\"
+(c) 2026 SUSE LLC
+.br
+The package SAPHanaSR-tester comes with ABSOLUTELY NO WARRANTY.
+.br
+For details see the GNU General Public License at
+http://www.gnu.org/licenses/gpl.html
+.\"

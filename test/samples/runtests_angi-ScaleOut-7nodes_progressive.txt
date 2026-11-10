@@ -21,5 +21,5 @@ kill_prim_worker_indexserver_fencing_alert kill_prim_worker_inst_fencing_alert k
 #
 BOTHCAS="nop"
 #
-TCASES="flup $SECNCAS free_log_area $PRIMCAS free_log_area $BOTHCAS free_log_area"
+TCASES="flup free_log_area $SECNCAS free_log_area $PRIMCAS free_log_area $BOTHCAS free_log_area"
 #

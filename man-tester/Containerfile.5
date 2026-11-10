@@ -1,0 +1,117 @@
+.\" Version: 1.2
+.\"
+.TH Containerfile 5 "4 Nov 2026" "" "SAPHanaSR-angi"
+.\"
+.SH NAME
+.\"
+Containerfile \- podman container build definiton.
+.PP
+.\"
+.SH DESCRIPTION
+.\"
+
+.PP
+.\"
+.SH EXAMPLES
+.\"
+.PP
+.PP
+.RS 2
+ARG VERSION=latest
+.br
+.\" TODO registry.suse.com/bci/...
+FROM registry.opensuse.org/opensuse/tumbleweed:${VERSION}
+.br
+.\" TODO packagehub or SCC repo
+ARG REPO_URL="http://download.suse.de/ibs/home:/fmherschel/openSUSE_Tumbleweed/"
+.br
+.\" TODO repo
+ARG REPO_NAME="SAPHanaSrTester"
+.br
+ARG WORK="/work"
+.br
+RUN echo VERSION ${VERSION} \\
+.br
+ && echo REPO_URL ${REPO_URL} \\
+.br
+ && echo REPO_NAME ${REPO_NAME} \\
+.br
+ && echo WORK ${WORK} \\
+.br
+ && sleep 10
+.br
+RUN zypper --non-interactive addrepo --refresh --no-gpgcheck \\
+.br
+ ${REPO_URL} ${REPO_NAME} \\
+.br
+ && zypper --non-interactive lr --details \\
+.br
+ && zypper --non-interactive --gpg-auto-import-keys refresh \\
+.br
+ && zypper --non-interactive in --no-recommends \\
+.br
+ iproute2 \\
+.br
+ iputils \\
+.br
+.\" TODO sign SAPHanaSR-tester
+ && zypper --non-interactive in --allow-unsigned-rpm \\
+.br
+ SAPHanaSR-tester \\
+.br
+ && zypper clean -a \\
+.br
+.\" TODO do mkdir in SAPHanaSR-tester
+ && mkdir -p /usr/lib/SAPHanaSR-tester /usr/share/SAPHanaSR-tester
+.br
+WORKDIR ${WORK}
+.br
+ENTRYPOINT ["/usr/bin/bash", "-c"]
+.RE
+.PP
+.SH FILES
+.\"
+.TP
+\fI$PWD\fR/
+project directory
+.TP
+\fI$PWD\fR/work/
+work directory, shared between container and host, /work/ inside the container
+.PP
+.\"
+.SH REQUIREMENTS
+.\"
+\fB*\fP TODO
+.PP
+.\"
+.SH BUGS
+.\"
+SAPHanaSR-tester is under development. Content of Containerfile is subject to
+change.
+.br
+.\" In case of any problem, please use your favourite SAP support process to open
+.\" a request for the component BC-OP-LNX-SUSE.
+Please report any other feedback and suggestions to feedback@suse.com.
+.PP
+.\"
+.SH SEE ALSO
+.\"
+\fBSAPHanaSR-tester\fR(7) , \fBSAPHanaSR-tester-podman\fR(7) ,
+\fBsct_runtests\fR(8) , \fBpodman\fR(1)
+.PP
+.\"
+.SH AUTHORS
+.\"
+F.Herschel, L.Pinne.
+.PP
+.\"
+.SH COPYRIGHT
+.\"
+(c) 2026 SUSE LLC
+.br
+The package SAPHanaSR-tester comes with ABSOLUTELY NO WARRANTY.
+.br
+For details see the GNU General Public License at
+http://www.gnu.org/licenses/gpl.html
+.\"
+

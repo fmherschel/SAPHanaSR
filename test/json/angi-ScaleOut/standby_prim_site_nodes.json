@@ -1,0 +1,85 @@
+{
+    "test": "standby_prim_site_nodes",
+    "name": "standby primary site nodes (and online again)",
+    "purpose": [
+        "angi",
+        "ScaleOut",
+        "standby",
+        "maintenance",
+        "primary",
+        "site",
+        "node",
+        "master",
+        "worker",
+        "takeover",
+        "standby"
+    ],
+    "start": "prereq10",
+    "steps": [
+        {
+            "step": "prereq10",
+            "name": "test prerequisites",
+            "next": "step20",
+            "loop": 1,
+            "wait": 1,
+            "post": "shell sct_test_standby_prim_site_nodes",
+            "pSite": "pSiteUp",
+            "sSite": "sSiteUp",
+            "pHost": "pHostUp",
+            "sHost": "sHostUp",
+            "pWorker": "pWorkerUp",
+            "sWorker": "sWorkerUp"
+        },
+        {
+            "step": "step20",
+            "name": "takeover on secondary",
+            "next": "step30",
+            "loop": 180,
+            "wait": 2,
+            "post": "shell sct_test_online_prim_site_nodes",
+            "pSite": [
+                "lss == 1",
+                "srr == P",
+                "lpt == 10",
+                "srHook == SWAIT" 
+            ],
+            "pHost": "pHostStandby",
+            "pWorker": "pWorkerStandby",
+            "sHost": "pHostUp",
+            "sWorker": "pWorkerUp" 
+        },
+        {
+            "step": "step30",
+            "name": "nodes back online",
+            "next": "final50",
+            "loop": 120,
+            "wait": 2,
+            "pHost": [
+                "clone_state == UNDEFINED",
+                "roles == master1::worker:",
+                "standby != on"
+            ],
+            "pWorker": [
+                "clone_state == UNDEFINED",
+                "roles == slave::worker:",
+                "standby != on"
+            ],
+            "sHost": "pHostUp",
+            "sWorker": "pWorkerUp" 
+        },
+        {
+            "step": "final50",
+            "name": "end recover",
+            "next": "END",
+            "loop": 180,
+            "wait": 2,
+            "post": "cleanup",
+            "pSite": "sSiteUp",
+            "sSite": "pSiteUp",
+            "pHost": "sHostUp",
+            "sHost": "pHostUp",
+            "pWorker": "sWorkerUp",
+            "sWorker": "pWorkerUp"
+        }
+    ]
+}
