@@ -498,7 +498,7 @@ function HANA_CALL() {
             esac
             if (( rc >= 124 )); then
                 super_ocf_log info "ACT: HANA_CALL timed out (rc=$rc)"
-                if oct_is_true "$g_timeout_log"; then
+                if ocf_is_true "$g_timeout_log"; then
                     super_ocf_log info "ACT: timeout logging activated (in background processing)"
                     /usr/bin/SAPHanaSR-hookHelper --alertLog & 
                 fi
