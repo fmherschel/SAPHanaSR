@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 # pylint: disable=consider-using-f-string
 # DONE: secondary TOPO is not detected, if secondary is down or not comlete?
 # pylint: disable=fixme
