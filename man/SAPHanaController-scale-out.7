@@ -1,6 +1,6 @@
 .\" Version: 1.2
 .\"
-.TH ocf_suse_SAPHanaController 7 "14 Nov 2025" "" "OCF resource agents"
+.TH ocf_suse_SAPHanaController 7 "11 Nov 2026" "" "OCF resource agents"
 .\"
 .SH NAME
 .\"
@@ -87,18 +87,29 @@ ocf_suse_SAPHanaFilesystem(7).
 .PP
 3. \fBhdbnsutil\fP
 .br
-The interface hdbnsutil is used to check the "topology" of the system replication as well as the current configuration (primary/secondary) of a SAP HANA database instance.
-A second task of the interface is the posibility to run a system replication takeover (sr_takeover) or to register a former primary to a newer one (sr_register). In scale-out setups, hdbnsutil sometimes might take some time.
+The interface hdbnsutil is used to check the "topology" of the system replication
+as well as the current configuration (primary/secondary) of a SAP HANA database
+instance. A second task of the interface is the posibility to run a system
+replication takeover (sr_takeover) or to register a former primary to a newer one
+(sr_register). In scale-out setups, hdbnsutil sometimes might take some time.
 .PP
 4. \fBsystemReplicationStatus\fP
 .br
-The interface systemReplicationStatus is a special query to check the HANA system replication status via a python library. This interface exists since SAP HANA 1.0 SPS09.
+SAP HANA 1.0 SPS 9 and later provide a python script 'systemReplicationStatus.py'
+for checking the system replication. The SAPHanaSR-angi uses this script instead
+of hdbsql. So, to manage recent versions of SAP HANA with SAPHanaSR-angi, the
+hdbsql is not used anymore.
 .PP
 5. \fBsaphostctrl\fP
 .br
-The interface saphostctrl uses the function ListInstances to figure out the virtual host name of the SAP HANA instance. This is typically the hostname used during the HANA installation.
+The interface saphostctrl uses the function ListInstances to figure out the virtual
+host name of the SAP HANA instance. This is typically the hostname used during the
+HANA installation.
 .PP
-To make configuring the cluster as simple as possible, the additional SAPHanaTopology resource agent runs on all nodes of the Linux cluster and gathers information about the statuses and configurations of SAP HANA system replication. The SAPHanaTopology RA is designed as a normal (stateless) clone.
+To make configuring the cluster as simple as possible, the additional
+SAPHanaTopology resource agent runs on all nodes of the Linux cluster and gathers
+information about the statuses and configurations of SAP HANA system replication.
+The SAPHanaTopology RA is designed as a normal (stateless) clone.
 .PP  
 Please see also the REQUIREMENTS section below and manual page SAPHanaSR-angi-scenarios(7).
 .RE
@@ -153,6 +164,16 @@ timeouts for HANA calls you should also adjust the operation timeouts of your Li
 cluster resources.
 .br
 Optional. Default value: 120.
+.RE
+.PP
+\fBTIMEOUT_LOG\fR
+.RS 4
+Define whether to collect and log system status information if HANA calls are timing
+out. If set, the RA will start 'SAPHanaSR-hookHelper --alertLog' in the background
+before proceeding. See also manual page SAPHanaSR-hookHelper(8).
+.br
+Optional. Default value: false. Should be changed only if requested by support
+engineers.
 .RE
 .PP
 \fBINSTANCE_PROFILE\fR
@@ -265,12 +286,15 @@ Suggested minimum timeout: 600\&.
 .PP
 \fBpromote\fR
 .RS 4
-Either runs a takeover for a secondary or a just-nothing for a primary. The correct timeout depends on factors like system replication operation mode and current load on the database. Suggested minimum timeout: 900\&.
+Either runs a takeover for a secondary or a just-nothing for a primary.
+The correct timeout depends on factors like system replication operation mode and
+current load on the database. Suggested minimum timeout: 900\&.
 .RE
 .PP
 \fBdemote\fR
 .RS 4
-Nearly does nothing and just marks the instance as demoted. Suggested minimum timeout: 320\&.
+Nearly does nothing and just marks the instance as demoted.
+Suggested minimum timeout: 320\&.
 .RE
 .PP
 \fBstatus\fR
@@ -280,12 +304,17 @@ Reports whether the HANA instance is running. Suggested minimum timeout: 60\&.
 .PP
 \fBmonitor (promoted role)\fR
 .RS 4
-Reports whether the HANA database seems to be working in replication primary mode. It also needs to check the system replication status. Suggested minimum timeout: 700\&. Suggested interval: 60\&.
+Reports whether the HANA database seems to be working in replication primary mode.
+It also needs to check the system replication status. Suggested minimum timeout: 700\&.
+Suggested interval: 60\&.
 .RE
 .PP
 \fBmonitor (demoted role)\fR
 .RS 4
-Reports whether the HANA database seems to be working in replication secondary mode. It also needs to check the system replication status. The secondary role's monitor interval has to be different from the primary (promoted) role. Suggested minimum timeout: 700\&. Suggested interval: 61\&.
+Reports whether the HANA database seems to be working in replication secondary mode.
+It also checks the system replication status. The secondary role's monitor interval
+has to be different from the primary (promoted) role.
+Suggested minimum timeout: 700\&. Suggested interval: 61\&.
 .RE
 .PP
 \fBvalidate\-all\fR
@@ -314,16 +343,20 @@ Changes parameters without forcing a recover of the resource. Suggested minimum 
 .\"
 The return codes are defined by the OCF cluster framework. Please refer to the
 OCF definition on the website mentioned below. 
-In addition return code 124 will be logged if HANA_CALL_TIMEOUT has been exceeded.
+A return code 124 will be logged if HANA_CALL_TIMEOUT has been exceeded.
 .br
-In addition, log entries are written, which can be scanned by using a pattern like "SAPHanaController.*RA.*rc=[1-7,9]" for errors. Regular operations might be found with "SAPHanaController.*RA.*rc=0".
+In addition, log entries are written, which can be scanned by using a pattern like
+"SAPHanaController.*RA.*rc=[1-7,9]" for errors. Regular operations might be found with
+"SAPHanaController.*RA.*rc=0".
 .PP
 .\"
 .SH EXAMPLES
 .\"
-* Below is an example configuration for a SAPHanaController multi-state resource in a HANA scale-out performance-optimised scenario.
+* SAPHanaController multi-state resource in a HANA scale-out performance-optimised scenario.
 .br
-The HANA consists of two sites with five nodes each. An additional cluster node is used as majority maker for split-brain situations. In addition, a SAPHanaTopology clone resource is needed to make this work.
+The HANA consists of two sites with five nodes each. An additional cluster node
+is used as majority maker for split-brain situations.
+In addition, a SAPHanaTopology clone resource is needed to make this work.
 .PP
 .RS 4
 primitive rsc_SAPHanaCon_SLE_HDB00 ocf:suse:SAPHanaController \\
@@ -567,7 +600,7 @@ request for the component BC-OP-LNX-SUSE.
 \fBSAPHanaSR\fP(7) , \fBSAPHanaSR-ScaleOut\fP(7) ,
 \fBSAPHanaSR_maintenance_examples\fP(7) , \fBSAPHanaSR_basic_cluster\fP(7) ,
 \fBSAPHanaSR-ScaleOut_basic_cluster\fP(7) , \fBSAPHanaSR-manageAttr\fP(8) , 
-\fBSAPHanaSR-alert-fencing\fP(8) ,
+\fBSAPHanaSR-alert-fencing\fP(8) , \fBSAPHanaSR-hookHelper\fP(8) ,
 \fBchrony.conf\fP(5) , \fBstonith\fP(8) , \fBcrm\fP(8) 
 .br
 https://documentation.suse.com/sbp/sap/ ,
