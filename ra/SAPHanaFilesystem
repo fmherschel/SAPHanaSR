@@ -92,18 +92,22 @@ then
 fi
 
 # parameter check
-if  [ -z "$OCF_RESKEY_SID" ]
-then
+if  [[ -z "$OCF_RESKEY_SID" ]]; then
     super_ocf_log err "ACT: Please set parameter SID!"
     exit "$OCF_ERR_ARGS"
 fi
 
-if  [ -z "$OCF_RESKEY_InstanceNumber" ]
-then
+if  [[ -z "$OCF_RESKEY_InstanceNumber" ]]; then
     super_ocf_log err "ACT: Please set parameter InstanceNumber!"
     exit "$OCF_ERR_ARGS"
 fi
 
+if [[ -n "$OCF_RESKEY_TIMEOUT_LOG" ]]; then
+    g_timeout_log="$OCF_RESKEY_TIMEOUT_LOG"
+    super_ocf_log info "ACT: Parameter TIMEOUT_LOG is set to $g_timeout_log"
+else
+    g_timeout_log="no"
+fi
 ra_rc="$OCF_ERR_UNIMPLEMENTED"
 case "$ACTION" in
     start|stop|monitor) # Standard controlling actions
