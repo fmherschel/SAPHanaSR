@@ -66,9 +66,9 @@ instance. A second task of the interface is the posibility to run a system
 replication takeover (sr_takeover) or to register a former primary to a newer one
 (sr_register).
 .PP
-4. \fBsystemReplicationStatus / hdbsql\fR
+4. \fBsystemReplicationStatus\fR
 .br
-SAP HANA 1.0 SPS 9 and later provide a python script "systemReplicationStatus.py"
+SAP HANA 1.0 SPS 9 and later provide a python script 'systemReplicationStatus.py'
 for checking the system replication. The SAPHanaSR-angi uses this script instead
 of hdbsql. So, to manage recent versions of SAP HANA with SAPHanaSR-angi, the
 hdbsql is not used anymore. 
@@ -76,8 +76,8 @@ hdbsql is not used anymore.
 5. \fBsaphostctrl\fR
 .br
 The interface saphostctrl uses the function ListInstances to figure out the virtual
-host name of the SAP HANA instance. This is the hostname used during the HANA
-installation.
+host name of the SAP HANA instance. This is typically the hostname used during the
+HANA installation.
 .PP
 To make configuring the cluster as simple as possible, the additional
 SAPHanaTopology resource agent runs on all nodes of a SAPHanaSR cluster and gathers
