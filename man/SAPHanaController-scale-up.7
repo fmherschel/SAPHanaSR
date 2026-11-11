@@ -1,6 +1,6 @@
 .\" Version: 1.2
 .\"
-.TH ocf_suse_SAPHanaController 7 "17 Feb 2026" "" "OCF resource agents"
+.TH ocf_suse_SAPHanaController 7 "11 Nov 2026" "" "OCF resource agents"
 .\"
 .SH NAME
 .\"
@@ -136,6 +136,16 @@ timeouts for HANA calls you should also adjust the operation timeouts of your Li
 cluster resources.
 .br
 Optional. Default value: 120.
+.RE
+.PP
+\fBTIMEOUT_LOG\fR
+.RS 4
+Define whether to collect and log system status information if HANA calls are timing
+out. If set, the RA will start 'SAPHanaSR-hookHelper --alertLog' in the background
+before proceeding. See also manual page SAPHanaSR-hookHelper(8).
+.br
+Optional. Default value: false. Should be changed only if requested by support
+engineers.
 .RE
 .PP
 \fBINSTANCE_PROFILE\fR
