@@ -500,7 +500,7 @@ function HANA_CALL() {
                 super_ocf_log info "ACT: HANA_CALL timed out (rc=$rc)"
                 if ocf_is_true "$g_timeout_log"; then
                     super_ocf_log info "ACT: timeout logging activated (in background processing)"
-                    /usr/bin/SAPHanaSR-hookHelper --alertLog & 
+                    /usr/bin/SAPHanaSR-hookHelper --sid="$SID" --case=alertLog &
                 fi
             fi
             if [[ -f "$cmd_out_log" ]]; then output=$(<"$cmd_out_log"); rm -f "$cmd_out_log"; fi
