@@ -22,7 +22,7 @@ OBSTARG ?= "SLE_12_SP2"
 
 tarball:
 	@echo -e "\e[33mMaking ${PKG}-${VERSION}.tgz\e[0m"
-	tar zcf ${PKG}-${VERSION}.tgz ${TAR_EXTRAS} ${FILE_LIST}
+	tar zcf ${PKG}-${VERSION}.tgz ${TAR_EXTRAS} --exclude .gitignore ${FILE_LIST}
 	@echo -e "\e[32mDone\e[0m"
 
 .ONESHELL:
