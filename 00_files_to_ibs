@@ -1,6 +1,6 @@
+#!/usr/bin/bash
 
-target=ibs
-
+target=${1:-ibs}
 #
 # angi and tester to obs or ibs
 #
