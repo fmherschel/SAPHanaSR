@@ -321,6 +321,7 @@ case "$USECASE" in
     test -x /usr/sbin/netstatlog && /usr/sbin/netstatlog /var/log/netstat.log
     # wildcards do not work for lsof
     test -x /usr/sbin/lsoflog && /usr/sbin/lsoflog /var/log/lsof.log "+D/tmp/ +D/hana/shared/${SID}/" 21
+    rc=0
     ;;
 #"nextUsecase")
 #    chk_next_case; rc=$?
