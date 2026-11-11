@@ -464,44 +464,53 @@ function HANA_CALL() {
     fi
     case "$timeOut" in
         0 | inf )
-                  case "$pre_cmd_type" in
-                      bash )
-                            output=$(bash -c "$pre_script; $cmd"); rc="$?"
-                            ;;
-                      su )
-                            output=$(sudo -i -u "${sid}adm" bash -c "$pre_script; $cmd"); rc="$?"
-                            ;;
-                  esac
-                  ;;
+            case "$pre_cmd_type" in
+                bash )
+                    output=$(bash -c "$pre_script; $cmd"); rc="$?"
+                    ;;
+                su )
+                    output=$(sudo -i -u "${sid}adm" bash -c "$pre_script; $cmd"); rc="$?"
+                    ;;
+            esac
+            ;;
         *       )
-                  errExt=$(date '+%s%N')_${sid}adm
-                  # TODO PRIO1: NG - need to differ files for Topology and Controller
-                  su_err_log="${runDir}/HANA_CALL_SU_${raType}${errExt}"
-                  cmd_out_log="${runDir}/HANA_CALL_CMD_${raType}OUT_${errExt}"
-                  cmd_err_log="${runDir}/HANA_CALL_CMD_${raType}ERR_${errExt}"
+            # fh-TODO:check for timeout rc (124+137); for 137 log it with original rc but then set rc-offunction to 124 (normalize)
+            # fh-TODO: In case of function-rc-124 optional start "SAPHanaSR-hookHelper --alertLog" in Background - Only if parameter TIMEOUT_LOG=yes is set
+            errExt=$(date '+%s%N')_${sid}adm
+            # TODO PRIO1: NG - need to differ files for Topology and Controller
+            su_err_log="${runDir}/HANA_CALL_SU_${raType}${errExt}"
+            cmd_out_log="${runDir}/HANA_CALL_CMD_${raType}OUT_${errExt}"
+            cmd_err_log="${runDir}/HANA_CALL_CMD_${raType}ERR_${errExt}"
 
-                  case "$pre_cmd_type" in
-                      bash )
-                            output=$(timeout -s 9 "$timeOut" bash -c "($pre_script; $cmd > $cmd_out_log) >& $cmd_err_log" 2>"$su_err_log"); rc="$?"
-                            ;;
-                      su )
-                            # bsc#1286377
-                            # timeout was blocking in special cases (cmd in D-State)
-                            # fix: - construction with sudo instead of su
-                            #      - remove parameter --foreground
-                            #      - remove outer cmd redirection, because output is be set by the content of file $cmd_out_log
-                            output=""
-                            timeout -s 9 "$timeOut" sudo -i -u "${sid}adm" bash -c "($pre_script; $cmd > $cmd_out_log) >& $cmd_err_log" 2>"$su_err_log"; rc="$?"
-                            ;;
-                  esac
-                  if [[ -f "$cmd_out_log" ]]; then output=$(<"$cmd_out_log"); rm -f "$cmd_out_log"; fi
-                  if [[ -f "$su_err_log" ]];  then suErr=$(<"$su_err_log");   rm -f "$su_err_log";  else suErr='NA'; fi
-                  if [[ -f "$cmd_err_log" ]]; then cmdErr=$(<"$cmd_err_log"); rm -f "$cmd_err_log"; else cmdErr='NA'; fi
-                  super_ocf_log debug "DBG: RA ==== action HANA_CALL (cmd is '$cmd', rc is '$rc', stderr from su is '$suErr', stderr from cmd is '$cmdErr') ===="
-                  # on rc=1 - retry to improve the behavior in AD environments
-                  # fh 20230127 deactivate this part. rc=1 could also be the valid rc of the called command
-                  # TODO PRIO2: NG - to improve handling of su-errors we need to catch this errors and differ them from the cmd rc
-                 ;;
+            case "$pre_cmd_type" in
+                bash )
+                    output=$(timeout -s 9 "$timeOut" bash -c "($pre_script; $cmd > $cmd_out_log) >& $cmd_err_log" 2>"$su_err_log"); rc="$?"
+                    ;;
+                su )
+                    # bsc#1286377
+                    # timeout was blocking in special cases (cmd in D-State)
+                    # fix: - construction with sudo instead of su
+                    #      - remove parameter --foreground
+                    #      - remove outer cmd redirection, because output is be set by the content of file $cmd_out_log
+                    output=""
+                    timeout -s 9 "$timeOut" sudo -i -u "${sid}adm" bash -c "($pre_script; $cmd > $cmd_out_log) >& $cmd_err_log" 2>"$su_err_log"; rc="$?"
+                    ;;
+            esac
+            if (( rc >= 124 )); then
+                super_ocf_log info "ACT: HANA_CALL timed out (rc=$rc)"
+                if oct_is_true "$g_timeout_log"; then
+                    super_ocf_log info "ACT: timeout logging activated (in background processing)"
+                    /usr/bin/SAPHanaSR-hookHelper --alertLog & 
+                fi
+            fi
+            if [[ -f "$cmd_out_log" ]]; then output=$(<"$cmd_out_log"); rm -f "$cmd_out_log"; fi
+            if [[ -f "$su_err_log" ]];  then suErr=$(<"$su_err_log");   rm -f "$su_err_log";  else suErr='NA'; fi
+            if [[ -f "$cmd_err_log" ]]; then cmdErr=$(<"$cmd_err_log"); rm -f "$cmd_err_log"; else cmdErr='NA'; fi
+            super_ocf_log debug "DBG: RA ==== action HANA_CALL (cmd is '$cmd', rc is '$rc', stderr from su is '$suErr', stderr from cmd is '$cmdErr') ===="
+            # on rc=1 - retry to improve the behavior in AD environments
+            # fh 20230127 deactivate this part. rc=1 could also be the valid rc of the called command
+            # TODO PRIO2: NG - to improve handling of su-errors we need to catch this errors and differ them from the cmd rc
+            ;;
     esac
     super_ocf_log info "RUNTIME HANA_CALL '$cmd' stack:${FUNCNAME[*]}rc=$rc"
     super_ocf_log debug "DBG: HANA_CALL '$cmd' rc=$rc output=$output"
@@ -884,7 +893,7 @@ function check_saphostagent() {
 # params: virt-name [--timeout timeout] [--set_gTopology]
 # globals: g_cache_lss(w)
 # output: either single value (default); or multi line key=value (--multiValue)
-# rc:     lss or timeout (124)
+# rc:     lss or timeout (>=124)
 function get_role_by_landscape(){
     # called by: TODO
     local virtName="$1"; shift
