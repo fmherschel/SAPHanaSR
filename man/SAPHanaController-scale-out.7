@@ -286,12 +286,15 @@ Suggested minimum timeout: 600\&.
 .PP
 \fBpromote\fR
 .RS 4
-Either runs a takeover for a secondary or a just-nothing for a primary. The correct timeout depends on factors like system replication operation mode and current load on the database. Suggested minimum timeout: 900\&.
+Either runs a takeover for a secondary or a just-nothing for a primary.
+The correct timeout depends on factors like system replication operation mode and
+current load on the database. Suggested minimum timeout: 900\&.
 .RE
 .PP
 \fBdemote\fR
 .RS 4
-Nearly does nothing and just marks the instance as demoted. Suggested minimum timeout: 320\&.
+Nearly does nothing and just marks the instance as demoted.
+Suggested minimum timeout: 320\&.
 .RE
 .PP
 \fBstatus\fR
@@ -301,12 +304,17 @@ Reports whether the HANA instance is running. Suggested minimum timeout: 60\&.
 .PP
 \fBmonitor (promoted role)\fR
 .RS 4
-Reports whether the HANA database seems to be working in replication primary mode. It also needs to check the system replication status. Suggested minimum timeout: 700\&. Suggested interval: 60\&.
+Reports whether the HANA database seems to be working in replication primary mode.
+It also needs to check the system replication status. Suggested minimum timeout: 700\&.
+Suggested interval: 60\&.
 .RE
 .PP
 \fBmonitor (demoted role)\fR
 .RS 4
-Reports whether the HANA database seems to be working in replication secondary mode. It also needs to check the system replication status. The secondary role's monitor interval has to be different from the primary (promoted) role. Suggested minimum timeout: 700\&. Suggested interval: 61\&.
+Reports whether the HANA database seems to be working in replication secondary mode.
+It also checks the system replication status. The secondary role's monitor interval
+has to be different from the primary (promoted) role.
+Suggested minimum timeout: 700\&. Suggested interval: 61\&.
 .RE
 .PP
 \fBvalidate\-all\fR
@@ -335,16 +343,20 @@ Changes parameters without forcing a recover of the resource. Suggested minimum 
 .\"
 The return codes are defined by the OCF cluster framework. Please refer to the
 OCF definition on the website mentioned below. 
-In addition return code 124 will be logged if HANA_CALL_TIMEOUT has been exceeded.
+A return code 124 will be logged if HANA_CALL_TIMEOUT has been exceeded.
 .br
-In addition, log entries are written, which can be scanned by using a pattern like "SAPHanaController.*RA.*rc=[1-7,9]" for errors. Regular operations might be found with "SAPHanaController.*RA.*rc=0".
+In addition, log entries are written, which can be scanned by using a pattern like
+"SAPHanaController.*RA.*rc=[1-7,9]" for errors. Regular operations might be found with
+"SAPHanaController.*RA.*rc=0".
 .PP
 .\"
 .SH EXAMPLES
 .\"
-* Below is an example configuration for a SAPHanaController multi-state resource in a HANA scale-out performance-optimised scenario.
+* SAPHanaController multi-state resource in a HANA scale-out performance-optimised scenario.
 .br
-The HANA consists of two sites with five nodes each. An additional cluster node is used as majority maker for split-brain situations. In addition, a SAPHanaTopology clone resource is needed to make this work.
+The HANA consists of two sites with five nodes each. An additional cluster node
+is used as majority maker for split-brain situations.
+In addition, a SAPHanaTopology clone resource is needed to make this work.
 .PP
 .RS 4
 primitive rsc_SAPHanaCon_SLE_HDB00 ocf:suse:SAPHanaController \\

@@ -242,7 +242,8 @@ Suggested minimum timeout: 600\&.
 \fBpromote\fR
 .RS 4
 Either runs a takeover for a secondary or a just-nothing for a primary.
-Suggested minimum timeout: 320\&.
+The correct timeout depends on factors like system replication operation mode and
+Suggested minimum timeout: 900\&.
 .RE
 .PP
 \fBdemote\fR
@@ -259,12 +260,17 @@ Suggested minimum timeout: 60\&.
 .PP
 \fBmonitor (promoted role)\fR
 .RS 4
-Reports whether the HANA instance seems to be working in replication primary mode. It also checks the system replication status. Suggested minimum timeout: 700\&. Suggested interval: 60\&.
+Reports whether the HANA instance seems to be working in replication primary mode.
+It also checks the system replication status. Suggested minimum timeout: 700\&.
+Suggested interval: 60\&.
 .RE
 .PP
 \fBmonitor (demoted role)\fR
 .RS 4
-Reports whether the HANA instance seems to be working inreplication secondary mode. It also checks the system replication status. The slave role's monitor interval has to be different from the promoted role. Suggested minimum timeout: 700\&. Suggested interval: 61\&.
+Reports whether the HANA instance seems to be working inreplication secondary mode.
+It also checks the system replication status. The slave role's monitor interval
+has to be different from the promoted role.
+Suggested minimum timeout: 700\&. Suggested interval: 61\&.
 .RE
 .PP
 \fBvalidate\-all\fR
@@ -284,11 +290,17 @@ Suggested minimum timeout: 5\&.
 Suggested minimum timeout: 5\&.
 .RE
 .PP
+\fBreload\fR
+.RS 4
+Changes parameters without forcing a recover of the resource. Suggested minimum timeout: 5.
+.RE
+.PP
 .\"
 .SH RETURN CODES
 .\"
 The return codes are defined by the OCF cluster framework. Please refer to the OCF
 definition on the website mentioned below. 
+A return code 124 will be logged if HANA_CALL_TIMEOUT has been exceeded.
 .br
 In addition, log entries are written, which can be scanned by using a pattern like
 "SAPHanaCon.*RA.*rc=[1-7,9]" for errors. Regular operations might be found with
