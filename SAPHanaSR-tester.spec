@@ -34,7 +34,7 @@ Requires:       python3 python3-base python3-paramiko openssh-clients /usr/bin/a
 
 %package client
 Group:          Productivity/Clustering/HA
-Summary:        Test suite for SAPHanaSR clusters - SAPHanaSR-tester-client is to be installed on all SAPHanaSR classic nodes
+Summary:        Test suite for SAPHanaSR clusters - Client for SAPHanaSR classic
 Conflicts:      SAPHanaSR-angi
 
 %description
@@ -55,7 +55,6 @@ SAPHanaSR-tester-client is to be installed on all SAPHanaSR classic nodes to all
 
 %prep
 tar xf %{S:0}
-#%define crmscr_path /usr/share/crmsh/scripts/
 
 %build
 gzip man-tester/*
@@ -63,7 +62,6 @@ gzip man-tester-client/*
 
 %install
 mkdir -p %{buildroot}/usr/bin
-#mkdir -p %{buildroot}%{_docdir}/%{name}
 mkdir -p %{buildroot}/usr/share/%{name}
 mkdir -p %{buildroot}/usr/share/%{name}/samples
 mkdir -p %{buildroot}/usr/share/%{name}/samples/crm_cfg/angi-ScaleUp
@@ -80,8 +78,6 @@ install -m 0644 test/tester/saphana_sr_test.py %{buildroot}/usr/lib/%{name}
 
 # test help programs, test loops and test calls
 install -m 0755 test/bin/cs_* %{buildroot}/usr/bin
-#install -m 0755 test/bin/callTest* %{buildroot}/usr/bin
-#install -m 0755 test/bin/loopTests* %{buildroot}/usr/bin
 install -m 0755 test/bin/sct_* %{buildroot}/usr/bin
 install -m 0644 test/lib/sct_* %{buildroot}/usr/lib/%{name}
 
@@ -99,7 +95,9 @@ install -m 0644 test/samples/* %{buildroot}/usr/share/%{name}/samples
 install -m 0644 crm_cfg/angi-ScaleUp/[0-9]*_* %{buildroot}/usr/share/%{name}/samples/crm_cfg/angi-ScaleUp
 
 # simulate files
-install -m 0644 test/simulate/* %{buildroot}/usr/share/%{name}/simulate
+install -m 0644 test/simulate/prop* %{buildroot}/usr/share/%{name}/simulate
+install -m 0644 test/simulate/SAP* %{buildroot}/usr/share/%{name}/simulate
+install -m 0755 test/simulate/call* %{buildroot}/usr/share/%{name}/simulate
 
 # manual pages
 install -m 0444 man-tester/*.5.gz %{buildroot}%{_mandir}/man5
@@ -108,6 +106,8 @@ install -m 0444 man-tester/*.8.gz %{buildroot}%{_mandir}/man8
 
 # man pages for client package
 install -m 0444 man-tester-client/*.7.gz %{buildroot}%{_mandir}/man7
+
+hardlink -cv %{buildroot}
 
 %files
 %defattr(-,root,root)
