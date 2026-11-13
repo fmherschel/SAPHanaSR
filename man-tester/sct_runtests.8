@@ -9,11 +9,11 @@ sct_runtests \-  run predefined sets of tests.
 .\"
 .SH SYNOPSIS
 .\"
-\fBsct_runtests\fR --case \fICASE\fR [ --testCases \fITESTS\fR ] --remoteNodes \fINODES\fR
+\fBsct_runtests\fR --testSet \fITESTSET\fR [ --testCases \fITESTS\fR ] --remoteNodes \fINODES\fR
 .br
-\fBsct_runtests\fR --caseFile \fIFILE\fR [ --testCases \fITESTS\fR ] --remoteNodes \fINODES\fR
+\fBsct_runtests\fR --testSetFile \fI/PATH/TO/FILE\fR [ --testCases \fITESTS\fR ] --remoteNodes \fINODES\fR
 .br
-\fBsct_runtests\fR --sample [ samples | \fICASE\fR ]
+\fBsct_runtests\fR --sample [ list | \fITESTSET\fR ]
 .br
 \fBsct_runtests\fR --help [ pages | \fIPAGE\fR ]
 .br
@@ -33,15 +33,14 @@ For running sct_runtests inside a podman container, see SAPHanaSR-tester-podman(
 --help [ pages | \fIPAGE\fR ]
 show usage, or list of manual pages, or given page
 .TP
---case \fICASE\fR
+--testSet \fITESTSET\fR
 sample set with scenario and test cases, defined in /usr/share/SAPHanaSR-tester/samples/runtests_\fICASE\fR.txt
 .TP
---caseFile \fIFILE\fR
+--tetSetFile \fI/PATH/TO/FILE\fR
 sample set file with scenario and test cases
 .TP
-.\" TODO sample vs. case ?
---sample [ samples | \fICASE\fR ]
-show list of tests samples, or show file for given sample
+--sample [ list | \fITESTSET\fR ]
+show list of test sets, or show file for given test set
 .TP
 --testCases \fITEST\fR [ \fITEST\fR [ ... ]]
 tests to execute
@@ -97,7 +96,7 @@ cluster nodes are 'nose1' and 'nose2'.
 the script itself
 .TP
 /usr/share/SAPHanaSR-tester/samples/
-directory with test sample sets
+directory with testsets
 .TP
 /usr/share/SAPHanaSR-tester/json/<\fISCENARIO\fR>/
 directories with HA scenarios and their test definitions

@@ -13,7 +13,7 @@ paramMode="basic"
 remoteNodes=""
 testCases=""
 seperator=" "
-
+EXE=$(/usr/bin/basename $0)
 
 function f_version() {
     /usr/bin/rpm -q SAPHanaSR-tester || echo "sct_runtests $myVersion"
