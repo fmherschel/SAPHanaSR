@@ -33,11 +33,8 @@ For running sct_runtests inside a podman container, see SAPHanaSR-tester-podman(
 --help [ list | \fIPAGE\fR ]
 show usage, or list of manual pages, or given page
 .TP
---testSet \fITESTSET\fR
-sample set with scenario and test cases, defined in /usr/share/SAPHanaSR-tester/samples/runtests_\fICASE\fR.txt
-.TP
---tetSetFile \fI/PATH/TO/FILE\fR
-sample set file with scenario and test cases
+--remoteNodes \fINODE\fR [ \fINODE\fR ]
+cluster nodes
 .TP
 --sample [ list | \fITESTSET\fR ]
 show list of test sets, or show file for given test set
@@ -45,8 +42,11 @@ show list of test sets, or show file for given test set
 --testCases \fITEST\fR [ \fITEST\fR [ ... ]]
 tests to execute
 .TP
---remoteNodes \fINODE\fR [ \fINODE\fR ]
-cluster nodes
+--testSet \fITESTSET\fR
+sample set with scenario and test cases, defined in /usr/share/SAPHanaSR-tester/samples/runtests_\fICASE\fR.txt
+.TP
+--tetSetFile \fI/PATH/TO/FILE\fR
+sample set file with scenario and test cases
 .TP
 --version
 show version
