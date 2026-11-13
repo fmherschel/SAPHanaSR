@@ -179,9 +179,10 @@ while [[ "$i" -lt "$NR_TCASES" ]]; do
   echo "#### $(date +%Y-%m-%d" "%H:%M:%S) run test: $TEST ####"
   echo "$(date +%Y-%m-%d" "%H:%M:%S) TEST $i/$NR_TCASES - $TEST" >&3
   if true; then
+      # shellcheck disable=SC2086
       /usr/bin/SAPHanaSR-testCluster \
             --testFile "$ASTROOT/$TEST.json" \
-            --remoteNodes "$REMOTENODES" --defaultsFile "$ASTROOT/defaults.json" \
+            --remoteNodes $REMOTENODES --defaultsFile "$ASTROOT/defaults.json" \
             --logFile "$TEST.log" --jsonOut "$TEST.json.out" \
             --onFail exit \
             --properties "$PROPERTIES" --dumpFailures >&3; rc=$?
