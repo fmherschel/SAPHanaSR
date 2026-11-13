@@ -24,18 +24,20 @@ function f_help() {
         pages)
             /usr/bin/rpm -ql SAPHanaSR-tester |\
             /usr/bin/awk -F"/" '$4=="man" {print $6}' |\
-            while read; do echo ${REPLY::-5}; done
+            while read -r; do echo "${REPLY::-5}"; done
             ;;
         self)
             echo
-            echo "usage     $EXE --case <case> [ --testCases <tests> ] --remoteNodes <nodes>"
-            echo "usage     $EXE --caseFile <file> [ --testCases <tests> ] --remoteNodes <nodes>"
-            echo "usage     $EXE --sample [ samples | <sample> ]"
+            echo "usage     $EXE --testSet <testSet> [ --testCases <tests> ] --remoteNodes <nodes>"
+            echo "usage     $EXE --testSetFile <testSetFile> [ --testCases <tests> ] --remoteNodes <nodes>"
+            echo "usage     $EXE --sample [ list | <sample> ]"
             echo "usage     $EXE --help [ pages | <page> ]"
             echo "usage     $EXE --version"
             echo
-            echo " --case           predefined test case"
-            echo " --caseFile       sample file with scenario and tests"
+            echo " --testSet        predefined test set"
+            echo "                  This sets testSetFile implicit from package structure"
+            echo " --testSetFile    testSetFile file with scenario and tests"
+            echo "                  This sets testSetFile explicit"
             echo " --testCases      tests to execute"
             echo " --remoteNodes    cluster nodes"
             echo " --sample         show sample"
@@ -52,10 +54,10 @@ function f_help() {
 
 function f_sample() {
     case "$1" in
-        samples)
+        list)
             # txt: Text eXecution Template
             /usr/bin/ls /usr/share/SAPHanaSR-tester/samples/runtests_*.txt |\
-            while read; do /usr/bin/basename $REPLY ".txt"; done
+            while read -r; do /usr/bin/basename "$REPLY" ".txt"; done
             ;;
         *)
             if [[ -n "$1" ]]; then
@@ -94,14 +96,17 @@ esac
 
 # TODO below in function
 
+# TODO rename masterCase variable to testSet
+# TODO rename caseFile variable to testSetFile
+
 while [[ "$#" -gt 0 ]]; do
     case "$1" in
-        --case ) 
+        --testSet ) 
             masterCase="$2"
             shift
             paramMode="basic"
             ;;
-        --caseFile )
+        --testSetFile )
             caseFile="$2"            
             shift
             paramMode="basic"
@@ -146,6 +151,7 @@ if [[ -z "$remoteNodes" ]]; then
    exit 1
 fi
 
+# shellcheck disable=SC1090
 source "$CASFILE" || exit 1
 
 if [[ -n "$testCases" ]]; then
@@ -158,6 +164,7 @@ SLEEP=120
 exec 3>&1
 exec 1>>"$LOGFILE"
 
+# shellcheck disable=SC2206
 A_TCASES=( $TCASES )
 NR_TCASES=${#A_TCASES[*]}
 
@@ -174,7 +181,7 @@ while [[ "$i" -lt "$NR_TCASES" ]]; do
   if true; then
       /usr/bin/SAPHanaSR-testCluster \
             --testFile "$ASTROOT/$TEST.json" \
-            --remoteNodes $REMOTENODES --defaultsFile "$ASTROOT/defaults.json" \
+            --remoteNodes "$REMOTENODES" --defaultsFile "$ASTROOT/defaults.json" \
             --logFile "$TEST.log" --jsonOut "$TEST.json.out" \
             --onFail exit \
             --properties "$PROPERTIES" --dumpFailures >&3; rc=$?
