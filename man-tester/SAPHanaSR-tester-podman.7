@@ -39,10 +39,10 @@ See manual page SAPHanaSR-testCluster(8) for details.
 .br
 Shared work directory is 'work', container name is 'saphanasr-tester', scenario
 is 'angi_ScaleUp', test is 'split_brain_prio.json', setup properties are
- 'properties_ScaleUp.json', cluster nodes are 'node1' and 'node2'.
+ 'properties_ScaleUp.json', cluster nodes are 'nose1' and 'nose2'.
 .PP
 .RS 2
-# podman run --rm \\
+# podman run --rm --tz=local \\
 .br
  -v ".work:work:z" \\
 .br
@@ -72,10 +72,10 @@ is 'angi_ScaleUp', test is 'split_brain_prio.json', setup properties are
 TODO
 Shared work directory is 'work', container name is 'saphanasr-tester', scenario
 and tests are taken from sample angi-ScaleUp_conservative',
-cluster nodes are 'node1' and 'node2'.
+cluster nodes are 'nose1' and 'nose2'.
 .PP
 .RS 2
-# podman run --rm \\
+# podman run --rm --tz=local \\
 .br
  -v ".work:work:z" \\
 .br
@@ -85,7 +85,7 @@ cluster nodes are 'node1' and 'node2'.
 .br
  saphanasr-tester "cd /work; /usr/bin/sct_runtests \\
 .br
- --case angi-ScaleUp_conservative --remoteNodes node1 node2"
+ --case angi-ScaleUp_conservative --remoteNodes nose1 nose2"
 .RE
 .PP
 .\"
