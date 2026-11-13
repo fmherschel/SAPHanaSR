@@ -8,12 +8,12 @@
 # http://www.gnu.org/licenses/gpl.html
 #
 
-myVersion="3.2.1 2026-11-05"
+myVersion="3.2.2 2026-11-11"
 paramMode="basic"
 remoteNodes=""
 testCases=""
 seperator=" "
-EXE=$(/usr/bin/basename $0)
+EXE=$(/usr/bin/basename "$0")
 
 function f_version() {
     /usr/bin/rpm -q SAPHanaSR-tester || echo "sct_runtests $myVersion"
@@ -22,9 +22,12 @@ function f_version() {
 function f_help() {
     case "$1" in
         list)
-            /usr/bin/rpm -ql SAPHanaSR-tester |\
-            /usr/bin/awk -F"/" '$4=="man" {print $6}' |\
-            while read -r; do echo "${REPLY::-5}"; done
+            mapfile -t docFiles < <( /usr/bin/rpm -ql --docfiles SAPHanaSR-tester ) # the syntax < <(..) is intended
+            for docFile in "${docFiles[@]}"; do
+               if [[ "$docFile" =~ (/.*)*/(.*)'.'(.)'.gz' ]]; then 
+                   echo "${BASH_REMATCH[2]}.${BASH_REMATCH[3]}"
+               fi
+            done
             ;;
         self)
             echo
