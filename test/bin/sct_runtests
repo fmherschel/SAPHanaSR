@@ -21,7 +21,7 @@ function f_version() {
 
 function f_help() {
     case "$1" in
-        pages)
+        list)
             /usr/bin/rpm -ql SAPHanaSR-tester |\
             /usr/bin/awk -F"/" '$4=="man" {print $6}' |\
             while read -r; do echo "${REPLY::-5}"; done
@@ -31,7 +31,7 @@ function f_help() {
             echo "usage     $EXE --testSet <testSet> [ --testCases <tests> ] --remoteNodes <nodes>"
             echo "usage     $EXE --testSetFile <testSetFile> [ --testCases <tests> ] --remoteNodes <nodes>"
             echo "usage     $EXE --sample [ list | <sample> ]"
-            echo "usage     $EXE --help [ pages | <page> ]"
+            echo "usage     $EXE --help [ list | <page> ]"
             echo "usage     $EXE --version"
             echo
             echo " --testSet        predefined test set"

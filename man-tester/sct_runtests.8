@@ -15,7 +15,7 @@ sct_runtests \-  run predefined sets of tests.
 .br
 \fBsct_runtests\fR --sample [ list | \fITESTSET\fR ]
 .br
-\fBsct_runtests\fR --help [ pages | \fIPAGE\fR ]
+\fBsct_runtests\fR --help [ list | \fIPAGE\fR ]
 .br
 \fBsct_runtests\fR --version
 .PP
@@ -30,7 +30,7 @@ For running sct_runtests inside a podman container, see SAPHanaSR-tester-podman(
 .SH OPTIONS
 .\"
 .TP
---help [ pages | \fIPAGE\fR ]
+--help [ list | \fIPAGE\fR ]
 show usage, or list of manual pages, or given page
 .TP
 --testSet \fITESTSET\fR
@@ -57,7 +57,7 @@ show version
 \fB*\fR Show list of predefined tests sample sets.
 .PP
 .RS 2
-# /usr/bin/sct_runtests --sample samples 
+# /usr/bin/sct_runtests --sample list
 .RE
 .PP
 \fB*\fR Show predefined tests sample set details.
@@ -85,7 +85,7 @@ cluster nodes are 'nose1' and 'nose2'.
 \fB*\fR Show list of hopefully helpful manual pages.
 .PP
 .RS 2
-# /usr/bin/sct_runtests --help pages
+# /usr/bin/sct_runtests --help list
 .RE
 .PP
 .\"
