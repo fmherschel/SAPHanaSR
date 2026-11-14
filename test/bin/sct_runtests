@@ -49,8 +49,7 @@ function f_help() {
             echo
             ;;
         *)
-            # TODO if man does not work (inside container): cat /usr/share/SAPHanaSR-tester/help/"$1"
-            /usr/bin/man "$1"
+            cat "/usr/share/SAPHanaSR-tester/help/$1.txt"
             ;;
     esac
 }
