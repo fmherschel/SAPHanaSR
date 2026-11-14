@@ -20,7 +20,7 @@ License:        GPL-2.0
 Group:          Productivity/Clustering/HA
 AutoReqProv:    on
 Summary:        Test suite for SAPHanaSR clusters
-Version:        3.2.2
+Version:        3.2.3
 Release:        0
 Url:            https://www.suse.com/c/fail-safe-operation-of-sap-hana-suse-extends-its-high-availability-solution/
 
@@ -30,7 +30,9 @@ Source0:        %{name}-%{version}.tgz
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
-Requires:       python3 python3-base python3-paramiko openssh-clients /usr/bin/awk /usr/bin/find
+BuildRequires:  man
+
+Requires:       python3 python3-base python3-paramiko openssh-clients /usr/bin/awk /usr/bin/find /usr/sbin/ip iptables
 
 %package client
 Group:          Productivity/Clustering/HA
@@ -66,6 +68,7 @@ mkdir -p %{buildroot}/usr/share/%{name}
 mkdir -p %{buildroot}/usr/share/%{name}/samples
 mkdir -p %{buildroot}/usr/share/%{name}/samples/crm_cfg/angi-ScaleUp
 mkdir -p %{buildroot}/usr/share/%{name}/simulate
+mkdir -p %{buildroot}/usr/share/%{name}/help
 mkdir -p %{buildroot}/usr/lib/%{name}
 mkdir -p %{buildroot}%{_mandir}/man5
 mkdir -p %{buildroot}%{_mandir}/man7
@@ -103,6 +106,12 @@ install -m 0755 test/simulate/call* %{buildroot}/usr/share/%{name}/simulate
 install -m 0444 man-tester/*.5.gz %{buildroot}%{_mandir}/man5
 install -m 0444 man-tester/*.7.gz %{buildroot}%{_mandir}/man7
 install -m 0444 man-tester/*.8.gz %{buildroot}%{_mandir}/man8
+
+( cd man-tester
+for manfile in *.gz; do
+    man -l "$manfile" > %{buildroot}/usr/share/%{name}/help/"${manfile%.gz}".txt
+done
+)
 
 # man pages for client package
 install -m 0444 man-tester-client/*.7.gz %{buildroot}%{_mandir}/man7
