@@ -1,0 +1,135 @@
+.\" Version: 1.2
+.\"
+.TH hascenario 5 "4 Nov 2026" "" "ClusterTools2"
+.\"
+.SH NAME
+.\"
+hascenario \- HA scenario description.
+.PP
+.\"
+.SH DESCRIPTION
+.\"
+The file /etc/sysconfig/hascenario should contain a structured description
+of the HA scenario deployed on the Linux cluster.
+.\" TODO rational
+.\"
+.\" TODO should /etc/sysconfig/hacluster be part of ClusterTools2?
+.\" TODO should /usr/share/$RPM/samples/hacluster be part of SAPHanaSR... sapstartsrv-...?
+.\"
+.PP
+.SH SYNTAX
+.\"
+.\" TODO follow sysconfig syntax
+.\" TODO SCENARIO_<n>= or HANA|ENSA|CONTENT|MEDI|DB2|DRBD|DISK|MISC|...= ?
+SCENARIO_\fIN\fR="\fISCENARIO\fR, [ \fITAG\fR [, \fITAG\fR [...] ]"
+.PP
+\fB*\fR SAP HANA database scenarios
+.PP
+hana, classic, scale-up, perf-opt [,multi-sid [,read-enabled] ] [,cons ] 
+.br
+hana, classic, scale-up, [ perf-opt | cost-opt ] [, read-enabled] [,cons ] 
+.br
+hana, classic, scale-out, [,auto-failover [,read-enabled] ] [,cons ]
+.br
+hana, angi, scale-up, perf-opt, [ cons | prog ] [,read-enabled ]
+.br
+hana, angi, scale-up, perf-opt, cons, multi-sid [,read-enabled]
+.br
+hana, angi, scale-up, cost-opt, cons [,read-enabled]
+.br
+.\" TODO dr-region on DR-region or on both regions?
+hana, angi, scale-up, dr-region, progressive
+.br
+hana, angi, scale-out, [ cons | prog ] [,read-enabled] ]
+.br
+hana, angi, scale-out, cons , auto-failover [,read-enabled] ]
+.br
+hana, angi, scale-out, xsa, progressive 
+.PP
+\fB*\fR SAP ENSA central services scenarios
+.PP
+ensa, [ ensa1 | ensa2 ], [ simple-mount | filesystem [,disk ] ]
+.PP
+\fB*\fR SAP CONTENT server scenario
+.PP
+\fB*\fR SAP Convergent Mediation scenario
+.PP
+media, zone [,ui ]
+.PP
+\fB*\fR IBM DB2 database scenarios
+.PP
+db2, [ simple | hadr ], ...
+.PP
+\fB*\fR DRBD storage scenario
+.PP
+drbd, ...
+.PP
+\fB*\fR Storage simple-stack scenario
+.PP
+\fB*\fR Miscellaneous scenarios
+.PP
+misc, ...
+.PP
+.\"
+.SH EXAMPLES
+.\"
+\fB*\fR Example hascenario file for HANA.
+.PP
+SAPHanaSR-angi, scale-up, performance-optimised, progressive, 
+no multi-sid, no read-enabled.
+.PP
+.RS 2
+# /etc/sysconfig/hascenario - HA scenario description
+.br
+#
+.br
+## Path:        System/High Availability/Scenario
+.br
+## Type:        string
+.br
+## Default:     ""
+.br
+#
+.br
+SCENARIO_0="hana,classic,scale-up,perf-opt"
+.br
+#
+.RE
+.PP
+.\"
+.SH FILES
+.\"
+.TP
+/etc/sysconfig/hascenario
+the HA scenario description file
+.PP
+.\"
+.SH BUGS
+In case of any problem, please use your favourite SAP support process to open a
+request for the component BC-OP-LNX-SUSE.
+.\" TODO Please report feedback and suggestions to feedback@suse.com.
+.PP
+.\"
+.SH SEE ALSO
+.\"
+\fBSAPHanaSR\fR(7) , \fBSAPHanaSR-ScaleOut\fR(7) , \fBSAPHanaSR-angi\fR(7) ,
+\fBSAPHanaSR-angi-scenarios\fR(7) , \fBocf_suse_SAPStartSrv\fR(7) ,
+\fBocf_suse_SAPCMControlZone\fR(7) , \fBSAPHanaSR-tester\fR(7) ,
+.br
+https://documentation.suse.com/sles-sap/sap-ha-support/html/sap-ha-support/index.html
+.PP
+.\"
+.SH AUTHORS
+.\"
+F.Herschel, L.Pinne.
+.PP
+.\"
+.SH COPYRIGHT
+.\"
+(c) 2026 SUSE LLC
+.br
+The hascenario description comes with ABSOLUTELY NO WARRANTY.
+.br
+For details see the GNU General Public License at
+http://www.gnu.org/licenses/gpl.html
+.\"
