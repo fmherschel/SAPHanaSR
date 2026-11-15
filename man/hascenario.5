@@ -20,8 +20,10 @@ of the HA scenario deployed on the Linux cluster.
 .SH SYNTAX
 .\"
 .\" TODO follow sysconfig syntax
-.\" TODO SCENARIO_<n>= or HANA|ENSA|CONTENT|MEDI|DB2|DRBD|DISK|MISC|...= ?
-SCENARIO_\fIN\fR="\fISCENARIO\fR, [ \fITAG\fR [, \fITAG\fR [...] ]"
+.\" TODO SCENARIO_<n>= or HANA|ENSA|CONTENT|CMCZ|DB2|DRBD|STORAGE|MISC|...= ?
+SCENARIO_\fIN\fR="\fIMAIN\fR, [ \fITAG\fR [, \fITAG\fR [...] ]"
+.PP
+MAIN = [ hana | ensa | content | cmcz | db2 | drbd | storage | misc ]
 .PP
 \fB*\fR SAP HANA database scenarios
 .PP
@@ -52,9 +54,9 @@ ensa, [ ensa1 | ensa2 ], [ simple-mount | filesystem [,disk ] ]
 .PP
 \fB*\fR SAP CONTENT server scenario
 .PP
-\fB*\fR SAP Convergent Mediation scenario
+\fB*\fR SAP Convergent Mediation ControlZone scenario
 .PP
-media, zone [,ui ]
+cmcz, platform [,ui ]
 .PP
 \fB*\fR IBM DB2 database scenarios
 .PP
@@ -65,6 +67,8 @@ db2, [ simple | hadr ], ...
 drbd, ...
 .PP
 \fB*\fR Storage simple-stack scenario
+.PP
+storage, ...
 .PP
 \fB*\fR Miscellaneous scenarios
 .PP
@@ -83,7 +87,7 @@ no multi-sid, no read-enabled.
 .br
 #
 .br
-## Path:        System/High Availability/Scenario
+## Path:        High Availability/Scenario
 .br
 ## Type:        string
 .br
