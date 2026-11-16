@@ -1,6 +1,6 @@
 {
     "action_types": {
-        "kill_inst": { "cmd": "su - @@sid@@adm HDB kill-9", "sudo": "sudo -u @@sid@@adm --login /usr/sap/@@SID@@/HDB@@INO@@/HDB kill-9" },
+        "kill_inst": { "cmd": "su - @@sid@@adm -c 'HDB kill-9'", "sudo": "sudo -u @@sid@@adm --login /usr/sap/@@SID@@/HDB@@INO@@/HDB kill-9" },
         "kill_sap_service": { "cmd": "pkill -u @@sid@@adm --signal 11 @@param1@@", "sudo": "sudo -u root pkill -u @@sid@@adm --signal 11 @@param1@@" },
         "kill_node": { "cmd": "/usr/bin/systemctl reboot --force", "sudo": "sudo -u root @@cmd@@"},
         "cluster_node": { "cmd": "/usr/sbin/crm node @@param1@@ @@node@@", "sudo": "sudo -u root @@cmd@@"},
