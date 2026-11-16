@@ -40,30 +40,29 @@ PLATFORM = [ metal | kvm | vmware | powervm | azure | ec2 | gcp | ... ]
 .PP
 \fB*\fR SAP HANA database scenarios
 .PP
-hana, classic, scale-up, perf-opt [,multi-sid [,read-enabled] ] [,cons] 
+hana, classic, scale-up, perf-opt [,multi-sid [,read-enabled] ][,cons] 
 .br
-hana, classic, scale-up, [ perf-opt | cost-opt ] [,read-enabled] [,cons] 
+hana, classic, scale-up, [ perf-opt | cost-opt ][,read-enabled][,cons] 
 .br
-hana, classic, scale-out, [,auto-failover [,read-enabled] ] [,cons]
+hana, classic, scale-out, [,auto-failover [,read-enabled] ][,cons]
 .br
-hana, angi, scale-up, perf-opt, [ cons | prog ] [,read-enabled]
+hana, angi, scale-up, perf-opt, [ cons | prog ][,read-enabled]
 .br
 hana, angi, scale-up, perf-opt, cons, multi-sid [,read-enabled]
 .br
 hana, angi, scale-up, cost-opt, cons [,read-enabled]
 .br
-.\" TODO dr-region on DR-region or on both regions?
-hana, angi, scale-up, dr-region, progressive
+hana, angi, scale-up, dr-region, prog
 .br
-hana, angi, scale-out, [ cons | prog ] [,read-enabled] ]
+hana, angi, scale-out, [ cons | prog ][,read-enabled] ]
 .br
 hana, angi, scale-out, cons, auto-failover [,read-enabled] ]
 .br
-hana, angi, scale-out, xsa, progressive 
+hana, angi, scale-out, xsa, prog
 .PP
 \fB*\fR SAP ENSA central services scenarios
 .PP
-ensa, [ ensa1 | ensa2 ], [ simple-mount | filesystem [,disk] ] [,multi-sid]
+ensa, [ ensa1 | ensa2 ], [ simple-mount | filesystem [,disk] ][,multi-sid]
 .PP
 \fB*\fR SAP CONTENT server scenario
 .PP
