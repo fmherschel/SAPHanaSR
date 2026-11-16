@@ -21,19 +21,32 @@ of the HA scenario deployed on the Linux cluster.
 .\"
 .\" TODO follow sysconfig syntax
 .\" TODO SCENARIO_<n>= or HANA|ENSA|CONTENT|CMCZ|DB2|DRBD|STORAGE|MISC|...= ?
-SCENARIO_\fIN\fR="\fIMAIN\fR, [ \fITAG\fR [, \fITAG\fR [...] ]"
+#
+.br
+SCENARIO_\fIN\fR="\fIMAIN\fR,\fITAG\fR,[ \fITAG\fR [...] ]"
+.br
+#
+.br
+CLUSTER="\fITAG\fR,[ \fITAG\fR [...] ],\fIPLATFORM\fR"
+.br
+#
 .PP
+.RS 2
 MAIN = [ hana | ensa | content | cmcz | db2 | drbd | storage | misc ]
+.br
+PLATFORM = [ metal | kvm | vmware | powervm | azure | ec2 | gcp | ... ]
+.RE
+.PP
 .PP
 \fB*\fR SAP HANA database scenarios
 .PP
-hana, classic, scale-up, perf-opt [,multi-sid [,read-enabled] ] [,cons ] 
+hana, classic, scale-up, perf-opt [,multi-sid [,read-enabled] ] [,cons] 
 .br
-hana, classic, scale-up, [ perf-opt | cost-opt ] [, read-enabled] [,cons ] 
+hana, classic, scale-up, [ perf-opt | cost-opt ] [,read-enabled] [,cons] 
 .br
-hana, classic, scale-out, [,auto-failover [,read-enabled] ] [,cons ]
+hana, classic, scale-out, [,auto-failover [,read-enabled] ] [,cons]
 .br
-hana, angi, scale-up, perf-opt, [ cons | prog ] [,read-enabled ]
+hana, angi, scale-up, perf-opt, [ cons | prog ] [,read-enabled]
 .br
 hana, angi, scale-up, perf-opt, cons, multi-sid [,read-enabled]
 .br
@@ -44,19 +57,19 @@ hana, angi, scale-up, dr-region, progressive
 .br
 hana, angi, scale-out, [ cons | prog ] [,read-enabled] ]
 .br
-hana, angi, scale-out, cons , auto-failover [,read-enabled] ]
+hana, angi, scale-out, cons, auto-failover [,read-enabled] ]
 .br
 hana, angi, scale-out, xsa, progressive 
 .PP
 \fB*\fR SAP ENSA central services scenarios
 .PP
-ensa, [ ensa1 | ensa2 ], [ simple-mount | filesystem [,disk ] ]
+ensa, [ ensa1 | ensa2 ], [ simple-mount | filesystem [,disk] ] [,multi-sid]
 .PP
 \fB*\fR SAP CONTENT server scenario
 .PP
 \fB*\fR SAP Convergent Mediation ControlZone scenario
 .PP
-cmcz, platform [,ui ]
+cmcz, platform [,ui]
 .PP
 \fB*\fR IBM DB2 database scenarios
 .PP
@@ -73,6 +86,20 @@ storage, ...
 \fB*\fR Miscellaneous scenarios
 .PP
 misc, ...
+.PP
+\fB*\fR Basic cluster setup
+.PP
+cluster, 2-node, [ 1-sbd | 2-sbd | 3-sbd | redfish | ... ],\fINETWORK\fR,\fIPLATFORM\fR
+.br
+cluster, [ 3-node | majority-maker | qdevice ],\fIFENCING\fR,\fINETWORK\fR,\fIPLATFORM\fR
+.PP
+.RS 2
+FENCING = [ 1-sbd | 2-sbd | 3-sbd | diskless-sbd | redfish | ... ]
+.br
+NETWORK = [ 1-corosync | 2-corosync | 1-knet | 2-knet | 3-knet ]
+.br
+PLATFORM = [ metal | kvm | vmware | powervm | azure | ec2 | gcp | ... ]
+.RE
 .PP
 .\"
 .SH EXAMPLES
@@ -95,7 +122,11 @@ no multi-sid, no read-enabled.
 .br
 #
 .br
-SCENARIO_0="hana,classic,scale-up,perf-opt"
+SCENARIO_0="hana,angi,scale-up,perf-opt,progressive"
+.br
+#
+.br
+CLUSTER="2-node,3-sbd,2-corosync,kvm"
 .br
 #
 .RE
