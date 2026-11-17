@@ -534,6 +534,22 @@ function register_hana_secondary() {
             hanaRM=$(get_hana_site_attribute "${gSite}" "${ATTR_NAME_HANA_SITE_REPLICATION_MODE[@]}")
             # TODO PRIO2: NG - do we still need ATTR_NAME_HANA_SEC?
             set_hana_attribute "$NODENAME" "$gSite" "${ATTR_NAME_HANA_SEC[@]}"
+            #
+            # bsc#1290624 - wait till primary is ready (srr==P, lss>=2)
+            # TODO PRIO1: Limit the wait loop not to run into cluster action timeout            
+            #
+            wait4primary=1
+            while [[ $wait4primary -eq 1 ]]; do
+                remoteSRR=$(get_hana_site_attribute "$remSite" "${ATTR_NAME_HANA_SITE_SRR[@]}")
+                remoteLSS=$(get_hana_site_attribute "$remSite" "${ATTR_NAME_HANA_SITE_LSS[@]}")
+                if [[ "$remoteSRR" == "P" && "$remoteLSS" -gt 2 ]]; then
+                    super_ocf_log info "ACT: SAP HANA REGISTER: Primary is marked ready to register"
+                    wait4primary=0
+                else
+                    super_ocf_log info "ACT: SAP HANA REGISTER: Primary is marked NOT ready to register (srr=$remoteSRR, lss=$remoteLSS)"
+                    sleep 10
+                fi
+            done
             remoteHanaHost=$(get_hana_site_attribute "$remSite" "${ATTR_NAME_HANA_SITE_MNS[@]}")
             # TODO PRIO2: NG - only start register, if all variables are set
             vHost=$(get_hana_attribute "$remoteHanaHost" "${ATTR_NAME_HANA_VHOST[@]}") 
