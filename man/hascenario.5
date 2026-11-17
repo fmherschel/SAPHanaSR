@@ -6,6 +6,8 @@
 .\"
 hascenario \- HA scenario description.
 .PP
+.B - DRAFT -
+.PP
 .\"
 .SH DESCRIPTION
 .\"
@@ -38,7 +40,7 @@ PLATFORM = [ metal | kvm | vmware | powervm | azure | ec2 | gcp | ... ]
 .RE
 .PP
 .PP
-\fB*\fR SAP HANA database scenarios
+\fB*\fR SAP HANA database system replication scenarios
 .PP
 hana, classic, scale-up, perf-opt [,multi-sid [,read-enabled] ][,cons] 
 .br
@@ -70,17 +72,19 @@ ensa, [ ensa1 | ensa2 ], [ simple-mount | filesystem [,disk] ][,multi-sid]
 .PP
 cmcz, platform [,ui]
 .PP
-\fB*\fR IBM DB2 database scenarios
+\fB*\fR IBM DB2 database HADR scenario
 .PP
-db2, [ simple | hadr ], ...
+db2, hadr, ...
 .PP
 \fB*\fR DRBD storage scenario
 .PP
 drbd, ...
 .PP
-\fB*\fR Storage simple-stack scenario
+\fB*\fR Simple-stack scenarios
 .PP
-storage, ...
+simple, disk, [ raid1 | asm ], [ db2 | oracle | ase | maxdb | pgsql | ascs | pas | ... ]
+.br
+simple, nfs, [ ascs | pas | ... ]
 .PP
 \fB*\fR Miscellaneous scenarios
 .PP
@@ -103,7 +107,7 @@ PLATFORM = [ metal | kvm | vmware | powervm | azure | ec2 | gcp | ... ]
 .\"
 .SH EXAMPLES
 .\"
-\fB*\fR Example hascenario file for HANA.
+\fB*\fR Example hascenario file for HANA system replication.
 .PP
 SAPHanaSR-angi, scale-up, performance-optimised, progressive, 
 no multi-sid, no read-enabled.
@@ -130,6 +134,32 @@ CLUSTER="2-node,3-sbd,2-corosync,kvm"
 #
 .RE
 .PP
+\fB*\fR Example hascenario file for simple-stack SLE12.
+.PP
+All-in-one simple-stack as in SAP HA on SLE12 enablement workshops.
+MaxDB and NetWeaver active-passive cluster on simple-stack storage with
+host-based mirror (Raid1, LVM2, Filesystem, IPaddr2, SAPInstance). 
+.PP
+.RS 2
+# /etc/sysconfig/hascenario - HA scenario description
+.br
+#
+.br
+## Path:        High Availability/Scenario
+.br
+## Type:        string
+.br
+## Default:     ""
+.br
+#
+.br
+SCENARIO_0="simple,disk,raid1,lvm2,maxdb,ascs,pas"
+.br
+#
+.br
+CLUSTER="2-node,2-sbd,2-corosync,kvm"
+.br
+#
 .\"
 .SH FILES
 .\"
