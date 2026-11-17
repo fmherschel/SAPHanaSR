@@ -182,9 +182,16 @@ function saphana_print_parameters() {
         <content type="string" default="" />
     </parameter>
     <parameter name="ON_FAIL_ACTION" unique="0" required="0">
-        <longdesc lang="en">Technical preview: ON_FAIL_ACTION selects the level RA escalates monitor failures on primary. Useful values are "fence" and "proceed".</longdesc>
-        <shortdesc lang="en">Technical preview: ON_FAIL_ACTION defines the RA escalation level after failures</shortdesc>
+        <longdesc lang="en">ON_FAIL_ACTION selects the level RA escalates monitor failures on primary. Useful values are "fence" and "proceed".</longdesc>
+        <shortdesc lang="en">ON_FAIL_ACTION defines the RA escalation level after failures</shortdesc>
         <content type="string" default="proceed" />
+    </parameter>
+    <parameter name="TIMEOUT_LOG" unique="0" required="0">
+        <longdesc lang="en"> Defines whether to collect and log system status information if HANA calls are timing out. Acivate only only if requested by support engineers.</longdesc>
+        <shortdesc lang="en">Defines whether to log information on HANA_CALL timeouts</shortdesc>
+        <content type="string" default="false" />
+    </parameter>
+
     </parameter>
 </parameters>
 '
@@ -438,7 +445,7 @@ function analyze_hana_sync_statusSRS() {
     # TODO PRIO3: NG define "python systemReplicationStatus.py" in saphana_init_sap_commands()?
     # DONE: NG reaction, if timeout occurs? Should we set SFAIL?
     FULL_SR_STATUS=$(HANA_CALL --timeout 5 --cmd "python systemReplicationStatus.py $siteParam" 2>/dev/null); srRc=$?
-    super_ocf_log info "DEC ${FUNCNAME[0]} systemReplicationStatus.py (to site '$gRemSite')-> $srRc"
+    super_ocf_log info "DEC: ${FUNCNAME[0]} systemReplicationStatus.py (to site '$gRemSite')-> $srRc"
     super_ocf_log info "FLOW ${FUNCNAME[0]} systemReplicationStatus.py (to site '$gRemSite')-> $srRc"
     #
     # TODO: PRIO2: Here we might also need to filter additional sites (if multi tier should be supported)
@@ -449,14 +456,14 @@ function analyze_hana_sync_statusSRS() {
        if grep -q "ACTIVE" < <(echo "$FULL_SR_STATUS"); then
           super_ocf_log info "FLOW ${FUNCNAME[0]} SOK"
           set_hana_site_attribute "$gRemSite" "SOK" "${ATTR_NAME_HANA_SITE_SYNC_STATUS[@]}"
-          super_ocf_log info "ACT site $gSite, setting SOK for secondary on site $gRemSite"
+          super_ocf_log info "ACT: site $gSite, setting SOK for secondary on site $gRemSite"
           lpa_set_lpt 30 "$gRemSite"
           rc=0;
        else
           # FULL_SR_STATUS does not contain "ACTIVE", so set secondary to SFAIL
           super_ocf_log info "FLOW ${FUNCNAME[0]} SFAIL"
           set_hana_site_attribute "$gRemSite" "SFAIL" "${ATTR_NAME_HANA_SITE_SYNC_STATUS[@]}"
-          super_ocf_log info "ACT site=$gSite, setting SFAIL for secondary on site $gRemSite - srRc=$srRc lss=$lss No ACTIVES found in cmd output"
+          super_ocf_log info "ACT: site=$gSite, setting SFAIL for secondary on site $gRemSite - srRc=$srRc lss=$lss No ACTIVES found in cmd output"
           # TODO PRIO1: - P004: need to check LSS again to avoid dying primary to block (SFAIL) secondary
           lpa_set_lpt 10 "$gRemSite"
        fi
@@ -471,7 +478,7 @@ function analyze_hana_sync_statusSRS() {
           super_ocf_log info "FLOW ${FUNCNAME[0]} SFAIL"
           # TODO PRIO1: NG - need to decide, if scale-up should set site attributes now
           # old scale-up code: set_hana_attribute "$remoteNode" "SFAIL" "${ATTR_NAME_HANA_SITE_SYNC_STATUS[@]}"
-          # super_ocf_log info "ACT site=$gSite, setting SFAIL for secondary (5) - srRc=$srRc lss=$lss"
+          # super_ocf_log info "ACT: site=$gSite, setting SFAIL for secondary (5) - srRc=$srRc lss=$lss"
           set_hana_site_attribute "$gRemSite" "SFAIL" "${ATTR_NAME_HANA_SITE_SYNC_STATUS[@]}"
           super_ocf_log debug "DBG: site=$gSite, setting SFAIL for secondary (5) - srRc=$srRc lss=$lss"
           # TODO PRIO1: - P004: need to check LSS again to avoid dying primary to block (SFAIL) secondary
@@ -516,8 +523,7 @@ function register_hana_secondary() {
         if ocf_is_true "${AUTOMATED_REGISTER}"; then
             # for scale-up we normally should not need that, but for scale-out:
             # before we could register we stop HANA on all nodes of the swarm (maybe some still running)
-            # fhBaustelle
-            if [[ $gNrSiteNode -gt 1 ]]; then
+            if [[ $gNrSiteNode -gt 1 ]]; then # do not call saphana_stop for scale-up as SAP HANA must already be down (lss 1)
                 saphana_stop
             fi
             # TODO PRIO1: NG - change from remoteHost to remoteMNS (remote MasterNameServer)
@@ -530,37 +536,34 @@ function register_hana_secondary() {
             set_hana_attribute "$NODENAME" "$gSite" "${ATTR_NAME_HANA_SEC[@]}"
             #
             # bsc#1290624 - wait till primary is ready (srr==P, lss>=2)
-            # TODO PRIO1: Limit the wait loop not to run into cluster action timeout            
+            # TODO PRIO1: We must not loop till the primary gets enabled. We need to end the start action with something like WAITING4PRIM
             #
-            wait4primary=1
-            while [[ $wait4primary -eq 1 ]]; do
-                remoteSRR=$(get_hana_site_attribute "$remSite" "${ATTR_NAME_HANA_SITE_SRR[@]}")
-                remoteLSS=$(get_hana_site_attribute "$remSite" "${ATTR_NAME_HANA_SITE_LSS[@]}")
-                if [[ "$remoteSRR" == "P" && "$remoteLSS" -gt 2 ]]; then
-                    super_ocf_log info "ACT: SAP HANA REGISTER: Primary is marked ready to register"
-                    wait4primary=0
-                else
-                    super_ocf_log info "ACT: SAP HANA REGISTER: Primary is marked NOT ready to register (srr=$remoteSRR, lss=$remoteLSS)"
-                    sleep 10
+            remoteSRR=$(get_hana_site_attribute "$remSite" "${ATTR_NAME_HANA_SITE_SRR[@]}")
+            remoteLSS=$(get_hana_site_attribute "$remSite" "${ATTR_NAME_HANA_SITE_LSS[@]}")
+            if [[ "$remoteSRR" == "P" && "$remoteLSS" -gt 2 ]]; then
+                super_ocf_log info "ACT: SAP HANA REGISTER: Primary is marked ready to register"
+                remoteHanaHost=$(get_hana_site_attribute "$remSite" "${ATTR_NAME_HANA_SITE_MNS[@]}")
+                # TODO PRIO2: NG - only start register, if all variables are set
+                vHost=$(get_hana_attribute "$remoteHanaHost" "${ATTR_NAME_HANA_VHOST[@]}") 
+                if [ -z "$vHost" ]; then
+                    vHost="$remoteHanaHost"
                 fi
-            done
-            remoteHanaHost=$(get_hana_site_attribute "$remSite" "${ATTR_NAME_HANA_SITE_MNS[@]}")
-            # TODO PRIO2: NG - only start register, if all variables are set
-            vHost=$(get_hana_attribute "$remoteHanaHost" "${ATTR_NAME_HANA_VHOST[@]}") 
-            if [ -z "$vHost" ]; then
-                vHost="$remoteHanaHost"
+                super_ocf_log info "ACT: SAP HANA REGISTER: hdbnsutil -sr_register --remoteHost=$vHost --remoteInstance=$remoteInstance --replicationMode=$hanaRM --operationMode=$hanaOM --name=$gSite"
+                #
+                # set status "R" for SRACTION attribute to interact with srTkOver; SRACTION_HISTORY is kept till next monitor
+                #
+                set_hana_attribute "$NODENAME" "R" "${ATTR_NAME_HANA_SRACTION[@]}"
+                set_hana_attribute "$NODENAME" "R" "${ATTR_NAME_HANA_SRACTION_HISTORY[@]}"
+                HANA_CALL --timeout inf --use-su --cmd "hdbnsutil -sr_register --remoteHost=$vHost --remoteInstance=$remoteInstance --replicationMode=$hanaRM --operationMode=$hanaOM --name=$gSite"; rc=$?
+                #
+                # resset status "-" for SRACTION attribute to interact with srTkOver; SRACTION_HISTORY is kept till next monitor
+                #
+                set_hana_attribute "$NODENAME" "-" "${ATTR_NAME_HANA_SRACTION[@]}"
+            else
+                super_ocf_log info "ACT: SAP HANA REGISTER: Primary is marked NOT ready to register (srr=$remoteSRR, lss=$remoteLSS)"
+                set_hana_attribute "${NODENAME}" "WAITING4PRIM" "${ATTR_NAME_HANA_CLONE_STATE[@]}"
+                rc=0
             fi
-            super_ocf_log info "ACT: SAP HANA REGISTER: hdbnsutil -sr_register --remoteHost=$vHost --remoteInstance=$remoteInstance --replicationMode=$hanaRM --operationMode=$hanaOM --name=$gSite"
-            #
-            # set status "R" for SRACTION attribute to interact with srTkOver; SRACTION_HISTORY is kept till next monitor
-            #
-            set_hana_attribute "$NODENAME" "R" "${ATTR_NAME_HANA_SRACTION[@]}"
-            set_hana_attribute "$NODENAME" "R" "${ATTR_NAME_HANA_SRACTION_HISTORY[@]}"
-            HANA_CALL --timeout inf --use-su --cmd "hdbnsutil -sr_register --remoteHost=$vHost --remoteInstance=$remoteInstance --replicationMode=$hanaRM --operationMode=$hanaOM --name=$gSite"; rc=$?
-            #
-            # resset status "-" for SRACTION attribute to interact with srTkOver; SRACTION_HISTORY is kept till next monitor
-            #
-            set_hana_attribute "$NODENAME" "-" "${ATTR_NAME_HANA_SRACTION[@]}"
         else
            super_ocf_log info "ACT: SAP HANA DROP REGISTER because AUTOMATED_REGISTER is set to FALSE"
            rc=1
