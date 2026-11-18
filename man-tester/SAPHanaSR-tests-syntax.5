@@ -197,10 +197,10 @@ Each step contains an expectation for SAPHanaSR attributes, which need to match.
 The attributes are arranged along the CIB and SAPHanaSR-showAttr sections. There must be at least one expectation per step.
 The object is one of
 .PP
-[ pHost | sHost | pWorker | sWorker | pSite | sSite | global | mstRsc ]
+[ pHost | sHost | xHost | pWorker | sWorker | pSite | sSite | global | mstRsc ]
 .RS 2
 .TP
-pHost, sHost, pWorker, sWorker
+pHost, sHost, xHost, pWorker, sWorker
 node attributes
 .TP
 pSite, sSite
@@ -267,7 +267,9 @@ host s is down (scale-out: master node)
 .TP
 sWorkerDown
 worker node s is down (scale-out)
-not yet implemented
+.TP
+xHostOut
+any node is completely off
 .RE
 .PP
 Note: Prefixes "s" and "p" are statically indicating geographical sites, as
