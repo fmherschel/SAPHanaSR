@@ -946,7 +946,7 @@ class SaphanasrTest:
                 self.message("STATUS: Test step {} FAILED successfully ;)".format(step_step))
                 # TODO: add onfail handling
                 # (curently only break for first step and continue for others)
-                if onfail == 'break':
+                if onfail == 'break' not step_alternative:
                     break
                 # in case there is no break, we continue with ...
                 if step_alternative:
