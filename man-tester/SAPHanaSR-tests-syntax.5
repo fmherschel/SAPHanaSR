@@ -115,6 +115,7 @@ test cluster failure
 .TP
 \fBdegraded\fR
 test leads to degraded HANA (lss=2), HANA recovers on its own
+.TP
 \fBDRregion\fR
 test specific to DR region nodes
 .TP
@@ -188,7 +189,7 @@ test may pass with an alternate result
 test on HANA worker node
 .TP
 \fBxsa\fR
-test specific to XSA node
+test specific to XSA worker node
 .RE
 .PP
 \fB*\fP Test step status <status>
@@ -197,10 +198,10 @@ Each step contains an expectation for SAPHanaSR attributes, which need to match.
 The attributes are arranged along the CIB and SAPHanaSR-showAttr sections. There must be at least one expectation per step.
 The object is one of
 .PP
-[ pHost | sHost | xHost | pWorker | sWorker | pSite | sSite | global | mstRsc ]
+[ pHost | sHost | pWorker | sWorker | pSite | sSite | global | mstRsc ]
 .RS 2
 .TP
-pHost, sHost, xHost, pWorker, sWorker
+pHost, sHost, pWorker, sWorker
 node attributes
 .TP
 pSite, sSite
@@ -399,8 +400,14 @@ standby primary node (scale-out: primary master)
 ssn
 standby secondary node (scale-out: secondary master)
 .TP
+standby_prim_site_nodes
+standby all nodes on primary site (scale-out)
+.TP
 standby_secn_worker_node
 standby secondary worker node (scale-out)
+.TP
+standby_secn_site_nodes
+standby all nodes on secondary site (scale-out)
 .TP
 opn
 online primary node (scale-out: primary master)
