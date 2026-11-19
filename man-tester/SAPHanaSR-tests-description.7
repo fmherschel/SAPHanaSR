@@ -190,7 +190,7 @@ No takeover. No fencing.
 Comment: Infrastructure failure, main cluster case.
 .RE
 .PP
-\fRblock_sr_and_freeze_prim_worker_nfs\fP
+\fBblock_sr_and_freeze_prim_worker_nfs\fP
 .RS 2
 Descr: Block HANA SR on primary master and freeze HANA NFS on primary worker.
 .br
@@ -1310,6 +1310,23 @@ Cluster stays online.
 SR SFAIL and finally SOK. No takeover. No fencing.
 .br
 Comment: Sub-optimal admin procedure.
+.PP
+\fBstop_hana_instance\fP 
+.RS 2
+Descr: Stop HANA instance at primary site.
+.br
+Topology: ScaleUp, ScaleOut.
+.br
+Prereq: Cluster and HANA are up and running, all good.
+.br
+Test: sapcontrol -nr <nr> -function StopSystem
+.br
+Expect: Cluster stays online.
+HANA primary (master) stopped and finally started as secondary.
+HANA secondary becomes finally primary.
+SR SFAIL and finally SOK. One takeover. No fencing.
+.br
+Comment: Admin mistake.
 .PP
 .\"
 .SH EXAMPLES
