@@ -1,0 +1,48 @@
+{
+    "test": "flup_fatal",
+    "name": "flup_fatal - expected to fail on fatalCondition" ,
+    "purpose": [
+        "angi",
+        "ScaleUp",
+        "fatal",
+        "parser",
+        "tester",
+        "sleep"
+    ],
+    "start": "prereq10",
+    "steps": [
+        {
+            "step": "prereq10",
+            "name": "test prerequitsites",
+            "next": "final40",
+            "loop": 10,
+            "wait": 1,
+            "post": "sleep 4",
+            "pHost": [
+                "never == never"
+            ],
+            "pSite": "pSiteUp",
+            "sSite": "sSiteUp",
+            "sHost": "sHostUp",
+            "fatalCondition": {
+                "pHost_fatal": {
+                    "pHost": [ 
+                        "score == 150",
+                        "roles == master1:master:worker:master"
+                    ]
+                }
+            }
+        },
+        {
+            "step": "final40",
+            "name": "still running",
+            "next": "END",
+            "loop": 1,
+            "wait": 1,
+            "pSite": "pSiteUp",
+            "sSite": "sSiteUp",
+            "pHost": "pHostUp",
+            "sHost": "sHostUp"
+        }
+    ]
+}

@@ -1,0 +1,33 @@
+{
+    "test": "check_for_none.json",
+    "name": "test that attribute and even object does not exist",
+    "start": "prereq10",
+    "steps": [
+        {
+            "step": "prereq10",
+            "name": "test prerequitsites None",
+            "next": "END",
+            "loop": 1,
+            "wait": 1,
+            "post": "sleep 1",
+            "pSite": [
+                "ssr is None",
+                "lss is None"
+            ],
+            "sSite": [
+                "ssr is None",
+                "lss is None"
+            ],
+            "pHost": [
+                "clone_state is None",
+                "roles is None",
+                "score is None"
+            ],
+            "sHost":[
+                "clone_state is None",
+                "roles is None",
+                "score is None"
+            ]
+        }
+    ]
+}
