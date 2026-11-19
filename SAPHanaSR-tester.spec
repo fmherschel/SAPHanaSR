@@ -32,7 +32,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 BuildRequires:  man
 
-Requires:       python3 python3-base python3-paramiko openssh-clients /usr/bin/awk /usr/bin/find /usr/sbin/ip iptables
+Requires:       python3 python3-base python3-paramiko openssh-clients /usr/bin/awk /usr/bin/find
 
 %package client
 Group:          Productivity/Clustering/HA
