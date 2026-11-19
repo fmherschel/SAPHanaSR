@@ -187,11 +187,9 @@ function saphana_print_parameters() {
         <content type="string" default="proceed" />
     </parameter>
     <parameter name="TIMEOUT_LOG" unique="0" required="0">
-        <longdesc lang="en"> Defines whether to collect and log system status information if HANA calls are timing out. Acivate only only if requested by support engineers.</longdesc>
+        <longdesc lang="en">Defines whether to collect and log system status information if HANA calls are timing out. Acivate only only if requested by support engineers.</longdesc>
         <shortdesc lang="en">Defines whether to log information on HANA_CALL timeouts</shortdesc>
         <content type="string" default="false" />
-    </parameter>
-
     </parameter>
 </parameters>
 '
