@@ -79,6 +79,9 @@ name of step to do next, if this step succeeds
 \fBonfail\fP
 name of step to do next, if this step fails (optional)
 .TP
+\fBfatalCondition\fP
+status condition leads to exit the test as failed
+.TP
 \fBloop\fP
 maximum number of loops to wait and check for status
 .TP
@@ -211,7 +214,7 @@ global
 global attributes
 .TP
 mstRsc
-multi state resource attributes
+multi-state resource attributes
 .PP
 See manual page SAPHanaSR-showAttr(8) for details on that attributes.
 .PP
@@ -411,9 +414,10 @@ online seconary node (scale-out: secondary master)
 .TP
 online_secn_worker_node
 online secondary worker node (scale-out)
-.TP
-script <script>
-execute predefined script
+.\" TODO script or shell?
+.\" .TP
+.\" script <script>
+.\" execute predefined script
 .TP
 shell <command>
 execute command
