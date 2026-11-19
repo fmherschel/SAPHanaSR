@@ -9,7 +9,7 @@
         "cluster",
         "master",
         "takeover",
-        "fencing"
+        "fencing",
         "onfail"
     ],
     "start": "prereq10",
