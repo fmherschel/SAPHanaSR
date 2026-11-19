@@ -218,10 +218,11 @@ See manual page SAPHanaSR-showAttr(8) for details on that attributes.
 Some common status are predefind as defaults:
 .TP
 globalUp
-both sites are up and in sync
+HANA on both sites are up and in sync
 .TP
 globalDown
 not yet implemented
+.\" TODO globalDown
 .TP
 sync_state_sfail
 Global attribute sync_state is "SFAIL" (classic scale-out)
@@ -233,44 +234,43 @@ sync_state_sok
 Global attribute sync_state is "SOK" (classic scale-out)
 .TP
 pHostUp
-host p (expected to be primary before the test starts) is up (scale-out: expected primary master node)
+HANA on host p (expected to be primary before the test starts) is up (scale-out: expected primary master node)
 .TP
 pWorkerUp
-worker node p is up (scale-out)
+HANA on worker node p is up (scale-out)
 .TP
 pSiteUp
-site p is up
+HANA on site p is up
 .TP
 sSiteUp
-site s (expected to be secondary before the test starts) is up  
+HANA on site s (expected to be secondary before the test starts) is up  
 .TP
 sHostUp
-host s is up (scale-out: master node)
+HANA on host s is up (scale-out: master node)
 .TP
 sWorkerUp
-worker node s is up (scale-out)
+HANA on worker node s is up (scale-out)
 .TP
 pHostDown
-host p is down (scale-out: master node)
+HANA on host p is down (scale-out: master node)
 .TP
 pWorkerDown
-worker node p is down (scale-out)
-not yet implemented
+HANA on worker node p is down (scale-out)
 .TP
 pSiteDown
-site p is down 
+HANA on site p is down 
 .TP
 sSiteDown
-site s is down 
+HANA on site s is down 
 .TP
 sHostDown
-host s is down (scale-out: master node)
+HANA on host s is down (scale-out: master node)
 .TP
 sWorkerDown
-worker node s is down (scale-out)
+HANA on worker node s is down (scale-out)
 .TP
 xHostOut
-any node is completely off
+any node is out of cluster
 .RE
 .PP
 Note: Prefixes "s" and "p" are statically indicating geographical sites, as
@@ -400,14 +400,8 @@ standby primary node (scale-out: primary master)
 ssn
 standby secondary node (scale-out: secondary master)
 .TP
-standby_prim_site_nodes
-standby all nodes on primary site (scale-out)
-.TP
 standby_secn_worker_node
 standby secondary worker node (scale-out)
-.TP
-standby_secn_site_nodes
-standby all nodes on secondary site (scale-out)
 .TP
 opn
 online primary node (scale-out: primary master)
