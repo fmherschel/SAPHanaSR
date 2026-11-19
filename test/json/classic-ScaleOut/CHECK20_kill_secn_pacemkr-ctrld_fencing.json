@@ -1,0 +1,39 @@
+{
+    "test": "CHECK20",
+    "name": "CHECK20",
+    "purpose": [
+        "classic",
+        "ScaleOut",
+        "secondary",
+        "master",
+        "kill",
+        "fencing",
+        "cluster"
+    ],
+    "start": "prereq10",
+    "steps": [
+        {
+            "step": "prereq10",
+            "name": "CHECK20",
+            "next": "END",
+            "loop": 1,
+            "wait": 1,
+            "pSite": "pSiteUp",
+            "pHost": "pHostUp",
+            "pWorker": "pWorkerUp",
+            "sSite": [
+                "srHook == SFAIL",
+                "srr == S"
+            ],
+            "sHost": [
+                "clone_state is None",
+                "roles is None",
+                "score is None"
+            ],
+            "sWorker": [
+               "clone_state == DEMOTED",
+               "roles ~ slave:"
+            ]
+        }
+    ]
+}
