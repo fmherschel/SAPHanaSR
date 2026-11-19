@@ -17,6 +17,7 @@ PRIMCAS="block_manual_takeover block_sr
 kill_prim_inst kill_prim_indexserver kill_prim_xsengine kill_prim_ipaddr kill_prim_saphostexec
 kill_prim_pacemakerd kill_prim_pacemkr-attrd kill_prim_pacemkr-based kill_prim_pacemkr-ctrld
 kill_prim_node
+stop_prim_inst
 standby_prim_node
 maintenance_prim_crmreport maintenance_prim_supportconfig"
 #
