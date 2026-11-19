@@ -1,0 +1,94 @@
+{
+    "test": "stop_prim_inst",
+    "name": "Stop HANA primary master instance",
+    "purpose": [
+        "classic",
+        "ScaleUp",
+        "primary",
+        "stop",
+        "hana",
+        "master",
+        "takeover"
+    ],
+    "start": "prereq10",
+    "steps": [
+        {
+            "step": "prereq10",
+            "name": "test prerequisites",
+            "next": "step20",
+            "loop": 1,
+            "wait": 1,
+            "post": "shell sct_test_stop_prim_inst",
+            "pSite": "pSiteUp",
+            "sSite": "sSiteUp",
+            "pHost": "pHostUp",
+            "sHost": "sHostUp"
+        },
+        {
+            "step": "step20",
+            "name": "failure detected",
+            "next": "step30",
+            "loop": 120,
+            "wait": 2,
+            "pSite": [
+                "srHook ~ (PRIM|SWAIT|SREG)"
+            ],
+            "sSite": [
+                "srHook ~ (PRIM|SOK)"
+            ],
+            "pHost": [
+                "lpa_@@sid@@_lpt > 1000000000",
+                "clone_state ~ (PROMOTED|DEMOTED|UNDEFINED)",
+                "roles == 1:P:master1::worker:",
+                "score ~ (90|70|5|0)"
+            ],
+            "sHost": [
+                "lpa_@@sid@@_lpt >~ 1000000000:(30)",
+                "clone_state ~ (PROMOTED|DEMOTED)",
+                "roles == 4:S:master1:master:worker:master",
+                "sync_state ~ (SOK|SFAIL)",
+                "score ~ (100|145)"
+            ]
+        },
+        {
+            "step": "step30",
+            "name": "begin recover",
+            "next": "final40",
+            "loop": 120,
+            "wait": 2,
+            "pSite": [
+                "srHook ~ (PRIM|SWAIT|SREG)"
+            ],
+            "sSite": [
+                "srHook == PRIM"
+            ],
+            "pHost": [
+                "lpa_@@sid@@_lpt >~ 1000000000:(30)",
+                "clone_state ~ (UNDEFINED|DEMOTED)",
+                "roles ~ 1:P:master1::worker:",
+                "sync_state = PRIM",
+                "score ~ (90|70|5)"
+            ],
+            "sHost": [
+                "lpa_@@sid@@_lpt >~ 1000000000:(30)",
+                "clone_state ~ (DEMOTED|PROMOTED)",
+                "roles ~ (4:S:master1:master:worker:master|4:P:master1:master:worker:master)",
+                "sync_state ~ (SOK|SFAIL)",
+                "score ~ (100|145)",
+                "srah == T"
+            ]
+        },
+        {
+            "step": "final40",
+            "name": "end recover",
+            "next": "END",
+            "loop": 240,
+            "wait": 2,
+            "post": "cleanup",
+            "pSite": "sSiteUp",
+            "sSite": "pSiteUp",
+            "pHost": "sHostUp",
+            "sHost": "pHostUp"
+        }
+    ]
+}
