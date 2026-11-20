@@ -111,16 +111,19 @@ fi
 ra_rc="$OCF_ERR_UNIMPLEMENTED"
 case "$ACTION" in
     start|stop|monitor) # Standard controlling actions
-        "${raType}""$ACTION$CLACT"; ra_rc="$?"
+        "${raType}""$ACTION$CLACT"
+        ra_rc="$?"
         ;;
     validate-all)
-        "${raType}"validate; ra_rc="$?"
+        "${raType}"validate
+        ra_rc="$?"
         ;;
     reload)
         ra_rc="$OCF_SUCCESS"
         ;;
     *)  # seems to be an unknown request
-        "${raType}"methods; ra_rc="$OCF_ERR_UNIMPLEMENTED"
+        "${raType}"methods
+        ra_rc="$OCF_ERR_UNIMPLEMENTED"
         ;;
 esac
 super_ocf_log info "RA ==== end action $ACTION$CLACT with rc=${ra_rc} ($SAPHanaFilesystemVersion) (${SECONDS}s)===="
