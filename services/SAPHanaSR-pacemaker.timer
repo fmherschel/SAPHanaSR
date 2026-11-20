@@ -7,7 +7,7 @@ Documentation=man:SAPHanaSR-pacemaker.timer(5)
 # sbd.service enabled
 # corosync.service disabled
 # pacemaker.service disabled
-# pacemaker.timer enabled
+# SAPHanaSR-pacemaker.timer enabled
 #
 # OnStartupSec disk-based SBD
 #   SBD_DELAY_START = pcmk_delay_max + msgwait + corosync.token + corosync.consensus
