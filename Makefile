@@ -5,14 +5,14 @@
 
 FILE_LIST = LICENSE \
 		README.md \
-        alert \
-        crm_cfg \
+		alert \
 		icons \
 		man \
 		man-testenv \
 		ra \
-        services \
+		samples \
 		srHook \
+		services \
 		tools \
 		wizard
 
