@@ -1,6 +1,7 @@
 *.tgz
 *.tar.gz
 osc
+obs
 ibs
 test.log
 misc
