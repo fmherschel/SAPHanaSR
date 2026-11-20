@@ -18,7 +18,7 @@ VERSION = $(strip $(patsubst Version:,,$(shell grep '^Version:' $(SPECFILE))))
 # OBS local project path: set it as a command line argument or as an ENV variable
 OBSPROJ ?= "placeholder"
 # OBS target platform
-OBSTARG ?= "SLE_12_SP2"
+OBSTARG ?= "SLE_15_SP7"
 
 tarball:
 	@echo -e "\e[33mMaking ${PKG}-${VERSION}.tgz\e[0m"
