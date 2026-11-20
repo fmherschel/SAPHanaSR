@@ -281,6 +281,10 @@ detects an status represented by those attributes. The attributes should not
 change faster than the tester could scan. As rule of thumb, attributes should
 stay in CIB at least for five seconds.
 .PP
+The tester uses ssh for login to the cluster nodes and sudo for executing
+commands. Delay for both should be less than half a second. Users and groups
+should be resolved locally on the cluster nodes.  
+.PP
 \fB*\fP The tester detects any cluster status based on representative combinations
 of attributes. Subsequent steps of a test can by identified, if they show at least 
 one different attribute value. 
