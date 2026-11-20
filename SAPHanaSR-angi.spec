@@ -21,7 +21,7 @@ License:        GPL-2.0
 Group:          Productivity/Clustering/HA
 AutoReqProv:    on
 Summary:        Resource agents to control the HANA database in system replication setup
-Version:        1.3.5.5.TOL+WP
+Version:        1.3.5.6.TOL+WP
 Release:        0
 Url:            https://www.suse.com/c/fail-safe-operation-of-sap-hana-suse-extends-its-high-availability-solution/
 
@@ -99,20 +99,21 @@ mkdir -p %{buildroot}%{_mandir}/man8
 mkdir -p %{buildroot}/usr/lib/%{name}
 install -m 0755 ra/SAPHana* %{buildroot}/usr/lib/ocf/resource.d/suse/
 install -m 0644 ra/saphana-*-lib %{buildroot}/usr/lib/%{name}
+install -m 0644 ra/*-meta-data.xml %{buildroot}/usr/lib/%{name}
 
 # HA/DR hook provider
 install -m 0644 srHook/susHanaSR.py %{buildroot}/usr/share/%{name}/
 install -m 0644 srHook/susTkOver.py %{buildroot}/usr/share/%{name}/
 install -m 0644 srHook/susCostOpt.py %{buildroot}/usr/share/%{name}/
 install -m 0644 srHook/susChkSrv.py %{buildroot}/usr/share/%{name}/
-install -m 0444 srHook/global.ini_* %{buildroot}/usr/share/%{name}/samples
+install -m 0444 samples/srHook/global.ini_* %{buildroot}/usr/share/%{name}/samples
 
 # alert manager
 install -m 0755 alert/SAPHanaSR-alert-fencing %{buildroot}/usr/bin
 install -m 0755 alert/SAPHanaSR-alert-timeout %{buildroot}/usr/bin
 
 # crm config templates
-install -m 0644 crm_cfg/angi-ScaleUp/[0-9]*_* %{buildroot}/usr/share/%{name}/samples/crm_cfg/angi-ScaleUp
+install -m 0644 samples/crm_cfg/angi-ScaleUp/* %{buildroot}/usr/share/%{name}/samples/crm_cfg/angi-ScaleUp
 
 # icons for SAPHanaSR-monitor
 install -m 0444 icons/* %{buildroot}/usr/share/%{name}/icons
@@ -179,6 +180,7 @@ install -m 0644 man-testenv/*8.gz %{buildroot}%{_mandir}/man8
 %dir /usr/lib/%{name}
 /usr/lib/%{name}/saphana-*-lib
 /usr/lib/%{name}/saphana_sr_*.py
+/usr/lib/%{name}/*-meta-data.xml
 /usr/bin/SAPHanaSR-showAttr
 /usr/bin/SAPHanaSR-showStatus
 /usr/bin/SAPHanaSR-replay-archive
