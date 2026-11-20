@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!DOCTYPE resource-agent SYSTEM "ra-api-1.dtd">
+<resource-agent name="SAPHanaFilesystem" version="$SAPHanaFilesystemVersion">
+    <version>1.0</version>
+    <shortdesc lang="en">SAPHanaFilesystem - Monitors mounted SAP HANA filesystems.</shortdesc>
+    <longdesc lang="en">The SAPHanaFilesystem resource agent (RA) monitors mounted SAP HANA filesystems
+by checking read/write access. This RA does neither mount nor umount any
+filesystem. In case the filesystem monitor fails, the RA decides how to proceed
+based on HANA system replication status.  The monitor and action timeouts are
+significantly shorter than SAPHanaController resource timeouts. This results in faster takeover actions.
+
+* Behaviour on HANA primary sites
+
+srHook=SOK: In case of monitor failure the Linux cluster tries to stop and
+restart the SAPHanaFilesystem resource (not the real filesystem). If that stop
+fails and the HANA system replication is in sync the node gets fenced.
+In consequence an HANA sr_takeover will be triggered.
+
+srHook=SFAIL: In case of monitor failure the Linux cluster tries to stop and
+restart the SAPHanaFilesystem resource (not the real filesystem). If the HANA
+system replication is not in sync this will be repeated until it gains success
+or migration-threshold is reached.
+
+* Behaviour on HANA secondary sites
+
+In case of monitor failure the Linux cluster tries to stop and restart the
+SAPHanaFilesystem resource (not the real filesystem). This will be repeated
+until it gains success or migration-threshold is reached.
+    </longdesc>
+<parameters>
+    <parameter name="SID" unique="0" required="1">
+        <longdesc lang="en">The SAP System Identifier (SID)</longdesc>
+        <shortdesc lang="en">The SAP System Identifier (SID)</shortdesc>
+        <content type="string" default=""/>
+    </parameter>
+    <parameter name="InstanceNumber" unique="0" required="0">
+        <longdesc lang="en">The SAP Instance Number - currently not used (placeholder)</longdesc>
+        <shortdesc lang="en">The SAP Instance Number</shortdesc>
+        <content type="string" default=""/>
+    </parameter>
+    <parameter name="DIRECTORY" unique="0" required="0">
+        <longdesc lang="en">The directory to be checked. Default is "/hana/shared/\$SID".
+The RA creates data in an own subdirectory .suse_SAPHanaFilesystem. Do not touch this hidden subdirectory.</longdesc>
+        <shortdesc lang="en">The directory to be checked. Default is "/hana/shared/\$SID"</shortdesc>
+        <content type="string" default=""/>
+    </parameter>
+    <parameter name="ON_FAIL_ACTION" unique="0" required="0">
+        <longdesc lang="en">TODO - parameter to decide fence or ignore. default is stop_error to force fence.</longdesc>
+        <shortdesc lang="en">TODO</shortdesc>
+        <content type="string" default=""/>
+    </parameter>
+</parameters>
+<actions>
+    <action name="start" timeout="10"/>
+    <action name="stop" timeout="20"/>
+    <action name="status" timeout="60"/>
+    <action name="monitor" depth="0" timeout="120" interval="120"/>
+    <action name="validate-all" timeout="5"/>
+    <action name="meta-data" timeout="5"/>
+    <action name="methods" timeout="5"/>
+    <action name="reload" timeout="5"/>
+</actions>
+</resource-agent>
