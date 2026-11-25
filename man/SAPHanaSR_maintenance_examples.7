@@ -126,6 +126,9 @@ Therefor the correct secondary site name has to be used, see later example.
 Finally the SAP HANA resources are given back to the Linux cluster.
 See also section REQUIREMENTS below and later example on determining the correct
 site name.
+.br
+SID is SLE, instance number 10, old primary master node is node11, new primary
+master node is node21, old primary and new secondary site is site1.
 .PP
 .RS 2
 1. On either node
@@ -155,6 +158,8 @@ If everything looks fine, proceed.
 .br
 .\" TODO check the below
 ~> sapcontrol -nr 10 -function GetSystemInstanceList
+.br
+~> exit
 .RE
 .PP
 .RS 2
@@ -173,14 +178,20 @@ If everything looks fine, proceed.
 .br
 ~> cdpy; python3 ./landscapeHostConfiguration.py; echo rc:$?
 .br
+~> exit
+.br
 If everything looks fine, proceed.
 .RE
 .RS 2
-4. On the former HANA primary master nameserver, now future secondary master nameserver (e.g. node11)
+4. On the former HANA primary master nameserver, now future secondary master
+nameserver (e.g. node11)
 .RE
 .RS 4
-~> hdbnsutil -sr_register --remoteHost=node21 --remoteInstance=10 --replicationMode=sync
---name=site2 --operationMode=logreplay
+# su - sleadm
+.br
+~> hdbnsutil -sr_register --remoteHost=node21 --remoteInstance=10 \\
+.br
+ --name=site1 --replicationMode=sync --operationMode=logreplay
 .br
 ~> sapcontrol -nr 10 -function StartSystem HDB
 .br
@@ -191,6 +202,7 @@ If everything looks fine, proceed.
 5. On the new HANA primary master nameserver (e.g. node21)
 .RE
 .RS 4
+# su - sleadm
 .br
 ~> cdpy; python3 ./systemReplicationStatus.py; echo rc:$?
 .br
@@ -260,9 +272,15 @@ site name.
 .PP
 \fB*\fR Check the two site names that are known to the Linux cluster. 
 .PP
-This is useful in case AUTOMATED_REGISTER is not yet set. In that case a former  primary needs to be registered manually with the former site name as new secondary. The point is finding the site name that already is in use by the Linux cluster. That exact site name has to be used for registration of the new secondary. See also REQUIREMENTS of SAPHanaSR(7) and SAPHanaSR-ScaleOut(7).
+This is useful in case AUTOMATED_REGISTER is not yet set. In that case a former
+primary needs to be registered manually with the former site name as new secondary.
+The point is finding the site name that already is in use by the Linux cluster.
+That exact site name has to be used for registration of the new secondary. See
+also REQUIREMENTS of SAPHanaSR(7) and SAPHanaSR-ScaleOut(7).
 .br
-In this example, node is suse11 on the future secondary site to be registered. Remote HANA master nameserver is suse21 on current primary site. Lowercase-SID is ha1.
+In this example, node is suse11 on the future secondary site to be registered.
+Remote HANA master nameserver is suse21 on current primary site. Lowercase-SID
+is ha1.
 .PP
 .RS 4
 # crm configure show suse11 suse21
@@ -350,19 +368,19 @@ of HANA and cluster above.
 # crm maintenance on
 .RE
 .RS 2
-4. Stop Linux Cluster on all nodes. Make sure to do that on all nodes.
+4. Stop Linux Cluster on all nodes.
 .RE
 .RS 4
-# crm cluster run "crm cluster stop"
+# crm cluster stop --all
 .RE
 .RS 2
 .PP
 5. Perform Linux maintenance.
 .PP
-6. Start Linux cluster on all nodes. Make sure to do that on all nodes.
+6. Start Linux cluster on all nodes.
 .RE
 .RS 4
-# crm cluster run "crm cluster start"
+# crm cluster start --all
 .RE
 .RS 2
 7. Set cluster ready for operations, on either node.
