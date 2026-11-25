@@ -356,7 +356,7 @@ of HANA and cluster above.
 .RS 2
 1. Check status of Linux cluster and HANA, see above.
 .br
-2. Set HANA multistate resource into maintenance mode.
+2. Set HANA multi-state resource into maintenance mode.
 .RE
 .RS 4
 # crm resource maintenance mst_... on
@@ -389,13 +389,13 @@ of HANA and cluster above.
 # crm maintenance off
 .RE
 .RS 2
-8. Let Linux cluster detect status of HANA multistate resource, on either node.
+8. Let Linux cluster detect status of HANA multi-state resource, on either node.
 .RE
 .RS 4
 # crm resource refresh mst_...
 .RE
 .RS 2
-9. Set HANA multistate resource ready for operations, on either node.
+9. Set HANA multi-state resource ready for operations, on either node.
 .RE
 .RS 4
 # crm maintenance mst_... off
