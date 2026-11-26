@@ -263,6 +263,10 @@ primitive rsc_stonith_sbd stonith:fence_sbd \\
 Let the Linux cluster manage one IP address and move that address along with the
 HANA primary master nameserver. If the HANA primary master nameserver is in
 transition, the IP address might be placed somewhere temporarily.
+The IP address never will go to the majority maker.
+Example IPaddr2 resource is rsc_ip_SLE_HDB00, IP address is 192.168.178.188,
+SAPHanaController multi-state resource is mst_SAPHanaCon_SLE_HDB00, majority
+maker node is vm-majority.
 .PP
 .RS 2
 primitive rsc_ip_SLE_HDB00 IPaddr2 \\
@@ -274,6 +278,8 @@ primitive rsc_ip_SLE_HDB00 IPaddr2 \\
 colocation col_ip_with_SLE_HDB00 \\
 .br
  2000: rsc_ip_SLE_HDB00:Started mst_SAPHanaCon_SLE_HDB00:Promoted
+.br
+location loc_ip_not_on_mm rsc_ip_SLE_HDB00 -inf: vm-majority
 .RE
 .PP
 \fB* alternative location constraint for IP address\fR
@@ -282,6 +288,9 @@ Alternative resource configuration for the HANA primary master virtual IP addres
 Same use case as example above. Instead of following the SAPHanaController resource
 PROMOTED role by colocation rule, the IPaddr2 resource follows the node score by
 location rule directly. Simplifies moving the IP address during maintenance.
+Example IPaddr2 resource is rsc_ip_SLE_HDB00, IP address is 192.168.178.188,
+SAPHanaController multi-state resource is mst_SAPHanaCon_SLE_HDB00, majority
+maker node is vm-majority.
 .PP
 .RS 2
 primitive rsc_ip_SLE_HDB00 IPaddr2 \\
@@ -295,6 +304,8 @@ location loc_ip_with_SLE_HDB00 \\
  rsc_ip_SLE_HDB00 \\
 .br
  rule 2000: master-rsc_SAPHanaCon_SLE_HDB00 eq 150
+.br
+location loc_ip_not_on_mm rsc_ip_SLE_HDB00 -inf: vm-majority
 .RE
 .PP
 \fB* crm pedantic IP address resource configuration\fR
